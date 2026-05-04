@@ -80,6 +80,7 @@ class FetchStatus(StrEnum):
     PENDING = "pending"
     FETCHED = "fetched"
     FAILED = "failed"
+    BLOCKED = "blocked"
 
 
 class SourceInput(WebResearchModel):

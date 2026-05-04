@@ -5,7 +5,9 @@ description = "A Python CLI and TUI web research runner built on agent workflows
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "httpx>=0.28.1",
     "pydantic>=2.12.5",
+    "trafilatura>=2.0.0",
 ]
 
 [project.scripts]
@@ -76,6 +78,31 @@ disallow_any_explicit = true
 
 [[tool.mypy.overrides]]
 module = "webresearch.types"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.providers.search_provider"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.search_web"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.fetch_url"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.extract_content"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.rank_sources"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
 
