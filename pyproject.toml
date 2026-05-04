@@ -115,6 +115,11 @@ module = "webresearch.agents.models"
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
+module = "webresearch.events.types"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
 module = [
     "webresearch.agents.gap",
     "webresearch.agents.output",
