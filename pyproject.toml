@@ -10,6 +10,7 @@ dependencies = [
     "openai-agents==0.6.1",
     "pydantic>=2.12.5",
     "trafilatura>=2.0.0",
+    "typer>=0.25.1",
 ]
 
 [project.scripts]
@@ -116,6 +117,11 @@ disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
 module = "webresearch.events.types"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.workflows.registry"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
 
