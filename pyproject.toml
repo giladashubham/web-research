@@ -9,6 +9,7 @@ dependencies = [
     "jsonschema>=4.26.0",
     "openai-agents==0.6.1",
     "pydantic>=2.12.5",
+    "python-dotenv>=1.2.2",
     "textual>=8.2.5",
     "trafilatura>=2.0.0",
     "typer>=0.25.1",

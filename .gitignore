@@ -20,6 +20,9 @@ coverage.xml
 
 # Project runtime
 .webresearch/
+.env
+.env.*
+!.env.example
 
 # Editor / OS
 .DS_Store
