@@ -9,6 +9,7 @@ dependencies = [
     "jsonschema>=4.26.0",
     "openai-agents==0.6.1",
     "pydantic>=2.12.5",
+    "textual>=8.2.5",
     "trafilatura>=2.0.0",
     "typer>=0.25.1",
 ]
@@ -62,6 +63,7 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["ANN", "PLR2004", "S101"]
+"webresearch/tui/**/*.py" = ["ASYNC240", "PLC0415", "PLR0912", "RUF012", "TC001", "TC002", "TC003"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -124,6 +126,11 @@ disallow_any_explicit = false
 module = "webresearch.workflows.registry"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tui.*"
+# Textual's dynamic App/Widget APIs are exercised by pilot tests.
+ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = [
