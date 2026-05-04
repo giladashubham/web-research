@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
+    "openai-agents==0.6.1",
     "pydantic>=2.12.5",
     "trafilatura>=2.0.0",
 ]
@@ -104,6 +105,22 @@ disallow_any_explicit = false
 [[tool.mypy.overrides]]
 module = "webresearch.tools.rank_sources"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.agents.models"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = [
+    "webresearch.agents.gap",
+    "webresearch.agents.output",
+    "webresearch.agents.planner",
+    "webresearch.agents.researchers",
+    "webresearch.agents.reviewer",
+]
+# The Agents SDK exposes Agent with Any-bearing generic defaults.
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]

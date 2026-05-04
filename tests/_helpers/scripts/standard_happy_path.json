@@ -1,0 +1,10 @@
+[
+  {
+    "expected_tools": [],
+    "final_output": {
+      "questions": ["What sources are needed?"],
+      "risks": ["Offline fixture"],
+      "search_strategy": "Use deterministic fixture searches."
+    }
+  }
+]

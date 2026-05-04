@@ -9,6 +9,13 @@ uv sync
 uv run pre-commit install
 ```
 
+## Runtime Environment
+
+Live OpenAI runs require `OPENAI_API_KEY`.
+
+The Agents SDK tracing dashboard is enabled by the SDK when tracing is configured for live runs;
+unit tests use mocks and do not require tracing credentials.
+
 ## Development
 
 ```sh
