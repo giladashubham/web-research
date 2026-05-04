@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from agents import Agent
+from agents.agent_output import AgentOutputSchema
 
 from webresearch.agents.models import FinalAnswer
 from webresearch.agents.prompts import load_prompt
@@ -11,5 +12,5 @@ def output_agent(output_schema: dict[str, object] | None = None) -> Agent:
     return Agent(
         name="Output",
         instructions=load_prompt("output.md"),
-        output_type=FinalAnswer,
+        output_type=AgentOutputSchema(FinalAnswer, strict_json_schema=False),
     )

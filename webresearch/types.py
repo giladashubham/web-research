@@ -176,6 +176,7 @@ WorkflowArtifact = Annotated[
 class WorkflowResult(WebResearchModel):
     answer_markdown: str
     structured_data: dict[str, object] | None = None
+    raw_structured_data: dict[str, object] | None = None
     structured_data_validation: StructuredDataValidation | None = None
     summary: str
     findings: list[ResearchFinding] = Field(default_factory=list)

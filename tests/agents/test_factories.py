@@ -50,7 +50,10 @@ def test_agent_factories_return_expected_agent(
 
     assert agent.name == name
     assert agent.instructions == load_prompt(prompt)
-    assert agent.output_type is output_type
+    if hasattr(agent.output_type, "output_type"):
+        assert agent.output_type.output_type is output_type
+    else:
+        assert agent.output_type is output_type
     assert len(agent.tools) == tool_count
 
 
