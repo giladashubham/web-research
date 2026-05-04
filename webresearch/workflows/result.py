@@ -19,7 +19,11 @@ if TYPE_CHECKING:
     from webresearch.workflows.state import WorkflowState
 
 
-def build_result(state: WorkflowState, ctx: WorkflowContext) -> WorkflowResult:
+def build_result(
+    state: WorkflowState,
+    ctx: WorkflowContext,
+    workflow_id: str = "standard",
+) -> WorkflowResult:
     if state.final is None:
         msg = "Cannot build WorkflowResult before final output is set"
         raise ValueError(msg)
@@ -46,7 +50,7 @@ def build_result(state: WorkflowState, ctx: WorkflowContext) -> WorkflowResult:
         warnings=warnings,
         metadata=WorkflowMetadata(
             run_id=state.run_id,
-            workflow_id="standard",
+            workflow_id=workflow_id,
             started_at=state.started_at,
             finished_at=datetime.now(UTC),
         ),

@@ -6,9 +6,9 @@ from webresearch.agents.models import ReviewOutput
 from webresearch.agents.prompts import load_prompt
 
 
-def reviewer_agent() -> Agent:
+def reviewer_agent(depth: str = "standard") -> Agent:
     return Agent(
         name="Reviewer",
-        instructions=load_prompt("reviewer.md"),
+        instructions=load_prompt("reviewer.md", depth),
         output_type=ReviewOutput,
     )
