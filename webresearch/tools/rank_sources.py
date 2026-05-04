@@ -6,10 +6,10 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 from webresearch.tools.heuristics.domain_reliability import domain_reliability_score
-from webresearch.types import EvidenceArtifact, SourceRecord
 
 if TYPE_CHECKING:
     from webresearch.context import WorkflowContext
+    from webresearch.types import SourceRecord
 
 RECENCY_WEIGHT = 0.2
 EVIDENCE_BONUS = 0.1
@@ -77,7 +77,4 @@ def _recency_score(source: SourceRecord) -> float:
 
 
 def _has_evidence_artifact(ctx: WorkflowContext, source_id: str) -> bool:
-    return any(
-        isinstance(artifact, EvidenceArtifact) and source_id in artifact.evidence_ids
-        for artifact in ctx.artifacts
-    )
+    return any(evidence.source_id == source_id for evidence in ctx.evidence)

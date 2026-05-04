@@ -7,7 +7,7 @@ import trafilatura
 from pydantic import BaseModel, ConfigDict
 
 from webresearch.sources.url_normalize import normalize_url
-from webresearch.types import EvidenceArtifact
+from webresearch.types import EvidenceArtifact, EvidenceNote
 
 if TYPE_CHECKING:
     from webresearch.context import WorkflowContext
@@ -54,14 +54,23 @@ async def extract_content(
         text = text[:MAX_EXTRACTED_CHARS]
 
     source = ctx.sources.get_by_url(normalized_url)
+    evidence_id = f"ev_{len(ctx.evidence) + 1}"
+    source_id = source.id if source is not None else ""
+    ctx.evidence.append(
+        EvidenceNote(
+            id=evidence_id,
+            source_id=source_id,
+            note=text,
+            relevance=query,
+        )
+    )
     artifact_id = f"artifact_{len(ctx.artifacts) + 1}"
-    source_ids = [source.id] if source is not None else []
     ctx.artifacts.append(
         EvidenceArtifact(
             id=artifact_id,
             title=f"Extracted evidence for {normalized_url}",
             created_at=datetime.now(UTC),
-            evidence_ids=source_ids,
+            evidence_ids=[evidence_id],
         )
     )
 
@@ -71,6 +80,6 @@ async def extract_content(
         text=text,
         char_count=len(text),
         truncated=truncated,
-        source_id=source.id if source is not None else None,
+        source_id=source_id if source is not None else None,
         artifact_id=artifact_id,
     )

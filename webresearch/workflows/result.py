@@ -45,7 +45,7 @@ def build_result(
             for index, finding in enumerate(state.final.findings, 1)
         ],
         sources=list(ctx.sources.list()),
-        evidence=[],
+        evidence=list(ctx.evidence),
         artifacts=[*state.artifacts, *ctx.artifacts],
         warnings=warnings,
         metadata=WorkflowMetadata(

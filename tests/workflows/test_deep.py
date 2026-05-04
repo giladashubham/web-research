@@ -188,5 +188,6 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
 def test_deep_prompt_uses_same_prompt_with_depth_extras() -> None:
     prompt = load_prompt("official.md", "deep")
 
-    assert "Official researcher placeholder prompt." in prompt
+    assert "official-source researcher" in prompt
+    assert "ResearcherOutput" in prompt
     assert "Be thorough" in prompt

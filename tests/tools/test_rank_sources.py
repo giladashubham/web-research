@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 from webresearch.context import WorkflowContext
 from webresearch.tools.rank_sources import rank_sources
-from webresearch.types import EvidenceArtifact, SourceInput
+from webresearch.types import EvidenceNote, SourceInput
 
 
 async def test_gov_and_edu_sources_outrank_blogs_by_default() -> None:
@@ -60,16 +60,15 @@ async def test_empty_source_list_returns_empty_result() -> None:
     assert result.sources == []
 
 
-async def test_evidence_artifact_boosts_source_score() -> None:
+async def test_evidence_note_boosts_source_score() -> None:
     ctx = WorkflowContext()
     without_evidence = ctx.sources.add(SourceInput(url="https://example.com/a"))
     with_evidence = ctx.sources.add(SourceInput(url="https://example.com/b"))
-    ctx.artifacts.append(
-        EvidenceArtifact(
-            id="artifact_1",
-            title="Evidence",
-            created_at=datetime(2026, 1, 1, tzinfo=UTC),
-            evidence_ids=[with_evidence.id],
+    ctx.evidence.append(
+        EvidenceNote(
+            id="ev_1",
+            source_id=with_evidence.id,
+            note="Evidence",
         )
     )
 

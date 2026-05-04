@@ -6,7 +6,7 @@ import pytest
 
 from webresearch.agents.models import FinalAnswer, ResearcherOutput, ResearchFindingRef
 from webresearch.context import WorkflowContext
-from webresearch.types import SourceInput, WorkflowInput
+from webresearch.types import EvidenceNote, SourceInput, WorkflowInput
 from webresearch.workflows.result import build_result
 from webresearch.workflows.state import WorkflowState
 
@@ -44,6 +44,7 @@ def _state(input_: WorkflowInput) -> WorkflowState:
 def test_build_result_populates_every_workflow_result_field() -> None:
     ctx = WorkflowContext()
     ctx.sources.add(SourceInput(url="https://example.com/report", title="Report"))
+    ctx.evidence.append(EvidenceNote(id="ev_1", source_id="src_1", note="Evidence"))
     ctx.warnings.append("context warning")
     state = _state(WorkflowInput(query="Query"))
     state.add_warning("state warning")
@@ -54,7 +55,7 @@ def test_build_result_populates_every_workflow_result_field() -> None:
     assert result.summary == "Research summary"
     assert result.findings[0].claim == "Claim"
     assert result.sources[0].id == "src_1"
-    assert result.evidence == []
+    assert result.evidence[0].id == "ev_1"
     assert result.artifacts == []
     assert result.warnings == ["state warning", "context warning"]
     assert result.metadata.run_id == "run_1"

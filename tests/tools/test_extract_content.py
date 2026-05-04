@@ -23,6 +23,9 @@ async def test_extracts_main_content_from_article_fixture() -> None:
     assert result.source_id == source.id
     assert "central article text" in result.text
     assert result.artifact_id == "artifact_1"
+    assert ctx.evidence[0].id == "ev_1"
+    assert ctx.evidence[0].source_id == source.id
+    assert "central article text" in ctx.evidence[0].note
     assert len(ctx.artifacts) == 1
 
 
@@ -45,6 +48,7 @@ async def test_no_body_returns_failure_and_no_artifact() -> None:
 
     assert result.status == "failed"
     assert result.reason == "No fetched page body found"
+    assert ctx.evidence == []
     assert ctx.artifacts == []
 
 
