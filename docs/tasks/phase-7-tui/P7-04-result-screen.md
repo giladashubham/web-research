@@ -11,7 +11,7 @@ Tabbed result view with answer (live deltas), sources, findings, evidence; plus 
   - Tabs: Answer | Findings | Sources | Evidence | Warnings.
   - Tab 1 — `Markdown` widget rendering `result.answer_markdown`. If the screen was constructed from a still-streaming run, render `OutputTextDelta` events live; on completion, replace with the canonical answer.
   - Tab 2 — Findings: list of claims with confidence; Enter shows linked evidence in an overlay.
-  - Tab 3 — Sources: `DataTable` with id, publisher, title, URL, fetch status. Enter on a row opens an overlay with the cached extract.
+  - Tab 3 — Sources: `DataTable` with id, publisher, title, URL, fetch status. Enter on a row opens an overlay with the extracted content.
   - Tab 4 — Evidence: list grouped by source; summary + relevance.
   - Tab 5 — Warnings.
   - `e` opens the Export overlay (format selector + path); reuses the formatters from P6-03.

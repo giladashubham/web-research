@@ -18,7 +18,6 @@ One file per task. Each task is a single focused PR.
 - [P1-02](phase-1-skeleton/P1-02-core-types.md) — Core Pydantic types
 - [P1-03](phase-1-skeleton/P1-03-url-normalize.md) — URL normalization
 - [P1-04](phase-1-skeleton/P1-04-source-registry.md) — Source registry
-- [P1-05](phase-1-skeleton/P1-05-file-cache.md) — File cache + Null cache
 
 ### Phase 2 — Tools
 - [P2-01](phase-2-tools/P2-01-search-provider-mock.md) — `SearchProvider` protocol + `MockSearchProvider`
@@ -69,7 +68,6 @@ P1-01 -> all
 P1-02 -> P1-04, P2-*, P3-02, P4-*
 P1-03 -> P1-04, P2-04
 P1-04 -> P2-03, P2-04
-P1-05 -> P2-03, P2-04, P2-05
 
 P2-01 -> P2-02, P2-03
 P2-03..P2-06 -> P3-03

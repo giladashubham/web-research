@@ -17,7 +17,6 @@ Two small but necessary screens.
 - Read-only listing:
   - Resolved model (from env var or default).
   - Provider env vars: `OPENAI_API_KEY` ✓/✗, `TAVILY_API_KEY` ✓/✗.
-  - Cache directory + current size.
   - Workflow registry counts.
 - No editing — env vars are set in the user's shell.
 

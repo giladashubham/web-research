@@ -7,7 +7,7 @@
 `webresearch run` subcommand with live progress on stderr.
 
 ## Scope
-- Usage: `webresearch run [WORKFLOW] QUERY [--depth ...] [--instructions ...] [--max-sources ...] [--out PATH] [--format json|md] [--no-cache] [--quiet]`.
+- Usage: `webresearch run [WORKFLOW] QUERY [--depth ...] [--instructions ...] [--max-sources ...] [--out PATH] [--format json|md] [--quiet]`.
 - Default workflow id: `standard`.
 - Resolve workflow function from `workflows.registry`; unknown id → exit 1 with a clear error.
 - Build `WorkflowInput` from flags.

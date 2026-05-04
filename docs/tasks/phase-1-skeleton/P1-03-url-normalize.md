@@ -4,7 +4,7 @@
 **Depends on:** P1-01
 
 ## Goal
-One function that turns a raw URL into a canonical form for dedup and cache keys.
+One function that turns a raw URL into a canonical form for source dedup.
 
 ## Scope
 - `normalize_url(raw: str) -> str`.

@@ -10,7 +10,7 @@ The CLI entrypoint and `webresearch list`.
 - Add `typer` to deps.
 - `webresearch/cli/__init__.py` exports `app = typer.Typer()`.
 - `pyproject.toml` adds the entrypoint: `webresearch = "webresearch.cli:app"`.
-- Global flags (parent app): `--workflows-dir` (currently a no-op since workflows are Python-defined; kept for symmetry and future user workflows), `--no-cache`.
+- Global flags (parent app): `--workflows-dir` (currently a no-op since workflows are Python-defined; kept for symmetry and future user workflows).
 - `webresearch list`:
   - Prints a table: `id`, `name`, `description`.
   - Reads from `webresearch.workflows.registry`.

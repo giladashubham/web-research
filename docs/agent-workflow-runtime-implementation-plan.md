@@ -29,7 +29,7 @@ The bar is set in P1-01 and enforced in CI from day one. Don't relax it later.
 - `mypy --strict` over `webresearch/`. No `Any` except at I/O boundaries (HTTP responses, raw env).
 - Every public function is fully typed. Use `from __future__ import annotations` everywhere.
 - Pydantic v2 models for any data that crosses a module boundary. No dicts-as-records.
-- `Protocol` over inheritance for capabilities (`SearchProvider`, `WorkflowCache`).
+- `Protocol` over inheritance for capabilities (e.g. `SearchProvider`).
 
 **Lint & format**
 - `ruff` with `E,F,W,I,B,UP,SIM,PL,RUF,ASYNC,TCH,ANN,RET,PTH,ARG,ERA` enabled. `ruff format` is the formatter.
@@ -223,13 +223,15 @@ async def search_web(
     return SearchResults(items=results)
 ```
 
-Shared state (source registry, cache, search provider) lives on `WorkflowContext`, passed to each `Runner.run` via the `context=` argument.
+Shared state (source registry, search provider) lives on `WorkflowContext`, passed to each `Runner.run` via the `context=` argument.
 
 V1 tools:
 - `search_web` — Tavily, with Mock for tests.
-- `fetch_url` — httpx + cache + source-registry update.
-- `extract_content` — trafilatura + cache + emits Evidence.
+- `fetch_url` — httpx + source-registry update.
+- `extract_content` — trafilatura + emits Evidence.
 - `rank_sources` — heuristic scoring.
+
+> Caching is deliberately omitted from V1 — every fetch/extract/search hits the network. A file-backed cache will be reintroduced once the end-to-end pipeline is shaken out.
 
 ## Structured Outputs
 
@@ -279,11 +281,10 @@ type WorkflowEvent =
 
 `stream_workflow(workflow_fn, input)` is an `AsyncIterator[WorkflowEvent]`. The CLI and TUI consume it.
 
-## Source Registry, Cache, Artifacts
+## Source Registry & Artifacts
 
 Still ours, but lighter in Python:
 - `SourceRegistry` — URL normalize + dedup + stable IDs.
-- `WorkflowCache` — file-backed, namespaced (`searches/`, `fetches/`, `extractions/`). `NullCache` for `--no-cache`.
 - Artifacts — Pydantic models accumulated on `WorkflowContext`.
 
 ## Config & Auth
@@ -305,8 +306,7 @@ webresearch run [WORKFLOW] QUERY \
   --depth quick|standard|deep \
   --instructions "..." \
   --out result.json \
-  --format json|md \
-  --no-cache
+  --format json|md
 ```
 
 - Default workflow: `standard`.
@@ -343,10 +343,6 @@ webresearch-agent/
     sources/
       registry.py
       url_normalize.py
-
-    cache/
-      file_cache.py
-      null_cache.py
 
     tools/
       search_web.py
@@ -408,7 +404,6 @@ webresearch-agent/
 
   tests/
     sources/
-    cache/
     tools/
     agents/
     workflows/
@@ -424,7 +419,6 @@ webresearch-agent/
 - Project init (uv, ruff, mypy, pytest, pytest-asyncio).
 - Core Pydantic types (`WorkflowInput`, `WorkflowResult`, `Depth`, artifact models).
 - `SourceRegistry` + URL normalization.
-- `FileCache` + `NullCache`.
 
 ### Phase 2 — Tools
 - `SearchProvider` protocol + `MockSearchProvider`.

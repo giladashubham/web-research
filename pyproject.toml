@@ -1,0 +1,92 @@
+[project]
+name = "webresearch"
+version = "0.1.0"
+description = "A Python CLI and TUI web research runner built on agent workflows."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.12.5",
+]
+
+[project.scripts]
+webresearch = "webresearch.cli:app"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "pre-commit>=4.3.0",
+    "pytest>=9.0.1",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "respx>=0.22.0",
+    "ruff>=0.14.8",
+]
+
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["webresearch"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "ANN",
+    "ARG",
+    "ASYNC",
+    "B",
+    "E",
+    "ERA",
+    "F",
+    "I",
+    "PL",
+    "PTH",
+    "RET",
+    "RUF",
+    "S",
+    "SIM",
+    "TCH",
+    "UP",
+    "W",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ANN", "PLR2004", "S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = "webresearch.*"
+disallow_any_explicit = true
+
+[[tool.mypy.overrides]]
+module = "webresearch.types"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_any_explicit = false
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+markers = [
+    "live: marks tests that use real network services",
+]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"

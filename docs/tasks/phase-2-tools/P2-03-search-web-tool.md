@@ -1,7 +1,7 @@
 # P2-03 — `search_web` tool
 
 **Phase:** 2 — Tools
-**Depends on:** P2-01, P2-02, P1-04, P1-05, P3-01 (deferred)
+**Depends on:** P2-01, P2-02, P1-04, P3-01 (deferred)
 
 ## Goal
 The `function_tool` agents call to search the web.
@@ -15,7 +15,7 @@ The `function_tool` agents call to search the web.
 - Tool docstring is the description the SDK exposes to the model.
 
 ## Out of scope
-- The `WorkflowContext` itself — defined alongside this task as a small dataclass holding registry, cache, provider.
+- The `WorkflowContext` itself — defined alongside this task as a small dataclass holding registry and provider.
 
 ## Files
 - `webresearch/context.py` (`WorkflowContext` dataclass)

@@ -8,7 +8,7 @@ Implement the standard pipeline as one async function, using the patterns from t
 
 ## Scope
 - `async def run_standard(input: WorkflowInput) -> WorkflowResult`.
-- Build a `WorkflowContext` (registry, cache, search provider, artifacts list).
+- Build a `WorkflowContext` (registry, search provider, artifacts list, in-memory `pages` dict).
 - Sequence:
   1. Planner — `await Runner.run(planner_agent(), input.query, context=ctx)`.
   2. Research — `asyncio.gather(...)` over Official / Recent / Broad researchers.
