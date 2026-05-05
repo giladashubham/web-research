@@ -6,7 +6,7 @@ from agents.agent_output import AgentOutputSchema
 from tests._helpers.mock_model import MockModel
 from webresearch.agents.models import FinalAnswer, PlanOutput, ResearcherOutput
 from webresearch.types import WorkflowInput
-from webresearch.workflows import quick
+from webresearch.workflows.quick import workflow as quick
 from webresearch.workflows.registry import WORKFLOWS
 
 

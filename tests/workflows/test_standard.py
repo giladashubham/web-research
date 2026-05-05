@@ -16,8 +16,8 @@ from webresearch.agents.models import (
 )
 from webresearch.agents.tools import RESEARCH_TOOLS
 from webresearch.types import Depth, WorkflowInput
-from webresearch.workflows import standard
 from webresearch.workflows.registry import WORKFLOWS
+from webresearch.workflows.standard import workflow as standard
 
 
 def _agent(name: str, output_type: type[object], script: list[dict[str, object]]) -> Agent:

@@ -26,6 +26,7 @@ from webresearch.events.step import (
 )
 from webresearch.workflows.shared.result import build_result
 from webresearch.workflows.shared.state import WorkflowState
+from webresearch.workflows.standard.config import CONFIG
 
 if TYPE_CHECKING:
     from webresearch.agents.models import (
@@ -69,7 +70,11 @@ async def run_standard(input: WorkflowInput) -> WorkflowResult:
         state.review = cast("ReviewOutput", review.final_output)
 
     round_index = 0
-    while state.review.has_critical_gaps and round_index < state.depth.max_rounds:
+    while (
+        CONFIG.gap_loop_enabled
+        and state.review.has_critical_gaps
+        and round_index < state.depth.max_rounds
+    ):
         round_index += 1
         await emit_loop_iteration("gap", round_index)
         async with step("gap"):
@@ -91,4 +96,4 @@ async def run_standard(input: WorkflowInput) -> WorkflowResult:
         state.final = cast("FinalAnswer", final.final_output)
         await emit_output_text_delta(state.final.answer_markdown)
 
-    return build_result(state, ctx)
+    return build_result(state, ctx, workflow_id=CONFIG.workflow_id)

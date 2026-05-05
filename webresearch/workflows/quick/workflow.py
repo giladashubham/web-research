@@ -13,6 +13,7 @@ from webresearch.agents.researchers import broad_researcher_agent, official_rese
 from webresearch.context import WorkflowContext
 from webresearch.events.step import current_run_id, emit_output_text_delta, step
 from webresearch.types import Depth
+from webresearch.workflows.quick.config import CONFIG
 from webresearch.workflows.shared.result import build_result
 from webresearch.workflows.shared.state import WorkflowState
 
@@ -26,7 +27,7 @@ async def run_quick(input: WorkflowInput) -> WorkflowResult:
     run_id = current_run_id()
     state = WorkflowState(
         input=input,
-        depth=Depth.for_preset("quick"),
+        depth=Depth.for_preset(CONFIG.depth_preset),
         run_id=run_id if run_id != "run_uninstrumented" else f"run_{uuid4().hex}",
         started_at=datetime.now(UTC),
     )
@@ -54,4 +55,4 @@ async def run_quick(input: WorkflowInput) -> WorkflowResult:
         state.final = cast("FinalAnswer", final.final_output)
         await emit_output_text_delta(state.final.answer_markdown)
 
-    return build_result(state, ctx, workflow_id="quick")
+    return build_result(state, ctx, workflow_id=CONFIG.workflow_id)

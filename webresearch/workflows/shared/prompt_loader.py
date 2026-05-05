@@ -14,7 +14,12 @@ def load_prompt(name: str, depth: str = "standard") -> str:
 
 @cache
 def load_depth_extras(depth: str) -> str:
-    path = files("webresearch").joinpath("prompts", "depth_extras", f"{depth}.md")
+    if depth == "standard":
+        path = files("webresearch.workflows.standard").joinpath("prompts", "depth_extras.md")
+    elif depth == "quick":
+        path = files("webresearch.workflows.quick").joinpath("prompts", "depth_extras.md")
+    else:
+        path = files("webresearch").joinpath("prompts", "depth_extras", f"{depth}.md")
     if not path.is_file():
         raise FileNotFoundError(f"Depth prompt extras file not found: {path}")
     return path.read_text(encoding="utf-8").strip()
