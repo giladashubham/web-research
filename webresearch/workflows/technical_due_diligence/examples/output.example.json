@@ -1,0 +1,101 @@
+{
+  "target": {
+    "company_name": "Example Robotics",
+    "product_name": "Example Autonomy Cloud",
+    "product_url": "https://example.com/",
+    "known_urls": [
+      "https://example.com/docs",
+      "https://example.com/changelog"
+    ],
+    "known_competitors": [
+      "Competitor One",
+      "Competitor Two"
+    ],
+    "evaluation_prompt": "Assess whether the company has defensible autonomy software or mostly wraps commodity models."
+  },
+  "executive_judgment": {
+    "technical_substance": "mixed",
+    "confidence": "medium",
+    "summary": "Public evidence suggests a real product surface, but defensibility needs code review.",
+    "key_risks": [
+      "Limited public architecture detail",
+      "Several claims depend on demos rather than technical documentation"
+    ],
+    "key_strengths": [
+      "Public docs describe multiple integration surfaces",
+      "Changelog suggests active product iteration"
+    ]
+  },
+  "claims": [
+    {
+      "claim": "The product provides autonomous workflow planning.",
+      "claim_source_urls": [
+        "https://example.com/"
+      ],
+      "public_evidence": "Docs and changelog mention planning APIs, but do not reveal implementation depth.",
+      "evidence_source_urls": [
+        "https://example.com/docs"
+      ],
+      "assessment": "partially_supported",
+      "confidence": "medium",
+      "code_review_follow_up_ids": [
+        "cr-1"
+      ]
+    }
+  ],
+  "technical_substance": {
+    "product_depth": "moderate",
+    "proprietary_architecture": "unclear",
+    "wrapper_risk": "medium",
+    "evidence": [
+      "Public API docs expose multiple workflow primitives",
+      "No public details confirm proprietary model or orchestration internals"
+    ],
+    "reasoning": "The public product surface appears broader than a demo, but the core architecture is not externally verifiable."
+  },
+  "competitors": [
+    {
+      "competitor_name": "Competitor One",
+      "competitor_url": "https://competitor.example/",
+      "similar_capabilities": [
+        "Workflow planning",
+        "API integrations"
+      ],
+      "differentiation_notes": "The public capability set overlaps materially; differentiation depends on implementation quality.",
+      "source_urls": [
+        "https://competitor.example/"
+      ]
+    }
+  ],
+  "replicability": {
+    "estimated_replication_time": "3_to_6_months",
+    "competitor_replication_risk": "medium",
+    "drivers": [
+      "Most visible capabilities are common SaaS and LLM orchestration patterns"
+    ],
+    "constraints": [
+      "Production reliability and domain integrations may take longer than the demo surface"
+    ]
+  },
+  "code_review_follow_ups": [
+    {
+      "id": "cr-1",
+      "area": "Planning engine",
+      "question": "Is planning driven by proprietary algorithms, prompt chains, or a third-party model wrapper?",
+      "expected_evidence": [
+        "Architecture diagrams",
+        "Planner implementation",
+        "Evaluation harnesses"
+      ],
+      "priority": "high"
+    }
+  ],
+  "evidence_gaps": [
+    "No public benchmarks were found in this skeleton example"
+  ],
+  "source_urls": [
+    "https://example.com/",
+    "https://example.com/docs",
+    "https://example.com/changelog"
+  ]
+}

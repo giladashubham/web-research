@@ -1,0 +1,447 @@
+{
+  "$defs": {
+    "ClaimAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "claim_source_urls": {
+          "items": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Claim Source Urls",
+          "type": "array"
+        },
+        "public_evidence": {
+          "minLength": 1,
+          "title": "Public Evidence",
+          "type": "string"
+        },
+        "evidence_source_urls": {
+          "items": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Evidence Source Urls",
+          "type": "array"
+        },
+        "assessment": {
+          "enum": [
+            "supported",
+            "partially_supported",
+            "unsupported",
+            "unclear"
+          ],
+          "title": "Assessment",
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "code_review_follow_up_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Code Review Follow Up Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim",
+        "public_evidence",
+        "assessment",
+        "confidence"
+      ],
+      "title": "ClaimAssessment",
+      "type": "object"
+    },
+    "CodeReviewFollowUp": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "area": {
+          "minLength": 1,
+          "title": "Area",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "expected_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Expected Evidence",
+          "type": "array"
+        },
+        "priority": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Priority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "area",
+        "question",
+        "priority"
+      ],
+      "title": "CodeReviewFollowUp",
+      "type": "object"
+    },
+    "CompetitorAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "competitor_name": {
+          "minLength": 1,
+          "title": "Competitor Name",
+          "type": "string"
+        },
+        "competitor_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Competitor Url"
+        },
+        "similar_capabilities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Similar Capabilities",
+          "type": "array"
+        },
+        "differentiation_notes": {
+          "minLength": 1,
+          "title": "Differentiation Notes",
+          "type": "string"
+        },
+        "source_urls": {
+          "items": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Source Urls",
+          "type": "array"
+        }
+      },
+      "required": [
+        "competitor_name",
+        "differentiation_notes"
+      ],
+      "title": "CompetitorAssessment",
+      "type": "object"
+    },
+    "DiligenceTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "company_name": {
+          "minLength": 1,
+          "title": "Company Name",
+          "type": "string"
+        },
+        "product_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Name"
+        },
+        "product_url": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "maxLength": 2083,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Url"
+        },
+        "known_urls": {
+          "items": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Known Urls",
+          "type": "array"
+        },
+        "known_competitors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Competitors",
+          "type": "array"
+        },
+        "evaluation_prompt": {
+          "minLength": 1,
+          "title": "Evaluation Prompt",
+          "type": "string"
+        }
+      },
+      "required": [
+        "company_name",
+        "evaluation_prompt"
+      ],
+      "title": "DiligenceTarget",
+      "type": "object"
+    },
+    "ExecutiveJudgment": {
+      "additionalProperties": false,
+      "properties": {
+        "technical_substance": {
+          "enum": [
+            "real_asset",
+            "mixed",
+            "thin",
+            "unclear"
+          ],
+          "title": "Technical Substance",
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "key_risks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Risks",
+          "type": "array"
+        },
+        "key_strengths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Strengths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "technical_substance",
+        "confidence",
+        "summary"
+      ],
+      "title": "ExecutiveJudgment",
+      "type": "object"
+    },
+    "ReplicabilityAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "estimated_replication_time": {
+          "enum": [
+            "under_3_months",
+            "3_to_6_months",
+            "6_to_12_months",
+            "over_12_months",
+            "unclear"
+          ],
+          "title": "Estimated Replication Time",
+          "type": "string"
+        },
+        "competitor_replication_risk": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "unclear"
+          ],
+          "title": "Competitor Replication Risk",
+          "type": "string"
+        },
+        "drivers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Drivers",
+          "type": "array"
+        },
+        "constraints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "estimated_replication_time",
+        "competitor_replication_risk"
+      ],
+      "title": "ReplicabilityAssessment",
+      "type": "object"
+    },
+    "TechnicalSubstanceAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "product_depth": {
+          "enum": [
+            "deep",
+            "moderate",
+            "thin",
+            "unclear"
+          ],
+          "title": "Product Depth",
+          "type": "string"
+        },
+        "proprietary_architecture": {
+          "enum": [
+            "clear",
+            "partial",
+            "commodity",
+            "unclear"
+          ],
+          "title": "Proprietary Architecture",
+          "type": "string"
+        },
+        "wrapper_risk": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "unclear"
+          ],
+          "title": "Wrapper Risk",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "reasoning": {
+          "minLength": 1,
+          "title": "Reasoning",
+          "type": "string"
+        }
+      },
+      "required": [
+        "product_depth",
+        "proprietary_architecture",
+        "wrapper_risk",
+        "reasoning"
+      ],
+      "title": "TechnicalSubstanceAssessment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "target": {
+      "$ref": "#/$defs/DiligenceTarget"
+    },
+    "executive_judgment": {
+      "$ref": "#/$defs/ExecutiveJudgment"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/ClaimAssessment"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "technical_substance": {
+      "$ref": "#/$defs/TechnicalSubstanceAssessment"
+    },
+    "competitors": {
+      "items": {
+        "$ref": "#/$defs/CompetitorAssessment"
+      },
+      "title": "Competitors",
+      "type": "array"
+    },
+    "replicability": {
+      "$ref": "#/$defs/ReplicabilityAssessment"
+    },
+    "code_review_follow_ups": {
+      "items": {
+        "$ref": "#/$defs/CodeReviewFollowUp"
+      },
+      "title": "Code Review Follow Ups",
+      "type": "array"
+    },
+    "evidence_gaps": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Gaps",
+      "type": "array"
+    },
+    "source_urls": {
+      "items": {
+        "format": "uri",
+        "maxLength": 2083,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Source Urls",
+      "type": "array"
+    }
+  },
+  "required": [
+    "target",
+    "executive_judgment",
+    "technical_substance",
+    "replicability"
+  ],
+  "title": "TechnicalDueDiligenceReport",
+  "type": "object"
+}

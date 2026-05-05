@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from time import perf_counter
 
-from agents import Agent
+from agents import Agent, Runner
 from agents.agent_output import AgentOutputSchema
 
 from tests._helpers.mock_model import MockModel
@@ -17,7 +17,9 @@ from webresearch.agents.models import (
 from webresearch.agents.tools import RESEARCH_TOOLS
 from webresearch.types import Depth, WorkflowInput
 from webresearch.workflows.registry import WORKFLOWS
-from webresearch.workflows.standard import workflow as standard
+from webresearch.workflows.standard import run_standard
+
+STANDARD_WORKFLOW_MODULE = "webresearch.workflows.standard.workflow"
 
 
 def _agent(name: str, output_type: type[object], script: list[dict[str, object]]) -> Agent:
@@ -66,8 +68,7 @@ def _patch_common_agents(
     gap_script: list[dict[str, object]] | None = None,
 ) -> None:
     monkeypatch.setattr(
-        standard,
-        "planner_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.planner_agent",
         lambda: _agent(
             "planner",
             PlanOutput,
@@ -83,8 +84,7 @@ def _patch_common_agents(
         ),
     )
     monkeypatch.setattr(
-        standard,
-        "official_researcher_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.official_researcher_agent",
         lambda: Agent(
             name="official",
             tools=list(RESEARCH_TOOLS),
@@ -93,8 +93,7 @@ def _patch_common_agents(
         ),
     )
     monkeypatch.setattr(
-        standard,
-        "recent_researcher_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.recent_researcher_agent",
         lambda: Agent(
             name="recent",
             tools=list(RESEARCH_TOOLS),
@@ -103,8 +102,7 @@ def _patch_common_agents(
         ),
     )
     monkeypatch.setattr(
-        standard,
-        "broad_researcher_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.broad_researcher_agent",
         lambda: Agent(
             name="broad",
             tools=list(RESEARCH_TOOLS),
@@ -129,10 +127,9 @@ def _patch_common_agents(
     def reviewer_factory() -> Agent:
         return _agent("reviewer", ReviewOutput, scripts.pop(0))
 
-    monkeypatch.setattr(standard, "reviewer_agent", reviewer_factory)
+    monkeypatch.setattr(f"{STANDARD_WORKFLOW_MODULE}.reviewer_agent", reviewer_factory)
     monkeypatch.setattr(
-        standard,
-        "gap_researcher_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.gap_researcher_agent",
         lambda: _agent(
             "gap",
             GapResearchOutput,
@@ -150,8 +147,7 @@ def _patch_common_agents(
         ),
     )
     monkeypatch.setattr(
-        standard,
-        "output_agent",
+        f"{STANDARD_WORKFLOW_MODULE}.output_agent",
         lambda _schema=None: _agent(
             "output",
             FinalAnswer,
@@ -179,12 +175,12 @@ def _patch_common_agents(
 async def test_standard_workflow_runs_with_mock_model_and_returns_result(monkeypatch) -> None:
     _patch_common_agents(monkeypatch)
 
-    result = await standard.run_standard(WorkflowInput(query="query"))
+    result = await run_standard(WorkflowInput(query="query"))
 
     assert result.answer_markdown == "Final answer"
     assert result.findings[0].claim == "Claim"
     assert result.metadata.workflow_id == "standard"
-    assert WORKFLOWS["standard"] is standard.run_standard
+    assert WORKFLOWS["standard"] is run_standard
 
 
 async def test_loop_skips_when_reviewer_has_no_critical_gaps(monkeypatch) -> None:
@@ -196,9 +192,9 @@ async def test_loop_skips_when_reviewer_has_no_critical_gaps(monkeypatch) -> Non
         gap_called = True
         return _agent("gap", GapResearchOutput, [])
 
-    monkeypatch.setattr(standard, "gap_researcher_agent", gap_factory)
+    monkeypatch.setattr(f"{STANDARD_WORKFLOW_MODULE}.gap_researcher_agent", gap_factory)
 
-    await standard.run_standard(WorkflowInput(query="query"))
+    await run_standard(WorkflowInput(query="query"))
 
     assert gap_called is False
 
@@ -230,9 +226,7 @@ async def test_loop_fires_when_reviewer_reports_gaps(monkeypatch) -> None:
         ],
     )
 
-    result = await standard.run_standard(
-        WorkflowInput(query="query", depth=Depth.for_preset("standard"))
-    )
+    result = await run_standard(WorkflowInput(query="query", depth=Depth.for_preset("standard")))
 
     assert "gap" in result.summary
 
@@ -258,11 +252,11 @@ async def test_researchers_run_concurrently(monkeypatch) -> None:
             )()
         return await original_run(agent, input, context=context)
 
-    original_run = standard.Runner.run
-    monkeypatch.setattr(standard.Runner, "run", slow_run)
+    original_run = Runner.run
+    monkeypatch.setattr(f"{STANDARD_WORKFLOW_MODULE}.Runner.run", slow_run)
 
     started = perf_counter()
-    await standard.run_standard(WorkflowInput(query="query"))
+    await run_standard(WorkflowInput(query="query"))
     elapsed = perf_counter() - started
 
     assert elapsed < 0.12
@@ -271,6 +265,6 @@ async def test_researchers_run_concurrently(monkeypatch) -> None:
 async def test_sources_collected_from_research_are_deduplicated(monkeypatch) -> None:
     _patch_common_agents(monkeypatch)
 
-    result = await standard.run_standard(WorkflowInput(query="query"))
+    result = await run_standard(WorkflowInput(query="query"))
 
     assert len(result.sources) == 2

@@ -1,0 +1,14 @@
+{
+  "company_name": "Example Robotics",
+  "product_name": "Example Autonomy Cloud",
+  "product_url": "https://example.com",
+  "known_urls": [
+    "https://example.com/docs",
+    "https://example.com/changelog"
+  ],
+  "known_competitors": [
+    "Competitor One",
+    "Competitor Two"
+  ],
+  "evaluation_prompt": "Assess whether the company has defensible autonomy software or mostly wraps commodity models."
+}

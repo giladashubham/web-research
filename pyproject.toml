@@ -124,6 +124,11 @@ module = "webresearch.events.types"
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
+module = "webresearch.workflows.technical_due_diligence.models"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
 module = "webresearch.workflows.registry"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false

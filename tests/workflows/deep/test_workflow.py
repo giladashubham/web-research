@@ -15,12 +15,14 @@ from webresearch.agents.models import (
     ReviewOutput,
 )
 from webresearch.types import WorkflowInput
-from webresearch.workflows.deep import workflow as deep
+from webresearch.workflows.deep import run_deep
 from webresearch.workflows.registry import WORKFLOWS
 from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
+
+DEEP_WORKFLOW_MODULE = "webresearch.workflows.deep.workflow"
 
 
 def _agent(name: str, output_type: type[object], script: list[dict[str, object]]) -> Agent:
@@ -69,8 +71,7 @@ def _review_agent(has_gaps: bool = True) -> Agent:
 def _patch_agents(monkeypatch) -> list[str]:
     reviewer_calls: list[str] = []
     monkeypatch.setattr(
-        deep,
-        "planner_agent",
+        f"{DEEP_WORKFLOW_MODULE}.planner_agent",
         lambda _depth="deep": _agent(
             "planner",
             PlanOutput,
@@ -86,23 +87,19 @@ def _patch_agents(monkeypatch) -> list[str]:
         ),
     )
     monkeypatch.setattr(
-        deep,
-        "official_researcher_agent",
+        f"{DEEP_WORKFLOW_MODULE}.official_researcher_agent",
         lambda _depth="deep": _research_agent("official"),
     )
     monkeypatch.setattr(
-        deep,
-        "recent_researcher_agent",
+        f"{DEEP_WORKFLOW_MODULE}.recent_researcher_agent",
         lambda _depth="deep": _research_agent("recent"),
     )
     monkeypatch.setattr(
-        deep,
-        "broad_researcher_agent",
+        f"{DEEP_WORKFLOW_MODULE}.broad_researcher_agent",
         lambda _depth="deep": _research_agent("broad"),
     )
     monkeypatch.setattr(
-        deep,
-        "gap_researcher_agent",
+        f"{DEEP_WORKFLOW_MODULE}.gap_researcher_agent",
         lambda _depth="deep": _agent(
             "gap",
             GapResearchOutput,
@@ -123,10 +120,9 @@ def _patch_agents(monkeypatch) -> list[str]:
         reviewer_calls.append("review")
         return _review_agent(True)
 
-    monkeypatch.setattr(deep, "reviewer_agent", reviewer_factory)
+    monkeypatch.setattr(f"{DEEP_WORKFLOW_MODULE}.reviewer_agent", reviewer_factory)
     monkeypatch.setattr(
-        deep,
-        "output_agent",
+        f"{DEEP_WORKFLOW_MODULE}.output_agent",
         lambda _schema=None, _depth="deep": _agent(
             "output",
             FinalAnswer,
@@ -146,13 +142,13 @@ def _patch_agents(monkeypatch) -> list[str]:
 
 
 async def test_deep_loads_from_registry() -> None:
-    assert WORKFLOWS["deep"] is deep.run_deep
+    assert WORKFLOWS["deep"] is run_deep
 
 
 async def test_deep_hits_max_rounds_two_and_stops(monkeypatch) -> None:
     reviewer_calls = _patch_agents(monkeypatch)
 
-    result = await deep.run_deep(WorkflowInput(query="query"))
+    result = await run_deep(WorkflowInput(query="query"))
 
     assert result.answer_markdown == "Deep answer"
     assert result.metadata.workflow_id == "deep"
@@ -169,9 +165,9 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
         steps.append(name)
         yield
 
-    monkeypatch.setattr(deep, "step", record_step)
+    monkeypatch.setattr(f"{DEEP_WORKFLOW_MODULE}.step", record_step)
 
-    await deep.run_deep(WorkflowInput(query="query"))
+    await run_deep(WorkflowInput(query="query"))
 
     assert steps == [
         "planner",
