@@ -48,7 +48,7 @@ from webresearch.workflows.quick import run_quick
 from webresearch.workflows.deep import run_deep
 ```
 
-Avoid importing implementation modules directly unless the test specifically needs to patch internal orchestration symbols.
+Avoid importing implementation modules directly. If tests need to patch orchestration internals, patch through the package-level module that owns the workflow implementation after the migration.
 
 ## Out of Scope
 
@@ -62,11 +62,12 @@ Avoid importing implementation modules directly unless the test specifically nee
 - `pytest tests/workflows` passes.
 - Full test suite passes.
 - No stale imports reference deleted module files.
+- No tests import old flat workflow modules or deleted compatibility modules.
 
 ## Suggested Verification
 
 ```sh
-rg "workflows\\.(standard|quick|deep)$|workflows/(standard|quick|deep)\\.py" tests webresearch
+rg "workflows\\.(standard|quick|deep)$|workflows/(standard|quick|deep)\\.py|workflows\\.(state|result)|agents\\.prompts" tests webresearch
 uv run pytest tests/workflows
 uv run pytest
 uv run ruff check

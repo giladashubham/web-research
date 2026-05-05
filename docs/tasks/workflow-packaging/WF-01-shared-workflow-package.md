@@ -22,13 +22,13 @@ webresearch/workflows/shared/
   prompt_loader.py
 ```
 
-Move or wrap:
+Move:
 
 - `webresearch/workflows/state.py` -> `webresearch/workflows/shared/state.py`
 - `webresearch/workflows/result.py` -> `webresearch/workflows/shared/result.py`
 - `webresearch/agents/prompts.py` prompt-loading behavior -> `webresearch/workflows/shared/prompt_loader.py`
 
-Keep compatibility imports for one migration step:
+Delete the old modules in the same task:
 
 ```text
 webresearch/workflows/state.py
@@ -36,31 +36,33 @@ webresearch/workflows/result.py
 webresearch/agents/prompts.py
 ```
 
-These compatibility modules should re-export the new shared implementations so existing tests and imports keep passing.
+Update every import to the new locations immediately. Do not leave compatibility shims or re-export modules.
 
 ## Out of Scope
 
-- Moving workflow files into packages.
+- Moving `standard`, `quick`, or `deep` workflow files into packages.
 - Moving prompt markdown files.
 - Changing workflow behavior.
 - Adding the technical due-diligence workflow.
 
 ## Acceptance Criteria
 
-- Existing imports keep working:
-  - `from webresearch.workflows.state import WorkflowState`
-  - `from webresearch.workflows.result import build_result`
-  - `from webresearch.agents.prompts import load_prompt`
-- New imports work:
+- Old import paths are gone:
+  - `webresearch.workflows.state`
+  - `webresearch.workflows.result`
+  - `webresearch.agents.prompts`
+- Runtime and tests use only:
   - `from webresearch.workflows.shared.state import WorkflowState`
   - `from webresearch.workflows.shared.result import build_result`
   - `from webresearch.workflows.shared.prompt_loader import load_prompt`
+- No compatibility shims or re-export wrappers are left behind.
 - Full test suite passes.
 - Ruff, format check, mypy, and pre-commit pass.
 
 ## Suggested Verification
 
 ```sh
+rg "webresearch\\.workflows\\.(state|result)|webresearch\\.agents\\.prompts" webresearch tests
 uv run pytest tests/workflows tests/agents
 uv run ruff check
 uv run ruff format --check

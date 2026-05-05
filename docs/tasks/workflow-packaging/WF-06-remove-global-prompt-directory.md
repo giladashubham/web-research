@@ -34,10 +34,7 @@ load_workflow_prompt(workflow_id: str, name: str) -> str
 load_depth_extras(workflow_id: str) -> str
 ```
 
-Compatibility:
-
-- Keep `webresearch.agents.prompts.load_prompt` only if needed by existing generic agent factory tests.
-- Prefer updating factories to use the new shared loader explicitly.
+Do not keep compatibility loaders under `webresearch.agents.prompts`. That module should already be gone from WF-01.
 
 ## Out of Scope
 
@@ -49,6 +46,7 @@ Compatibility:
 
 - `webresearch/prompts/` no longer exists.
 - No runtime code references `webresearch.prompts` as a package resource.
+- No runtime code imports `webresearch.agents.prompts`.
 - All current workflow prompts still load correctly.
 - Existing prompt boundary tests pass.
 - Full test suite passes.
@@ -56,7 +54,7 @@ Compatibility:
 ## Suggested Verification
 
 ```sh
-rg "webresearch.*prompts|joinpath\\(\"prompts\"" webresearch tests
+rg "webresearch\\.agents\\.prompts|webresearch.*prompts|joinpath\\(\"prompts\"" webresearch tests
 uv run pytest tests/agents tests/workflows
 uv run pytest
 uv run ruff check
