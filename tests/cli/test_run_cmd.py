@@ -10,8 +10,8 @@ from webresearch.agents.models import FinalAnswer
 from webresearch.cli import app, run_cmd
 from webresearch.context import WorkflowContext
 from webresearch.events.step import step
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 if TYPE_CHECKING:
     from webresearch.types import WorkflowInput, WorkflowResult

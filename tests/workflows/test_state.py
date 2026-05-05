@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 
 from webresearch.agents.models import PlanOutput, ResearcherOutput, ReviewOutput
 from webresearch.types import Depth, WorkflowInput
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.state import WorkflowState
 
 
 def test_prompt_helpers_produce_stable_deterministic_strings() -> None:

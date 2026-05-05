@@ -14,10 +14,10 @@ from webresearch.agents.models import (
     ResearcherOutput,
     ReviewOutput,
 )
-from webresearch.agents.prompts import load_prompt
 from webresearch.types import WorkflowInput
 from webresearch.workflows import deep
 from webresearch.workflows.registry import WORKFLOWS
+from webresearch.workflows.shared.prompt_loader import load_prompt
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator

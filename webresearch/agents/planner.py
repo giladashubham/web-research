@@ -3,7 +3,7 @@ from __future__ import annotations
 from agents import Agent
 
 from webresearch.agents.models import PlanOutput
-from webresearch.agents.prompts import load_prompt
+from webresearch.workflows.shared.prompt_loader import load_prompt
 
 
 def planner_agent(depth: str = "standard") -> Agent:

@@ -7,8 +7,8 @@ import pytest
 from webresearch.agents.models import FinalAnswer, ResearcherOutput, ResearchFindingRef
 from webresearch.context import WorkflowContext
 from webresearch.types import EvidenceNote, SourceInput, WorkflowInput
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 
 def _state(input_: WorkflowInput) -> WorkflowState:

@@ -6,8 +6,8 @@ from webresearch.agents.models import FinalAnswer
 from webresearch.cli.formats import format_result, write_output
 from webresearch.context import WorkflowContext
 from webresearch.types import SourceInput, WorkflowInput, WorkflowResult
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 
 def _result() -> WorkflowResult:

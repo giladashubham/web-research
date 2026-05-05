@@ -13,8 +13,8 @@ from webresearch.agents.researchers import broad_researcher_agent, official_rese
 from webresearch.context import WorkflowContext
 from webresearch.events.step import current_run_id, emit_output_text_delta, step
 from webresearch.types import Depth
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 if TYPE_CHECKING:
     from webresearch.agents.models import FinalAnswer, PlanOutput, ResearcherOutput

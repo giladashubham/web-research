@@ -24,8 +24,8 @@ from webresearch.events.step import (
     emit_step_skipped,
     step,
 )
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 if TYPE_CHECKING:
     from webresearch.agents.models import (

@@ -16,7 +16,7 @@ from webresearch.types import (
 if TYPE_CHECKING:
     from webresearch.agents.models import ResearchFindingRef
     from webresearch.context import WorkflowContext
-    from webresearch.workflows.state import WorkflowState
+    from webresearch.workflows.shared.state import WorkflowState
 
 
 def build_result(

@@ -3,8 +3,8 @@ from __future__ import annotations
 from agents import Agent
 
 from webresearch.agents.models import ResearcherOutput
-from webresearch.agents.prompts import load_prompt
 from webresearch.agents.tools import RESEARCH_TOOLS
+from webresearch.workflows.shared.prompt_loader import load_prompt
 
 
 def official_researcher_agent(depth: str = "standard") -> Agent:

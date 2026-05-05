@@ -14,7 +14,6 @@ from webresearch.agents.models import (
 )
 from webresearch.agents.output import output_agent
 from webresearch.agents.planner import planner_agent
-from webresearch.agents.prompts import load_prompt
 from webresearch.agents.researchers import (
     broad_researcher_agent,
     official_researcher_agent,
@@ -23,6 +22,7 @@ from webresearch.agents.researchers import (
 from webresearch.agents.reviewer import reviewer_agent
 from webresearch.context import WorkflowContext
 from webresearch.types import SourceInput
+from webresearch.workflows.shared.prompt_loader import load_prompt
 
 RESEARCH_TOOL_NAMES = [
     "search_web_tool",

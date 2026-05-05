@@ -7,8 +7,8 @@ from webresearch.agents.models import FinalAnswer
 from webresearch.context import WorkflowContext
 from webresearch.events.step import emit_output_text_delta, emit_step_skipped, step
 from webresearch.types import WorkflowInput, WorkflowResult
-from webresearch.workflows.result import build_result
-from webresearch.workflows.state import WorkflowState
+from webresearch.workflows.shared.result import build_result
+from webresearch.workflows.shared.state import WorkflowState
 
 
 def make_result(query: str = "query") -> WorkflowResult:

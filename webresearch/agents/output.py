@@ -4,7 +4,7 @@ from agents import Agent
 from agents.agent_output import AgentOutputSchema
 
 from webresearch.agents.models import FinalAnswer
-from webresearch.agents.prompts import load_prompt
+from webresearch.workflows.shared.prompt_loader import load_prompt
 
 
 def output_agent(output_schema: dict[str, object] | None = None, depth: str = "standard") -> Agent:
