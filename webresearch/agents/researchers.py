@@ -3,6 +3,7 @@ from __future__ import annotations
 from agents import Agent
 
 from webresearch.agents.models import ResearcherOutput
+from webresearch.agents.settings import no_store_model_settings
 from webresearch.agents.tools import RESEARCH_TOOLS
 from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
@@ -23,6 +24,7 @@ def _researcher_agent(name: str, prompt_name: str, workflow_id: str) -> Agent:
     return Agent(
         name=name,
         instructions=load_shared_prompt(prompt_name, workflow_id),
+        model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=ResearcherOutput,
     )

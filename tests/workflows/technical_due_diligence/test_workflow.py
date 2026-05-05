@@ -7,7 +7,7 @@ from agents import Agent
 from jsonschema import validate
 
 from tests._helpers.mock_model import MockModel
-from webresearch.types import Depth, WorkflowInput
+from webresearch.types import Depth, UrlsByCategory, WorkflowInput
 from webresearch.workflows.registry import WORKFLOWS
 from webresearch.workflows.technical_due_diligence import (
     ClaimExtraction,
@@ -17,7 +17,17 @@ from webresearch.workflows.technical_due_diligence import (
     FinalMemoOutput,
     IntakePlan,
     TechnicalSubstanceReview,
+    UnresolvedClaim,
     run_technical_due_diligence,
+)
+from webresearch.workflows.technical_due_diligence.workflow import (
+    claim_extractor_agent,
+    competitor_mapper_agent,
+    evidence_researcher_agent,
+    final_memo_agent,
+    gap_researcher_agent,
+    intake_planner_agent,
+    technical_substance_reviewer_agent,
 )
 
 PACKAGE = "webresearch.workflows.technical_due_diligence"
@@ -52,7 +62,17 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                 "research_questions": ["What is public evidence vs inference?"],
                 "likely_claim_areas": ["technical substance"],
                 "competitor_names": ["Competitor One"],
-                "priority_urls": ["https://example.com/docs"],
+                "priority_urls_by_category": {
+                    "docs": ["https://example.com/docs"],
+                    "api": [],
+                    "changelog": ["https://example.com/changelog"],
+                    "pricing": [],
+                    "security": [],
+                    "customers": [],
+                    "blog": [],
+                    "careers": [],
+                    "other": [],
+                },
             },
         ),
     )
@@ -64,6 +84,7 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             {
                 "claims": [
                     {
+                        "id": "claim_1",
                         "claim": claim["claim"],
                         "source_urls": claim["claim_source_urls"],
                         "category": "architecture",
@@ -97,6 +118,23 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             },
         ),
     )
+
+    unresolved: list[dict[str, object]] = (
+        [
+            {
+                "claim_id": "claim_1",
+                "claim_text": claim["claim"],
+                "reason_unresolved": (
+                    "Docs describe the API but do not explain the retrieval mechanism."
+                ),
+                "artefact_types_to_chase": ["docs", "changelog"],
+                "follow_up_queries": ["Find architecture evidence"],
+            }
+        ]
+        if has_gaps
+        else []
+    )
+
     monkeypatch.setattr(
         f"{WORKFLOW_MODULE}.technical_substance_reviewer_agent",
         lambda: _agent(
@@ -107,8 +145,7 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                 "technical_substance": report["technical_substance"],
                 "replicability": report["replicability"],
                 "code_review_follow_ups": report["code_review_follow_ups"],
-                "has_critical_gaps": has_gaps,
-                "follow_up_queries": ["Find architecture evidence"] if has_gaps else [],
+                "unresolved_claims": unresolved,
             },
         ),
     )
@@ -174,7 +211,7 @@ async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None
     validate(instance=result.structured_data, schema=schema)
 
 
-async def test_diligence_gap_loop_runs_when_review_reports_gaps(monkeypatch) -> None:
+async def test_diligence_gap_loop_runs_when_review_reports_unresolved(monkeypatch) -> None:
     _patch_agents(monkeypatch, has_gaps=True)
 
     result = await run_technical_due_diligence(
@@ -185,3 +222,46 @@ async def test_diligence_gap_loop_runs_when_review_reports_gaps(monkeypatch) -> 
     )
 
     assert "Public gap research" in result.summary
+
+
+async def test_intake_plan_carries_categorised_urls(monkeypatch) -> None:
+    _patch_agents(monkeypatch)
+
+    result = await run_technical_due_diligence(WorkflowInput(query="Evaluate Example Robotics"))
+
+    assert result.metadata.workflow_id == "technical_due_diligence"
+
+
+async def test_unresolved_claim_model_round_trips() -> None:
+    claim = UnresolvedClaim(
+        claim_id="claim_1",
+        claim_text="The product provides autonomous workflow planning.",
+        reason_unresolved="Docs describe the API but do not explain the retrieval mechanism.",
+        artefact_types_to_chase=["docs", "changelog"],
+        follow_up_queries=["Search for architecture details"],
+    )
+    assert claim.claim_id == "claim_1"
+    assert "docs" in claim.artefact_types_to_chase
+
+
+async def test_priority_urls_by_category_is_categorised() -> None:
+    cat = UrlsByCategory(
+        docs=["https://example.com/docs"],
+        changelog=["https://example.com/changelog"],
+    )
+    assert cat.docs == ["https://example.com/docs"]
+    assert cat.api == []
+
+
+def test_diligence_agents_disable_openai_response_storage() -> None:
+    agents = [
+        intake_planner_agent(),
+        claim_extractor_agent(),
+        evidence_researcher_agent(),
+        competitor_mapper_agent(),
+        technical_substance_reviewer_agent(),
+        gap_researcher_agent(),
+        final_memo_agent(),
+    ]
+
+    assert all(agent.model_settings.store is False for agent in agents)

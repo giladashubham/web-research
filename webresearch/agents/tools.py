@@ -3,10 +3,24 @@ from __future__ import annotations
 from agents import RunContextWrapper, function_tool
 
 from webresearch.context import WorkflowContext  # noqa: TC001
-from webresearch.tools.extract_content import ExtractResult, extract_content
-from webresearch.tools.fetch_url import FetchResult, fetch_url
+from webresearch.tools.discover_urls import DiscoveredUrls, discover_urls
+from webresearch.tools.fetch_and_extract import FetchAndExtractResult, fetch_and_extract
 from webresearch.tools.rank_sources import RankedSources, rank_sources
 from webresearch.tools.search_web import SearchResults, search_web
+
+
+@function_tool
+async def discover_urls_tool(
+    ctx: RunContextWrapper[WorkflowContext],
+    seed_url: str,
+) -> DiscoveredUrls:
+    """Expand a seed URL into categorised high-value pages on the same domain.
+
+    Use this before search_web_tool. Fetches sitemap.xml, parses anchor links,
+    and probes canonical paths (/docs, /changelog, /api, /pricing, /security,
+    /customers, /blog, /careers). Returns zero Tavily calls.
+    """
+    return await discover_urls(ctx.context, seed_url)
 
 
 @function_tool
@@ -20,19 +34,18 @@ async def search_web_tool(
 
 
 @function_tool
-async def fetch_url_tool(ctx: RunContextWrapper[WorkflowContext], url: str) -> FetchResult:
-    """Fetch a URL and store the page body for extraction."""
-    return await fetch_url(ctx.context, url)
-
-
-@function_tool
-async def extract_content_tool(
+async def fetch_and_extract_tool(
     ctx: RunContextWrapper[WorkflowContext],
     url: str,
     query: str | None = None,
-) -> ExtractResult:
-    """Extract readable text from a fetched page."""
-    return await extract_content(ctx.context, url, query)
+) -> FetchAndExtractResult:
+    """Fetch a URL and return its extracted text in one step.
+
+    Prefer this over separate fetch+extract calls. Pass query to focus extraction
+    on the most relevant content. Returns the full readable text, source_id for
+    citation, and whether the content was truncated.
+    """
+    return await fetch_and_extract(ctx.context, url, query)
 
 
 @function_tool
@@ -46,8 +59,8 @@ async def rank_sources_tool(
 
 
 RESEARCH_TOOLS = [
+    discover_urls_tool,
     search_web_tool,
-    fetch_url_tool,
-    extract_content_tool,
+    fetch_and_extract_tool,
     rank_sources_tool,
 ]

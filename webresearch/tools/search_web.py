@@ -32,6 +32,10 @@ class SearchResults(BaseModel):
 
 # TODO(P3-01): decorate with openai-agents `@function_tool` once the SDK is installed.
 async def search_web(ctx: WorkflowContext, query: str, limit: int = 10) -> SearchResults:
+    cache_key = query.strip().lower()
+    if cache_key in ctx.search_query_cache:
+        return ctx.search_query_cache[cache_key]
+
     try:
         provider_results = await ctx.search_provider.search(query, limit=limit)
     except SearchProviderError as exc:
@@ -65,4 +69,6 @@ async def search_web(ctx: WorkflowContext, query: str, limit: int = 10) -> Searc
             )
         )
 
-    return SearchResults(query=query, results=results, provider_id=ctx.search_provider.id)
+    result = SearchResults(query=query, results=results, provider_id=ctx.search_provider.id)
+    ctx.search_query_cache[cache_key] = result
+    return result

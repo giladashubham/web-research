@@ -50,6 +50,7 @@ def test_agent_factories_return_expected_agent(
 
     assert agent.name == name
     assert agent.instructions == load_shared_prompt(prompt, "standard")
+    assert agent.model_settings.store is False
     if hasattr(agent.output_type, "output_type"):
         assert agent.output_type.output_type is output_type
     else:
@@ -68,9 +69,9 @@ def test_researcher_tools_have_expected_names() -> None:
     agent = official_researcher_agent()
 
     assert [tool.name for tool in agent.tools] == [
+        "discover_urls_tool",
         "search_web_tool",
-        "fetch_url_tool",
-        "extract_content_tool",
+        "fetch_and_extract_tool",
         "rank_sources_tool",
     ]
 

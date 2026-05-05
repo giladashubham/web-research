@@ -16,6 +16,7 @@ from webresearch.workflows.technical_due_diligence.models import (
     TechnicalDueDiligenceReport,
     TechnicalSubstanceAssessment,
     TechnicalSubstanceReview,
+    UnresolvedClaim,
 )
 from webresearch.workflows.technical_due_diligence.workflow import run_technical_due_diligence
 
@@ -37,5 +38,6 @@ __all__ = [
     "TechnicalDueDiligenceReport",
     "TechnicalSubstanceAssessment",
     "TechnicalSubstanceReview",
+    "UnresolvedClaim",
     "run_technical_due_diligence",
 ]

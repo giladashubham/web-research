@@ -35,9 +35,9 @@ def _research_script(summary: str, query: str) -> list[dict[str, object]]:
     return [
         {
             "expected_tools": [
+                "discover_urls_tool",
                 "search_web_tool",
-                "fetch_url_tool",
-                "extract_content_tool",
+                "fetch_and_extract_tool",
                 "rank_sources_tool",
             ],
             "tool_calls": [
@@ -46,9 +46,9 @@ def _research_script(summary: str, query: str) -> list[dict[str, object]]:
         },
         {
             "expected_tools": [
+                "discover_urls_tool",
                 "search_web_tool",
-                "fetch_url_tool",
-                "extract_content_tool",
+                "fetch_and_extract_tool",
                 "rank_sources_tool",
             ],
             "final_output": {

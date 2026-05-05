@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add an optional run log that captures every observable workflow event into a separate
+Add an automatic run log that captures every observable workflow event into a separate
 `.jsonc` file keyed by `run_id`, without mixing it into the normal result output file.
 
 The log should make debugging and diligence review easier by showing:
@@ -29,6 +29,15 @@ is too thin, replace it cleanly and update all callers and tests in the same cha
 The final code should have one event vocabulary, one stream translation path, and one
 JSONC writer path.
 
+The default log location is project-local:
+
+```text
+.web-research/logs/run_<run_id>.jsonc
+```
+
+The logging system should create `.web-research/` and `.web-research/logs/` when they do
+not exist. This directory is runtime state, not source code.
+
 ## Target User Experience
 
 CLI example:
@@ -38,18 +47,17 @@ uv run webresearch run \
   "Evaluate Wazuh for technical diligence. Start with https://wazuh.com/. Find competitors too." \
   technical_due_diligence \
   --format json \
-  --out diligence.json \
-  --events-out logs
+  --out diligence.json
 ```
 
 Expected files:
 
 ```text
 diligence.json
-logs/run_<run_id>.jsonc
+.web-research/logs/run_<run_id>.jsonc
 ```
 
-Optional explicit path:
+Optional explicit log path:
 
 ```sh
 uv run webresearch run "query" standard --events-out logs/my-run.jsonc
@@ -167,7 +175,8 @@ webresearch/events/jsonc_writer.py
 
 Responsibilities:
 
-- create the destination directory when needed
+- create `.web-research/` and `.web-research/logs/` when needed
+- default to `.web-research/logs/run_<run_id>.jsonc`
 - derive `run_<run_id>.jsonc` when `--events-out` is a directory
 - write JSONC header comments
 - write a single JSON object with an `events` array
@@ -191,22 +200,23 @@ Add a CLI option in `webresearch/cli/run_cmd.py`:
 
 Behavior:
 
-- omitted: no event log file
+- omitted: write `.web-research/logs/run_<run_id>.jsonc`
 - directory path: write `PATH/run_<run_id>.jsonc`
 - file path ending in `.jsonc`: write exactly that file
 - fail with exit code `3` on IO errors, matching existing output write behavior
 
 The option should work with all workflows, including `technical_due_diligence`.
 
-Add the option directly to the main `run` command surface. Do not add hidden legacy flags,
-environment-variable-only switches, or deprecated aliases.
+Add the option directly to the main `run` command surface as an override for the default
+`.web-research/logs/` location. Do not add hidden legacy flags, environment-variable-only
+switches, or deprecated aliases.
 
 ### EV-05 - Stream Multiplexing
 
 Update the run command event loop so each streamed event is sent to both:
 
 - `ProgressRenderer`
-- optional JSONC writer
+- JSONC writer
 
 The normal result output path should remain unchanged.
 
@@ -242,6 +252,7 @@ Coverage:
 
 - writer creates a valid JSONC file for a successful run
 - writer finalizes on workflow failure
+- CLI without `--events-out` creates `.web-research/logs/run_<run_id>.jsonc`
 - CLI `--events-out logs` creates `logs/run_<run_id>.jsonc`
 - CLI `--events-out file.jsonc` writes the explicit file
 - final result output still goes to `--out`
@@ -256,13 +267,16 @@ Coverage:
 Update README with:
 
 - `--events-out` usage
-- example event log path
+- default `.web-research/logs/run_<run_id>.jsonc` event log path
 - what is captured
 - explicit note that hidden chain-of-thought is not captured
 
 ## Acceptance Criteria
 
-- `uv run webresearch run "query" standard --events-out logs` writes a `.jsonc` event log.
+- `uv run webresearch run "query" standard` writes
+  `.web-research/logs/run_<run_id>.jsonc`.
+- `uv run webresearch run "query" standard --events-out logs` writes a `.jsonc` event log
+  under the explicit directory.
 - The log includes `run_id`, workflow id, step events, agent events, tool calls, arguments,
   tool results, warnings, errors, and timestamps.
 - The normal `--out` result file is still separate.

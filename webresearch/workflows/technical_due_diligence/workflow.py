@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime
 from importlib.resources import files
 from typing import TYPE_CHECKING, cast
+from urllib.parse import urlparse
 from uuid import uuid4
 
 from agents import Agent, Runner
@@ -11,6 +12,7 @@ from jsonschema import ValidationError as JsonSchemaValidationError
 from jsonschema import validate
 from pydantic import BaseModel
 
+from webresearch.agents.settings import no_store_model_settings
 from webresearch.agents.tools import RESEARCH_TOOLS
 from webresearch.context import WorkflowContext
 from webresearch.events.step import (
@@ -22,6 +24,7 @@ from webresearch.events.step import (
 from webresearch.types import (
     ResearchFinding,
     StructuredDataValidation,
+    UrlsByCategory,
     WorkflowMetadata,
     WorkflowResult,
 )
@@ -41,15 +44,25 @@ if TYPE_CHECKING:
     from webresearch.types import WorkflowInput
 
 WORKFLOW_ID = "technical_due_diligence"
+# For non-quick depths, enforce a minimum so a real investigation has room to run.
+_MIN_MAX_ROUNDS = 5
+# Research stages fetch many pages in parallel batches; 10 (SDK default) is too low.
+_RESEARCH_MAX_TURNS = 50
 
 
 async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
     ctx = WorkflowContext()
     run_id = current_run_id()
     started_at = datetime.now(UTC)
+    # Preserve quick=0 (no gap rounds). For standard/deep, bump to at least 5.
+    effective_max_rounds = (
+        max(input.depth.max_rounds, _MIN_MAX_ROUNDS) if input.depth.max_rounds > 0 else 0
+    )
 
     async with step("intake_planner"):
-        plan_result = await Runner.run(intake_planner_agent(), _input_prompt(input), context=ctx)
+        plan_result = await Runner.run(
+            intake_planner_agent(), _input_prompt(input), context=ctx, max_turns=_RESEARCH_MAX_TURNS
+        )
         plan = cast("IntakePlan", plan_result.final_output)
 
     async with step("claim_extractor"):
@@ -57,6 +70,7 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
             claim_extractor_agent(),
             _stage_prompt(input, plan=plan),
             context=ctx,
+            max_turns=_RESEARCH_MAX_TURNS,
         )
         claims = cast("ClaimExtraction", claims_result.final_output)
 
@@ -65,6 +79,7 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
             evidence_researcher_agent(),
             _stage_prompt(input, plan=plan, claims=claims),
             context=ctx,
+            max_turns=_RESEARCH_MAX_TURNS,
         )
         evidence = cast("EvidenceResearch", evidence_result.final_output)
 
@@ -73,6 +88,7 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
             competitor_mapper_agent(),
             _stage_prompt(input, plan=plan, claims=claims, evidence=evidence),
             context=ctx,
+            max_turns=_RESEARCH_MAX_TURNS,
         )
         competitors = cast("CompetitorMapping", competitor_result.final_output)
 
@@ -85,6 +101,7 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                 claims=claims,
                 evidence=evidence,
                 competitors=competitors,
+                pages_read_by_domain=_pages_by_domain(ctx),
             ),
             context=ctx,
         )
@@ -92,9 +109,10 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
 
     gap_results: list[DiligenceGapResearch] = []
     round_index = 0
-    while review.has_critical_gaps and round_index < input.depth.max_rounds:
+    while review.unresolved_claims and round_index < effective_max_rounds:
         round_index += 1
         await emit_loop_iteration("gap", round_index)
+        unread_high_value = _unread_high_value_urls(plan, ctx)
         async with step("gap_researcher"):
             gap_result = await Runner.run(
                 gap_researcher_agent(),
@@ -106,10 +124,21 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                     competitors=competitors,
                     review=review,
                     gaps=gap_results,
+                    unread_high_value_urls=unread_high_value,
                 ),
                 context=ctx,
+                max_turns=_RESEARCH_MAX_TURNS,
             )
             gap_results.append(cast("DiligenceGapResearch", gap_result.final_output))
+            # Re-evaluate which claims are still unresolved. If the gap researcher
+            # produced no new assessments at all, stop early — further rounds won't
+            # help and we've hit a public-evidence ceiling.
+            previous_unresolved_count = len(review.unresolved_claims)
+            review = _merge_gap_into_review(review, gap_results[-1])
+            if not gap_results[-1].additional_claim_assessments and len(
+                review.unresolved_claims
+            ) == previous_unresolved_count:
+                break
 
     async with step("final_memo"):
         final_result = await Runner.run(
@@ -166,6 +195,8 @@ def intake_planner_agent() -> Agent:
     return Agent(
         name="Technical Diligence Intake Planner",
         instructions=load_workflow_prompt(WORKFLOW_ID, "intake_planner.md"),
+        model_settings=no_store_model_settings(),
+        tools=list(RESEARCH_TOOLS),
         output_type=IntakePlan,
     )
 
@@ -174,6 +205,7 @@ def claim_extractor_agent() -> Agent:
     return Agent(
         name="Technical Diligence Claim Extractor",
         instructions=load_workflow_prompt(WORKFLOW_ID, "claim_extractor.md"),
+        model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=ClaimExtraction,
     )
@@ -183,6 +215,7 @@ def evidence_researcher_agent() -> Agent:
     return Agent(
         name="Technical Diligence Evidence Researcher",
         instructions=load_workflow_prompt(WORKFLOW_ID, "evidence_researcher.md"),
+        model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=EvidenceResearch,
     )
@@ -192,6 +225,7 @@ def competitor_mapper_agent() -> Agent:
     return Agent(
         name="Technical Diligence Competitor Mapper",
         instructions=load_workflow_prompt(WORKFLOW_ID, "competitor_mapper.md"),
+        model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=CompetitorMapping,
     )
@@ -201,6 +235,7 @@ def technical_substance_reviewer_agent() -> Agent:
     return Agent(
         name="Technical Diligence Substance Reviewer",
         instructions=load_workflow_prompt(WORKFLOW_ID, "technical_substance_reviewer.md"),
+        model_settings=no_store_model_settings(),
         output_type=TechnicalSubstanceReview,
     )
 
@@ -209,6 +244,7 @@ def gap_researcher_agent() -> Agent:
     return Agent(
         name="Technical Diligence Gap Researcher",
         instructions=load_workflow_prompt(WORKFLOW_ID, "gap_researcher.md"),
+        model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=DiligenceGapResearch,
     )
@@ -218,6 +254,7 @@ def final_memo_agent() -> Agent:
     return Agent(
         name="Technical Diligence Final Memo Writer",
         instructions=load_workflow_prompt(WORKFLOW_ID, "final_memo.md"),
+        model_settings=no_store_model_settings(),
         output_type=FinalMemoOutput,
     )
 
@@ -254,6 +291,50 @@ def _to_jsonable(value: object) -> object:
     if isinstance(value, dict):
         return {key: _to_jsonable(item) for key, item in value.items()}
     return value
+
+
+def _pages_by_domain(ctx: WorkflowContext) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for url in ctx.pages:
+        domain = urlparse(url).netloc
+        counts[domain] = counts.get(domain, 0) + 1
+    return counts
+
+
+def _all_priority_urls(cat: UrlsByCategory) -> list[str]:
+    return (
+        cat.docs
+        + cat.api
+        + cat.changelog
+        + cat.pricing
+        + cat.security
+        + cat.customers
+        + cat.blog
+        + cat.careers
+        + cat.other
+    )
+
+
+def _unread_high_value_urls(plan: IntakePlan, ctx: WorkflowContext) -> list[str]:
+    fetched = set(ctx.pages.keys())
+    high_value = (
+        plan.priority_urls_by_category.docs
+        + plan.priority_urls_by_category.api
+        + plan.priority_urls_by_category.changelog
+        + plan.priority_urls_by_category.security
+    )
+    return [u for u in high_value if u not in fetched]
+
+
+def _merge_gap_into_review(
+    review: TechnicalSubstanceReview,
+    gap: DiligenceGapResearch,
+) -> TechnicalSubstanceReview:
+    resolved_claim_ids = {
+        a.claim for a in gap.additional_claim_assessments if a.assessment != "unclear"
+    }
+    remaining = [c for c in review.unresolved_claims if c.claim_text not in resolved_claim_ids]
+    return review.model_copy(update={"unresolved_claims": remaining})
 
 
 def _validate_report(

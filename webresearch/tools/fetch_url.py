@@ -15,8 +15,10 @@ if TYPE_CHECKING:
 ALLOWED_CONTENT_TYPES = {
     "application/json",
     "application/xhtml+xml",
+    "application/xml",
     "text/html",
     "text/plain",
+    "text/xml",
 }
 BODY_SIZE_LIMIT_BYTES = 5 * 1024 * 1024
 USER_AGENT = "webresearch-agent/0.1"
@@ -37,6 +39,21 @@ class FetchResult(BaseModel):
 # TODO(P3-01): decorate with openai-agents `@function_tool` once the SDK is installed.
 async def fetch_url(ctx: WorkflowContext, url: str) -> FetchResult:
     normalized_url = normalize_url(url)
+
+    if normalized_url in ctx.pages:
+        page = ctx.pages[normalized_url]
+        source = ctx.sources.get_by_url(normalized_url) or ctx.sources.add(
+            SourceInput(url=normalized_url)
+        )
+        return FetchResult(
+            url=normalized_url,
+            status="fetched",
+            byte_size=len(page.body.encode("utf-8", errors="replace")),
+            content_type=page.content_type,
+            truncated=page.truncated,
+            source_id=source.id,
+        )
+
     source = ctx.sources.get_by_url(normalized_url) or ctx.sources.add(
         SourceInput(url=normalized_url)
     )

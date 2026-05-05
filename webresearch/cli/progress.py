@@ -13,6 +13,7 @@ from webresearch.events.types import (
     ToolStarted,
     Warning,
     WorkflowEvent,
+    WorkflowFailed,
 )
 
 
@@ -39,6 +40,8 @@ class ProgressRenderer:
             self._line(self._dim(f"   · {event.tool_name}"))
         elif isinstance(event, Warning):
             self._line(self._yellow(f"! {event.message}"))
+        elif isinstance(event, WorkflowFailed):
+            self._line(self._red(f"✗  workflow failed: {event.error}"))
         elif isinstance(event, OutputTextDelta):
             self._stream.write(event.delta)
             self._stream.flush()
@@ -56,3 +59,8 @@ class ProgressRenderer:
         if not self._use_color:
             return text
         return f"\033[33m{text}\033[0m"
+
+    def _red(self, text: str) -> str:
+        if not self._use_color:
+            return text
+        return f"\033[31m{text}\033[0m"

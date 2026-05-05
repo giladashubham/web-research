@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from webresearch.types import WebResearchModel
+from webresearch.types import UrlsByCategory, WebResearchModel
 
 UrlString = Annotated[str, Field(min_length=1)]
 
@@ -90,10 +90,11 @@ class IntakePlan(WebResearchModel):
     research_questions: list[str] = Field(default_factory=list)
     likely_claim_areas: list[str] = Field(default_factory=list)
     competitor_names: list[str] = Field(default_factory=list)
-    priority_urls: list[UrlString] = Field(default_factory=list)
+    priority_urls_by_category: UrlsByCategory = Field(default_factory=UrlsByCategory)
 
 
 class ExtractedClaim(WebResearchModel):
+    id: str = Field(min_length=1)
     claim: str = Field(min_length=1)
     source_urls: list[UrlString] = Field(default_factory=list)
     category: Literal["product", "architecture", "ai_ml", "integration", "customer", "other"]
@@ -116,13 +117,22 @@ class CompetitorMapping(WebResearchModel):
     comparison_summary: str = Field(min_length=1)
 
 
+class UnresolvedClaim(WebResearchModel):
+    claim_id: str = Field(min_length=1)
+    claim_text: str = Field(min_length=1)
+    reason_unresolved: str = Field(min_length=1)
+    artefact_types_to_chase: list[
+        Literal["docs", "changelog", "api", "pricing", "security", "customers", "blog", "careers"]
+    ] = Field(default_factory=list)
+    follow_up_queries: list[str] = Field(default_factory=list)
+
+
 class TechnicalSubstanceReview(WebResearchModel):
     executive_judgment: ExecutiveJudgment
     technical_substance: TechnicalSubstanceAssessment
     replicability: ReplicabilityAssessment
     code_review_follow_ups: list[CodeReviewFollowUp] = Field(default_factory=list)
-    has_critical_gaps: bool = False
-    follow_up_queries: list[str] = Field(default_factory=list)
+    unresolved_claims: list[UnresolvedClaim] = Field(default_factory=list)
 
 
 class DiligenceGapResearch(WebResearchModel):

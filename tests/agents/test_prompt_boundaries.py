@@ -25,9 +25,9 @@ from webresearch.types import SourceInput
 from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
 RESEARCH_TOOL_NAMES = [
+    "discover_urls_tool",
     "search_web_tool",
-    "fetch_url_tool",
-    "extract_content_tool",
+    "fetch_and_extract_tool",
     "rank_sources_tool",
 ]
 

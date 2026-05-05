@@ -10,6 +10,7 @@ from webresearch.tools.providers.tavily import TavilySearchProvider
 
 if TYPE_CHECKING:
     from webresearch.tools.providers.search_provider import SearchProvider
+    from webresearch.tools.search_web import SearchResults
     from webresearch.types import Artifact, EvidenceNote
 
 
@@ -35,3 +36,4 @@ class WorkflowContext:
     evidence: list[EvidenceNote] = field(default_factory=list)
     artifacts: list[Artifact] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    search_query_cache: dict[str, SearchResults] = field(default_factory=dict)
