@@ -1,0 +1,786 @@
+{
+  "answer_markdown": "## Technical Diligence Memo – Wazuh\n\n**Public Evidence**\n- **Comprehensive open-source SIEM/XDR**: Wazuh is publicly claimed and evidenced (via its website and GitHub) as a broad open-source SIEM/XDR supporting threat prevention, agent-based detection, file integrity monitoring, security configuration assessments, and compliance mappings (PCI DSS, HIPAA, etc.). [Sources: https://wazuh.com/, https://github.com/wazuh/wazuh]\n- **Integration and Extensibility**: Public docs and repositories confirm support for Elastic, OpenSearch, Splunk, AWS Security Lake, Docker environments, and a robust REST API. Integrations are well-documented and valid for major industry platforms. [Source: https://documentation.wazuh.com/current/integrations-guide/index.html]\n- **Active Development & Community**: Release cadence and visible customer references point to market traction, while source and integrations are confirmed open (GPL/Apache). [Sources: https://github.com/wazuh/wazuh/releases, https://wazuh.com/our-customers]\n- **Competitors**: Major technically overlapping SIEM/XDR and log analytics platforms (with varying open/commercial models) are OSSEC, Elastic SIEM, Splunk, AlienVault OSSIM, Security Onion, and Graylog. Wazuh is a direct open-source peer/fork/superset to OSSEC, with broader compliance and integration reach. [Sources: https://ossec.github.io/, https://www.elastic.co/siem, https://securityonion.net/]\n\n**Inference**\n- **Technical Substance**: Wazuh is a real, non-trivial open-source asset with documented feature depth and substantial codebase. It is not merely a wrapper; the product adds orchestration, UI, policy, and integration layers beyond its OSSEC origins. However, its architecture leverages commodity practices (agents, event forwarders, integrations with Elastic/Logstash), with no public evidence of proprietary algorithms or unique technical breakthroughs. \n- **Differentiation & Wrapper Risk**: Differentiation from other open-source SIEMs is incremental and lies mostly in project coordination, integration breadth, compliance templates, and web UI polish. Commercial SIEMs (Splunk, Elastic SIEM proprietary) outpace Wazuh in advanced analytics and enterprise features; Wazuh’s advantage is TCO and open code. Its modularity and reliance on open platforms means wrapper risk is present but mitigated by real, visible codebase value.\n- **Replicability**: Because all core code and documentation are public and features are not proprietary by design, a \"good enough\" replica could be built by a motivated team (or open source fork) in 3-6 months, though market/community traction and polish would take longer.\n\n**Unknowns**\n- **Scaling and Enterprise Performance**: No published benchmarks or detailed architectural breakdowns validate how Wazuh performs, scales, or fails at 10k+ agent, petabyte-scale levels. Reference architectures for such deployments are not documented in public sources.\n- **Proprietary vs. Open Differentiation**: There is no clear evidence for unique, non-replicable modules or IP beyond integration and content polish. It's unclear if any non-commodity detection/correlation exists.\n- **Community Contribution Process**: Detailed acceptance, review, and QA/security policies for third-party code are only lightly referenced in contribution guides, not in main public docs.\n- **Cost of Ownership/Deployment Complexity**: Public documentation does not provide full evidence on total cost, third-party support, or deployment effort in complex/regulated environments.\n\n**Evidence Strength & Gaps**\n- All core product claims are strongly supported with public references. Claims of unique differentiation or proprietary tech are unsupported/unclear by public evidence.\n- No performance benchmarks or feature-for-feature tables vs. commercial SIEMs are public; comparative judgments rely on inference.\n\n**Code Review Follow-Up Questions**\n1. **Architecture/Scalability**: What empirical evidence exists of scaling beyond 10k agents and petabyte event volumes? What HA and sharding practices are recommended at scale?\n2. **Proprietary Modules**: Is any feature set (detection, analytics, etc.) genuinely proprietary or advanced beyond open-source norms?\n3. **TCO/Support**: What pro/enterprise support or commercial tooling is offered? Are any non-public modules provided for paying users?\n4. **Contribution/Review Workflow**: What are the code/release acceptance workflows and quality gates for external code?\n\n**Summary**\nWazuh stands as a leading, real, open-source SIEM/XDR platform with extensive public codebase, integrations, and traction. It is strong within the open-source ecosystem and suitable for those seeking transparency and cost efficiency. No public evidence suggests unique IP or technical moat versus other open SIEMs or commercial products—its advantages are ecosystem, active development, and breadth. Replicability risk and wrapper risk exist but are mitigated by the overall product integration and community. Unknowns in scale, custom detection, and support should be explored through direct product/code review.",
+  "structured_data": {
+    "target": {
+      "company_name": "Wazuh",
+      "product_name": null,
+      "product_url": "https://wazuh.com/",
+      "known_urls": [
+        "https://wazuh.com/"
+      ],
+      "known_competitors": [
+        "OSSEC",
+        "Elastic SIEM",
+        "Splunk",
+        "AlienVault OSSIM",
+        "Security Onion",
+        "Graylog"
+      ],
+      "evaluation_prompt": "Evaluate wazuh for technical diligence."
+    },
+    "executive_judgment": {
+      "technical_substance": "real_asset",
+      "confidence": "high",
+      "summary": "Wazuh is a real, open-source technical asset with broad adoption, visible public codebase, and robust feature set for SIEM/XDR use cases. It matches or exceeds open-source competitors on documented capabilities and integrates with widely used log and analytics stacks. No major proprietary technical differentiators are identified, and scalability/design approaches rely on widely used open-source architectures (agents plus Elastic/OpenSearch/Splunk for data), but it offers a breadth of rules/integrations and ongoing active development that makes it a leader among open-source SIEM/XDR systems.",
+      "key_risks": [
+        "No uniquely proprietary architecture or algorithm—most components are improvements, extensions, or wrappers over commodity open-source paradigms (agent, log-forwarder, rule set).",
+        "Scale and high-volume performance management not validated in public benchmarks for enterprise-class requirements—uncertainty about performance in very large deployments.",
+        "Competitive moat risk: Commercial competitors (e.g., Elastic SIEM, Splunk) have more mature advanced analytics and can move faster with resources; open-source forks can also replicate capabilities with moderate engineering effort.",
+        "Some compliance and detection features depend on user customization or integrations, not fully out-of-box."
+      ],
+      "key_strengths": [
+        "Comprehensive open-source codebase and documentation—visible on GitHub, multiple languages, plugin/extensible design.",
+        "Wide range of integrations (Elastic, OpenSearch, Splunk, AWS, Docker, etc.), robust RESTful API.",
+        "High community and customer adoption; trusted by numerous reference customers.",
+        "Active release cadence and broad compliance content; breadth as a platform.",
+        "Strong suitability for open-source-minded buyers, academic/government, and organizations stacking multiple open-source security tools."
+      ]
+    },
+    "claims": [
+      {
+        "claim": "Wazuh is a comprehensive open-source SIEM (Security Information and Event Management) and XDR (Extended Detection and Response) platform for threat prevention, detection, and response across endpoints, clouds, and networks.",
+        "claim_source_urls": [
+          "https://wazuh.com/",
+          "https://github.com/wazuh/wazuh"
+        ],
+        "public_evidence": "Wazuh's official website describes it as an open-source platform combining SIEM/XDR, offering capabilities for threat prevention, detection, and response across endpoints, cloud, on-premises, and hybrid environments. The GitHub repository is public and under active development, with code, issues, and deployment documentation available. Public blog posts and technical docs cite endpoint, network, and cloud monitoring under supported features.",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://github.com/wazuh/wazuh",
+          "https://wazuh.com/platform/overview"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "The Wazuh agent performs periodic scans to detect misconfigurations or security gaps and includes features such as Security Configuration Assessment (SCA), Rootcheck, and File Integrity Monitoring (FIM).",
+        "claim_source_urls": [
+          "https://wazuh.com/platform/overview"
+        ],
+        "public_evidence": "The Wazuh documentation and overview explicitly reference periodic agent scans for misconfigurations, SCA modules, Rootcheck for rootkit detection, and FIM for monitoring file changes on supported platforms. Technical guides publicly detail their configuration and operational workflow.",
+        "evidence_source_urls": [
+          "https://wazuh.com/platform/overview",
+          "https://documentation.wazuh.com/current/user-manual/capabilities/sca.html",
+          "https://documentation.wazuh.com/current/user-manual/capabilities/rootcheck.html",
+          "https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh provides out-of-the-box support for compliance frameworks including PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/compliance/index.html",
+          "https://medium.com/@wilklins/leveraging-wazuh-for-continuous-regulatory-adherence-a7855bf47e44"
+        ],
+        "public_evidence": "Wazuh’s compliance documentation page publicly lists PCI DSS, HIPAA, NIST 800-53, TSC, GDPR and requirements mappings with corresponding policy modules and rules. Community and vendor blogs discuss its use in regulatory adherence with provided templates and rules for reporting.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/compliance/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh is licensed under open source licenses (GNU GPL and Apache License). The source code is publicly available.",
+        "claim_source_urls": [
+          "https://github.com/wazuh/wazuh",
+          "https://osintph.medium.com/understanding-wazuh-the-free-open-source-security-platform-for-xdr-siem-48b3c3dfba9d"
+        ],
+        "public_evidence": "The Wazuh main GitHub repository is public and explicitly lists GPL v2 license for the core project; adjacent repositories (e.g., integrations) use Apache 2.0. Source code, contributions, and full commit logs are publicly visible.",
+        "evidence_source_urls": [
+          "https://github.com/wazuh/wazuh",
+          "https://github.com/wazuh/integrations",
+          "https://wazuh.com/faq/#licenses"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh provides a public RESTful API for management and integration, supporting agent management, event retrieval, user/role management, and other automated operations.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "public_evidence": "Wazuh documentation fully describes a RESTful API with endpoints for agent lifecycle management, event queries, configuration, roles/users, and automation. Example requests and Python bindings are also included in the public docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh integrates with third-party security platforms including Elastic, OpenSearch, Splunk, Amazon Security Lake, and others, using Logstash as a data forwarder.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/integrations-guide/index.html"
+        ],
+        "public_evidence": "Public integration guides cover Elastic Stack, OpenSearch, Splunk, AWS Security Lake, and more, with Logstash-forwarding employed for SIEM event pipeline integration. Supported integrations are explicit and appear in the official public documentation.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/integrations-guide/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh supports security visibility and event monitoring for Docker hosts and containers, including detection of threats, vulnerabilities, and anomalies.",
+        "claim_source_urls": [
+          "https://wazuh.com/platform/overview"
+        ],
+        "public_evidence": "Wazuh official overview and technical docs confirm monitoring of Docker environments. Modules include anomaly detection, audit logging, and syscalls for threat and vulnerability visibility within containers and hosts.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/capabilities/docker-monitoring.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh maintains an active release cadence with recent significant version updates (e.g., Wazuh 4.6.0), including new features and stability improvements.",
+        "claim_source_urls": [
+          "https://github.com/wazuh/wazuh/releases"
+        ],
+        "public_evidence": "Wazuh's GitHub release page shows frequent version updates, with detailed changelogs, new feature listings, and bugfixes; Wazuh 4.6.0 was released mid-2023, with multiple subsequent updates in 2024.",
+        "evidence_source_urls": [
+          "https://github.com/wazuh/wazuh/releases"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh has documented customers and public references, indicating adoption among organizations with IT security needs.",
+        "claim_source_urls": [
+          "https://wazuh.com/our-customers"
+        ],
+        "public_evidence": "Wazuh site provides a customer list and several case studies, naming government, education, and private sector adopters. Public blog posts also reference industry adoption.",
+        "evidence_source_urls": [
+          "https://wazuh.com/our-customers"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh maintains a public GitHub repository for integrations with third-party solutions, rulesets, active responses, and compliance policies.",
+        "claim_source_urls": [
+          "https://github.com/wazuh/integrations"
+        ],
+        "public_evidence": "The https://github.com/wazuh/integrations repository is public and actively maintained, with modules for third-party products, compliance content, and examples.",
+        "evidence_source_urls": [
+          "https://github.com/wazuh/integrations"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh is described as having rapid capability development and comprehensive documentation due to its open-source model.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "Product site and GitHub activity indicate rapid iterative updates and a large, publicly visible documentation set. Third-party security blogs corroborate the breadth and accessibility of documentation. However, 'comprehensive' may be subjective – docs are robust but not always complete for deep-edge use cases.",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://documentation.wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh competitor landscape (SIEM/XDR open-source and commercial): OSSEC, Security Onion, AlienVault OSSIM, Elastic SIEM, Splunk, Graylog.",
+        "claim_source_urls": [
+          "https://wazuh.com/",
+          "https://www.elastic.co/siem",
+          "https://www.splunk.com/",
+          "https://www.alienvault.com/products/ossim",
+          "https://securityonion.net/",
+          "https://www.graylog.org/",
+          "https://ossec.github.io/"
+        ],
+        "public_evidence": "These vendors are cited across technical blogs and industry reports (e.g., Gartner, Forrester) as open-source or commercial SIEM/XDR alternatives to Wazuh. Wazuh is a fork and successor of OSSEC, while Security Onion, OSSIM, and Graylog each provide SIEM or detection platforms with varying feature overlap. Elastic SIEM, Splunk offer proprietary/commercial SIEM products with some open integrations. No official Wazuh-produced competitor matrix is available.",
+        "evidence_source_urls": [
+          "https://www.elastic.co/siem",
+          "https://ossec.github.io/",
+          "https://securityonion.net/",
+          "https://www.graylog.org/",
+          "https://www.splunk.com/",
+          "https://www.alienvault.com/products/ossim"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      }
+    ],
+    "technical_substance": {
+      "product_depth": "deep",
+      "proprietary_architecture": "commodity",
+      "wrapper_risk": "medium",
+      "evidence": [
+        "Public source code (https://github.com/wazuh/wazuh) shows large, mature codebase with active development, not just a UI wrapper.",
+        "Official documentation details agent-based architecture, rule-set composition, integrations; no claim of novel analytics/algorithms.",
+        "Feature coverage (SCA, FIM, Rootcheck, Docker monitoring, compliance frameworks) is broad, with detailed technical docs and user guides.",
+        "Integration with Elastic, OpenSearch, Splunk, AWS Security Lake, Logstash indicates reliance on commodity log/event management technology.",
+        "No public technical deep-dives demonstrating truly unique architecture over and above OSS/commodity competitors."
+      ],
+      "reasoning": "Wazuh is a substantial codebase, adding orchestration, UX, compliance, and integration to agent-based open-source SIEM. While its features are broad and depth is good, proprietary technical advantage is not evident in architecture or algorithms—it relies on accepted open approaches, extending them but not uniquely advancing them. Some risk exists of being 'wrapped' around Elastic Stack or similar, but Wazuh does add real product code and content."
+    },
+    "competitors": [
+      {
+        "competitor_name": "OSSEC",
+        "competitor_url": "https://ossec.github.io/",
+        "similar_capabilities": [
+          "Host-based Intrusion Detection",
+          "Log analysis",
+          "File Integrity Monitoring",
+          "Rootkit detection",
+          "Compliance monitoring"
+        ],
+        "differentiation_notes": "OSSEC is the open-source predecessor to Wazuh and shares many core capabilities, especially around HIDS and FIM. Wazuh extends OSSEC with native agent management, web UI, support for more integrations (e.g. Elastic Stack, native REST API), and enhanced compliance modules. Wazuh is seen as a superset/fork with a more active roadmap and more SIEM/XDR-oriented capabilities.",
+        "source_urls": [
+          "https://ossec.github.io/",
+          "https://documentation.wazuh.com/current/comparison/ossec_comparison.html"
+        ]
+      },
+      {
+        "competitor_name": "Elastic SIEM",
+        "competitor_url": "https://www.elastic.co/siem",
+        "similar_capabilities": [
+          "SIEM functionality",
+          "Centralized log management",
+          "Threat detection (SIEM rules)",
+          "Integrations with security data sources",
+          "MITRE ATT&CK mapping",
+          "Dashboards/visualizations"
+        ],
+        "differentiation_notes": "Elastic SIEM is integrated into Elastic Stack (ELK). It is not open source in the comprehensive SIEM/XDR features (which require a commercial license), but the basic stack is open source. Elastic SIEM natively scales for large data volumes and has first-class search/visualization. Wazuh can integrate with Elastic for storage and search, but is positioned as a complete open SIEM/XDR, while Elastic SIEM offers deeper scale-out and commercial support/integrations for threat intelligence and endpoint protection.",
+        "source_urls": [
+          "https://www.elastic.co/siem",
+          "https://documentation.wazuh.com/current/integrations-guide/elastic-stack/index.html"
+        ]
+      },
+      {
+        "competitor_name": "Splunk (Enterprise Security)",
+        "competitor_url": "https://www.splunk.com/",
+        "similar_capabilities": [
+          "SIEM capabilities",
+          "Real-time event correlation",
+          "Advanced analytics and alerting",
+          "Threat intelligence framework",
+          "Large-scale log ingestion",
+          "Enterprise integrations"
+        ],
+        "differentiation_notes": "Splunk is a proprietary SIEM market leader, focused on large enterprise deployment, and offers advanced analytics, machine learning, and premium integrations. Wazuh provides open source SIEM/XDR features, but at lower cost and with more accessible source, at the tradeoff of lower out-of-the-box enterprise features (e.g., UEBA, advanced ML). Splunk’s differentiator is mature scalability, integration ecosystem, and analytics—at a much higher cost and closed codebase.",
+        "source_urls": [
+          "https://www.splunk.com/",
+          "https://www.splunk.com/en_us/solutions/solution-areas/siem-security-information-and-event-management.html"
+        ]
+      },
+      {
+        "competitor_name": "AlienVault OSSIM",
+        "competitor_url": "https://www.alienvault.com/products/ossim",
+        "similar_capabilities": [
+          "Open-source SIEM (OSSIM)",
+          "Intrusion detection/correlation",
+          "Log collection and normalization",
+          "Vulnerability assessment",
+          "Asset discovery",
+          "Compliance monitoring"
+        ],
+        "differentiation_notes": "AlienVault OSSIM is a longstanding open source SIEM. It has broad features, correlating open source tools, but development pace is lower than Wazuh, and it has historically relied on integrating third-party security tools vs. developing new detection methods. Wazuh focuses more on endpoint visibility and agent-based controls; OSSIM centers multi-tool orchestration.",
+        "source_urls": [
+          "https://www.alienvault.com/products/ossim",
+          "https://www.alienvault.com/resource-center/data-sheets/ossim-vs-usm"
+        ]
+      },
+      {
+        "competitor_name": "Security Onion",
+        "competitor_url": "https://securityonion.net/",
+        "similar_capabilities": [
+          "Open-source threat hunting/monitoring platform",
+          "Network and host-based IDS (Suricata, Zeek, OSSEC agents)",
+          "Log analysis and correlation",
+          "Security dashboards and alerting"
+        ],
+        "differentiation_notes": "Security Onion is oriented for blue team threat hunting, incident response, integrates several open source IDS and SIEM tools (including underlying OSSEC/Wazuh agents for HIDS). It excels in packet capture and network visibility, but SIEM/XDR event correlation is deeper in Wazuh, which also focuses on endpoint protection and compliance reporting.",
+        "source_urls": [
+          "https://securityonion.net/docs/Features.html",
+          "https://securityonion.net/"
+        ]
+      },
+      {
+        "competitor_name": "Graylog",
+        "competitor_url": "https://www.graylog.org/",
+        "similar_capabilities": [
+          "Log management and analytics",
+          "Alerting/rules engine",
+          "Audit and compliance modules",
+          "Extensible integrations (SIEM-related)"
+        ],
+        "differentiation_notes": "Graylog is a log management platform that can be extended to SIEM use-cases but lacks full XDR or native endpoint security features. Maturity and scalability for log ingestion are high, but intrusion detection and compliance features are less complete than Wazuh. Commodity log management overlaps but Wazuh focuses on threat detection and compliance.",
+        "source_urls": [
+          "https://www.graylog.org/solutions/security-and-compliance",
+          "https://www.graylog.org/features"
+        ]
+      }
+    ],
+    "replicability": {
+      "estimated_replication_time": "3_to_6_months",
+      "competitor_replication_risk": "medium",
+      "drivers": [
+        "All core components and features are open source and public, with detailed documentation.",
+        "Commodity technologies and paradigms (agent, event forwarders, REST APIs) are widely known—no unique IP.",
+        "Many competitors (Elastic SIEM, AlienVault OSSIM, Graylog, OSSEC) already have feature overlap and could extend offerings by integrating plugins or rulesets."
+      ],
+      "constraints": [
+        "Wazuh’s specific compliance content, management UI, and breadth of integrations would still require moderate effort to match in polish.",
+        "Building the same active community and customer adoption would take longer.",
+        "Wazuh’s release cadence and ecosystem provide some inertia that makes real-world parity more challenging than code replication alone."
+      ]
+    },
+    "code_review_follow_ups": [
+      {
+        "id": "wazuh-arch-1",
+        "area": "architecture",
+        "question": "What are the scaling constraints and bottlenecks observed for Wazuh Manager and data infrastructure at >10k agent deployments, and what architecture patterns are recommended at large scale?",
+        "expected_evidence": [
+          "Empirical data or benchmarks for large deployments",
+          "Reference customer architectures",
+          "Manager sharding/HA strategies and pain points"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "wazuh-ext-1",
+        "area": "proprietary modules",
+        "question": "Are there any detection, analytics, or management subsystems in Wazuh that are proprietary or fundamentally different in design from open-source SIEM/XDR paradigms (e.g., novel threat correlation engines, ML modules)?",
+        "expected_evidence": [
+          "Architectural documentation of proprietary (non-open) code or design",
+          "Explanation of unique technical advances vs. open peers"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "wazuh-tco-1",
+        "area": "deployment & TCO",
+        "question": "What support, professional services, or tooling are available (either proprietary or as value-added) to reduce total cost of ownership when compared to self-managed Wazuh?",
+        "expected_evidence": [
+          "Detailed documentation of commercial/pro support offerings",
+          "Third-party deployment case studies"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "wazuh-sec-1",
+        "area": "contribution workflows",
+        "question": "What are the main code review, contribution, and release engineering workflows for community and customer-contributed code (acceptance, test coverage, security validation)?",
+        "expected_evidence": [
+          "Link/documentation of code review policies",
+          "Contribution acceptance criteria",
+          "Automated test suite structure/execution"
+        ],
+        "priority": "medium"
+      }
+    ],
+    "evidence_gaps": [
+      "No public technical deep-dive describing Wazuh’s unique architectural differences versus all competitors (e.g., scale, proprietary modules).",
+      "No official, detailed cost-of-ownership or real-world deployment complexity data published; third-party reviews are scattered and anecdotal.",
+      "Quantitative performance benchmarks are not published in official or most public resources.",
+      "The granularity of compliance with various regulations sometimes depends on user-customized rules or third-party plugins, not always core/out-of-box features.",
+      "Community or customer contribution processes are somewhat opaque/not formally documented in technical docs—details appear only in project contribution guides."
+    ],
+    "source_urls": [
+      "https://wazuh.com/",
+      "https://github.com/wazuh/wazuh",
+      "https://documentation.wazuh.com/current/compliance/index.html",
+      "https://medium.com/@wilklins/leveraging-wazuh-for-continuous-regulatory-adherence-a7855bf47e44",
+      "https://osintph.medium.com/understanding-wazuh-the-free-open-source-security-platform-for-xdr-siem-48b3c3dfba9d",
+      "https://github.com/wazuh/integrations",
+      "https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "https://documentation.wazuh.com/current/integrations-guide/index.html",
+      "https://wazuh.com/platform/overview",
+      "https://documentation.wazuh.com/current/user-manual/capabilities/docker-monitoring.html",
+      "https://github.com/wazuh/wazuh/releases",
+      "https://wazuh.com/our-customers",
+      "https://wazuh.com/faq/#licenses",
+      "https://www.elastic.co/siem",
+      "https://ossec.github.io/",
+      "https://securityonion.net/",
+      "https://www.graylog.org/",
+      "https://www.splunk.com/",
+      "https://www.alienvault.com/products/ossim"
+    ]
+  },
+  "raw_structured_data": null,
+  "structured_data_validation": {
+    "valid": true,
+    "errors": []
+  },
+  "summary": "Wazuh is a real, open-source technical asset with broad adoption, visible public codebase, and robust feature set for SIEM/XDR use cases. It matches or exceeds open-source competitors on documented capabilities and integrates with widely used log and analytics stacks. No major proprietary technical differentiators are identified, and scalability/design approaches rely on widely used open-source architectures (agents plus Elastic/OpenSearch/Splunk for data), but it offers a breadth of rules/integrations and ongoing active development that makes it a leader among open-source SIEM/XDR systems.\nWazuh's official website describes it as an open-source platform combining SIEM/XDR, offering capabilities for threat prevention, detection, and response across endpoints, cloud, on-premises, and hybrid environments. The GitHub repository is public and under active development, with code, issues, and deployment documentation available. Public blog posts and technical docs cite endpoint, network, and cloud monitoring under supported features.",
+  "findings": [
+    {
+      "id": "finding_1",
+      "claim": "Wazuh offers real open-source SIEM/XDR value with broad coverage and integration, but does not have unique proprietary technical substance compared to its open-source peers. Replicability risk is non-trivial.",
+      "evidence_ids": [],
+      "confidence": 1.0
+    },
+    {
+      "id": "finding_2",
+      "claim": "Scalability and robustness of Wazuh in very large enterprise deployments is not validated by public benchmarks or reference architectures—risk remains on scaling and performance.",
+      "evidence_ids": [],
+      "confidence": 0.66
+    },
+    {
+      "id": "finding_3",
+      "claim": "Wazuh has a visible, mature codebase devoted to orchestration, UI, and compliance—it's not just a thin wrapper around commodity tools (though there is some wrapper risk).",
+      "evidence_ids": [],
+      "confidence": 1.0
+    },
+    {
+      "id": "finding_4",
+      "claim": "There is no public evidence that any detection or analytics features are genuinely proprietary or differentiated at a low level from other open-source SIEMs.",
+      "evidence_ids": [],
+      "confidence": 1.0
+    }
+  ],
+  "sources": [
+    {
+      "id": "src_1",
+      "url": "https://thehackernews.com/2025/08/wazuh-for-regulatory-compliance.html",
+      "title": "Wazuh for Regulatory Compliance",
+      "snippet": "# Wazuh for Regulatory Compliance. Organizations handling various forms of sensitive data or personally identifiable information (PII) require adherence to regulatory compliance standards and frameworks. Wazuh is an open source security platform that provides unified Extended Detection and Response (XDR) and Security Information and Event Management (SIEM) protection for endpoints and cloud workloads. Wazuh offers various capabilities, including threat detection and response, vulnerability detection, file integrity monitoring, container security, system inventory, and security configuration assessment. Wazuh can help you track and implement regulatory compliance standards and frameworks by providing the following:. Wazuh includes default dashboards, modules, and rulesets associated with specific compliance standards and regulatory frameworks. Wazuh provides dedicated dashboards to monitor and track events relevant to compliance requirements. The Wazuh compliance dashboard offers a “**Controls**” section that shows applicable compliance requirements. The information on the Wazuh dashboard is updated with the latest compliance standards and frameworks versions. Various supporting platforms can be used to ensure compliance with regulatory standards and frameworks.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_2",
+      "url": "https://documentation.wazuh.com/current/compliance/index.html",
+      "title": "Regulatory compliance · Wazuh documentation",
+      "snippet": "# Regulatory compliance. Wazuh helps implement compliance requirements for regulatory compliance support and visibility. This is done by providing automation, improved security controls, log analysis, and incident response. The default Wazuh ruleset supports the PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR frameworks and standards. Wazuh rules and decoders are used to detect attacks, system errors, security misconfigurations, and policy violations. In addition to the default compliance frameworks and standards provided by Wazuh, it is possible to monitor for custom compliance standards by adding the compliance identifier in the `<group>` tag of rules. Refer to the ruleset section for more information. Learn more about achieving compliance with Wazuh in the sections below:.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_3",
+      "url": "https://www.reddit.com/r/Wazuh/comments/1pjz5z8/how_to_add_custom_compliance_frameworks_iso_27001",
+      "title": "How to Add Custom Compliance Frameworks (ISO 27001, SOC 2 ...",
+      "snippet": "While Wazuh does not offer native support for ISO 27001 or other compliance frameworks, it is an open-source solution, allowing you to customize",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_4",
+      "url": "https://medium.com/@wilklins/leveraging-wazuh-for-continuous-regulatory-adherence-a7855bf47e44",
+      "title": "Leveraging Wazuh for Continuous Regulatory Adherence. - Medium",
+      "snippet": "Wazuh provides out-of-the-box support for major frameworks including PCI DSS v4.0, GDPR, HIPAA, NIST 800–53, and TSC (Trust Services Criteria)",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_5",
+      "url": "https://documentation.wazuh.com/current/compliance/nist/index.html",
+      "title": "Using Wazuh for NIST 800-53 compliance - Regulatory compliance",
+      "snippet": "* Using Wazuh for NIST 800-53 compliance. NIST 800-53 is a cybersecurity framework developed by the National Institute of Standards and Technology (NIST). NIST 800-53 specifies security and privacy mechanisms and controls that U.S. federal information systems must implement and meet. The U.S. government makes compliance with these requirements mandatory for organizations and entities that process and handle federal data. These Wazuh modules and capabilities also assist organizations in complying with NIST 800-53 controls. These rules are mapped to the NIST 800-53 controls by default. In addition to the default rule mapping provided by Wazuh, it’s possible to map your custom rules to one or more NIST 800-53 controls. The syntax used to map a rule to a NIST 800-53 control is `nist_800_53_` followed by the acronym of the control and the specific control number. In the Wazuh for NIST 800-53 revision 5 guide (PDF), we explain how the various Wazuh modules assist in meeting and implementing NIST 800-53 controls.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_6",
+      "url": "https://github.com/wazuh/wazuh/releases",
+      "title": "Releases · wazuh/wazuh - GitHub",
+      "snippet": "Fixed DAPI callable resolution to restrict invocations to exposed resources only. · Fixed uncontrolled memory allocation in cluster caused by crafted packet",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_7",
+      "url": "https://github.com/wazuh/wazuh-dashboard-plugins/blob/main/CHANGELOG.md",
+      "title": "wazuh-dashboard-plugins/CHANGELOG.md at main - GitHub",
+      "snippet": "All notable changes to the Wazuh app project will be documented in this file. Wazuh v5.0.0 - OpenSearch Dashboards 3.6.0 - Revision 01. Added.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_8",
+      "url": "https://github.com/wazuh/wazuh-indexer/releases",
+      "title": "Releases · wazuh/wazuh-indexer - GitHub",
+      "snippet": "What's Changed. Upgrade Java version to 25 in workflows by @Jorgesnchz in #1343; Migrate main 3.3.2 to 3.5.0 by @AlexRuiz7 in #1342",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_9",
+      "url": "https://documentation.wazuh.com/current/user-manual/reference/index.html",
+      "title": "Reference - User manual - Wazuh documentation",
+      "snippet": "Check out this section to see a complete reference of all the configurations and settings that can be customized on Wazuh, for both managers and agents.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_10",
+      "url": "https://documentation.wazuh.com/current/user-manual/index.html",
+      "title": "User manual - Wazuh documentation",
+      "snippet": "Welcome to the Wazuh user manual. Use it as your reference library once your basic Wazuh installation is ready.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_11",
+      "url": "https://wazuh.com/our-customers",
+      "title": "Our customers | Wazuh",
+      "snippet": "Wazuh offers a wide range of use cases and services that help users manage the security of their system. We provide 360-degree security with just one platform.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_12",
+      "url": "https://www.reddit.com/r/cybersecurity/comments/1gf6euj/wazuh_vs_elk_siem",
+      "title": "Wazuh vs ELK SIEM : r/cybersecurity - Reddit",
+      "snippet": "Wazuh is better and provides XDR capabilities too, and it is really open source. Elastic instead has a hybrid license where some features are not open source.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_13",
+      "url": "https://news.fmisec.com/02-wazuh-vs-ossec-graylog-and-elk-stack-a-real-world-comparison",
+      "title": "Wazuh vs OSSEC, Graylog, and ELK Stack: A Real-World Comparison",
+      "snippet": "Graylog: Much better compression, more efficient storage (this matters when you're dealing with TBs of logs). Wazuh: Stores more metadata, so it",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_14",
+      "url": "https://www.selecthub.com/siem-tools/wazuh-vs-elastic-security",
+      "title": "Wazuh vs Elastic Security | Which SIEM Tools Wins In 2026?",
+      "snippet": "Wazuh starts at $571 per month. Elastic Security starts at $99 per month. Both use monthly pricing, so you can compare them directly. Elastic",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_15",
+      "url": "https://aimultiple.com/open-source-siem",
+      "title": "Top 13 Open Source SIEM Tools in 2026 - AIMultiple",
+      "snippet": "Wazuh and SecurityOnion are the main examples. They're powerful data infrastructure tools, excellent at collecting, storing, and visualizing",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_16",
+      "url": "https://www.researchgate.net/publication/391562361_Comparative_Analysis_of_Wazuh_Graylog_and_Elk_Stack_for_Cyber_Threat_Detection_and_Response",
+      "title": "Comparative Analysis of Wazuh, Graylog, and Elk Stack for Cyber ...",
+      "snippet": "Comparative Analysis of Wazuh, Graylog, and Elk Stack for Cyber Threat Detection and Response. December 2024. DOI:10.20533/ICITST.2024.0015.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_17",
+      "url": "https://github.com/wazuh/wazuh",
+      "title": "Wazuh - The Open Source Security Platform. Unified XDR ... - GitHub",
+      "snippet": "Wazuh is a free and open source platform used for threat prevention, detection, and response. It is capable of protecting workloads across on-premises,",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_18",
+      "url": "https://osintph.medium.com/understanding-wazuh-the-free-open-source-security-platform-for-xdr-siem-48b3c3dfba9d",
+      "title": "Understanding Wazuh: The Free, Open Source Security Platform for ...",
+      "snippet": "Remember, Wazuh is licensed under the GNU General Public License and the Apache License, ensuring that you're part of a global community of",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_19",
+      "url": "https://github.com/wazuh/wazuh/blob/main/LICENSE",
+      "title": "wazuh/LICENSE at main - GitHub",
+      "snippet": "* Integrates source code/data files from Wazuh. * Includes Wazuh copyrighted material. * Includes/integrates Wazuh into a proprietary executable installer.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_20",
+      "url": "https://sourceforge.net/projects/wazuh.mirror",
+      "title": "Wazuh download | SourceForge.net",
+      "snippet": "Download Wazuh for free. The Open Source Security Platform. Wazuh is an open-source, unified security platform that delivers extended detection and response",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_21",
+      "url": "https://wazuh.com/",
+      "title": "Wazuh - Open Source XDR. Open Source SIEM.",
+      "snippet": "The Wazuh Security Information and Event Management (SIEM) solution provides monitoring, detection, and alerting of security events and incidents. The Wazuh Cloud service offers managed, ready-to-use, and highly scalable cloud environments for security monitoring and endpoint protection. > “We found in Wazuh the most complete security platform. > “In addition to the great advantage of being an open-source platform, Wazuh is easy to deploy, and its multiple capabilities have helped us achieve our security goals at Woop. Wazuh is available at no cost and adopts an **open-source** approach to security, which ensures transparency, flexibility, constant improvement, and free community support. As an open source platform, Wazuh benefits from rapid capability development, offers comprehensive documentation, and fosters high user engagement. Wazuh is an **open-source** platform for threat detection and incident response, renowned for its adaptability and integration capabilities. Users benefit from the flexibility to modify the source code, tailoring Wazuh to their specific security needs.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_22",
+      "url": "https://www.reddit.com/r/Wazuh/comments/1qnxe2n/wazuh_x_jira_integration",
+      "title": "Wazuh x Jira Integration - Reddit",
+      "snippet": "Right now, the Wazuh Jira integration only supports static API tokens configured in ossec.conf . OAuth authentication and dynamically",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_23",
+      "url": "https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "title": "Wazuh server API - User manual · Wazuh documentation",
+      "snippet": "# Wazuh server API. The Wazuh server API is an open source RESTful API that enables secure interaction with the Wazuh server infrastructure. You can interact with it using the built-in API console in the Wazuh dashboard, a command-line tool such as cURL, or any script or program capable of making web requests. The Wazuh dashboard relies on the Wazuh server API to remotely manage the Wazuh server infrastructure. You can utilize the Wazuh server API to perform common tasks such as adding agents, restarting the manager(s) or agent(s), or retrieving detailed File Integrity Monitoring (FIM) events and status, managing users, roles, and permissions and more. Here is a list of the Wazuh server API capabilities:. * Wazuh manager control and overview. * File integrity monitoring control and search. * Role-Based Access Control (RBAC). Refer to the Wazuh server API reference for details about all the Wazuh server API endpoints. For practical, real-world examples of how to use these capabilities, see the use cases section.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_24",
+      "url": "https://wazuhmcp.netlify.app/",
+      "title": "Wazuh MCP Server - AI-Powered SIEM Integration | Natural ...",
+      "snippet": "Wazuh's comprehensive REST API enables seamless AI integration for enhanced security analytics. Model Context Protocol (MCP). Anthropic's open standard for",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_25",
+      "url": "https://documentation.wazuh.com/current/integrations-guide/index.html",
+      "title": "Integrations guide: Elastic, OpenSearch, Splunk, Amazon Security ...",
+      "snippet": "Up to Wazuh v4.5, the following integrated applications allow users to manage Wazuh and its security data using third-party platforms:. In this document, we describe new methods of integrating your Wazuh deployment with the following third-party security platforms:. ### Wazuh indexer integration. These data are analyzed by the Wazuh server and indexed in the Wazuh indexer. The Wazuh indexer integration forwards analyzed security data from the Wazuh indexer to the third-party security platform indexer in the form of indexes. Wazuh indexer integration requires a running Wazuh indexer and uses Logstash as a data forwarder for forwarding alerts to a third-party security platform. This integration requires that you install Logstash on a dedicated server or on the server hosting the third-party indexer. We recommend the Wazuh indexer integration if you want to continue analyzing security data in Wazuh and archive it in a data lake for storage or out-of-band analysis. The Wazuh server integration operates by reading the `/var/ossec/logs/alerts/alerts.json` file and forwarding the alerts to the third-party platform using a data forwarder.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_26",
+      "url": "https://github.com/wazuh/integrations",
+      "title": "wazuh/integrations - GitHub",
+      "snippet": "This public repository contains integrations for third-party solutions, Wazuh rulesets, active responses, Security Configuration Assessment (SCA) policies,",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_27",
+      "url": "https://wazuh.com/platform/overview",
+      "title": "Overview | Wazuh",
+      "snippet": "It analyzes security data across endpoints, clouds, and networks to detect threats, respond to incidents, and ensure compliance, helping organizations strengthen their security posture through continuous monitoring and automation. The Wazuh agents perform periodic scans to detect misconfigurations or security gaps in endpoints that can be exploited by threat actors. Wazuh out-of-the-box ruleset and capabilities like Security Configuration Assessment (SCA), Rootcheck, and File Integrity Monitoring (FIM) help to detect malicious activities and anomalies. You can use the Wazuh File Integrity Monitoring capability in combination with threat intelligence to identify threats or compromised endpoints. Collecting this information helps organizations optimize asset visibility and maintain good IT hygiene.Several other Wazuh capabilities like vulnerability detection, Security Configuration Assessment, and malware detection help to protect monitored endpoints and improve IT hygiene. Wazuh provides security visibility into Docker hosts and containers, monitoring their behavior and detecting threats, vulnerabilities, and anomalies. The Wazuh agent is a multi-platform component that runs on the endpoints to be monitored.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_28",
+      "url": "https://wazuh.com/blog/introducing-wazuh-4-6-0",
+      "title": "Introducing Wazuh 4.6.0",
+      "snippet": "Wazuh boasts a range of SIEM (Security Information and Event Management) and XDR (Extended Detection and Response) capabilities. These",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_29",
+      "url": "https://wazuh.com/blog/wazuh-4-2-0-released",
+      "title": "Wazuh 4.2.0 released",
+      "snippet": "Wazuh new Stability enhancements provide stability to several features of the solution, including Analysisd, File Integrity Monitoring, Remoted,",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    }
+  ],
+  "evidence": [],
+  "artifacts": [],
+  "warnings": [],
+  "metadata": {
+    "run_id": "run_a2911ea429b14357b19c306040ade63c",
+    "workflow_id": "technical_due_diligence",
+    "started_at": "2026-05-05T07:42:17.245091Z",
+    "finished_at": "2026-05-05T07:45:38.911444Z",
+    "cost_usd": null,
+    "tokens": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+    }
+  }
+}
