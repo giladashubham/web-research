@@ -10,8 +10,6 @@
         },
         "claim_source_urls": {
           "items": {
-            "format": "uri",
-            "maxLength": 2083,
             "minLength": 1,
             "type": "string"
           },
@@ -25,8 +23,6 @@
         },
         "evidence_source_urls": {
           "items": {
-            "format": "uri",
-            "maxLength": 2083,
             "minLength": 1,
             "type": "string"
           },
@@ -124,8 +120,6 @@
         "competitor_url": {
           "anyOf": [
             {
-              "format": "uri",
-              "maxLength": 2083,
               "minLength": 1,
               "type": "string"
             },
@@ -150,8 +144,6 @@
         },
         "source_urls": {
           "items": {
-            "format": "uri",
-            "maxLength": 2083,
             "minLength": 1,
             "type": "string"
           },
@@ -189,8 +181,6 @@
         "product_url": {
           "anyOf": [
             {
-              "format": "uri",
-              "maxLength": 2083,
               "minLength": 1,
               "type": "string"
             },
@@ -203,8 +193,6 @@
         },
         "known_urls": {
           "items": {
-            "format": "uri",
-            "maxLength": 2083,
             "minLength": 1,
             "type": "string"
           },
@@ -427,8 +415,6 @@
     },
     "source_urls": {
       "items": {
-        "format": "uri",
-        "maxLength": 2083,
         "minLength": 1,
         "type": "string"
       },
