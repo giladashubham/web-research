@@ -5,21 +5,23 @@ from importlib.resources import files
 
 
 @cache
-def load_prompt(name: str, depth: str = "standard") -> str:
-    path = files("webresearch.workflows.shared").joinpath("prompts", name)
+def load_shared_prompt(name: str, workflow_id: str) -> str:
+    path = files("webresearch.workflows.shared") / "prompts" / name
     if not path.is_file():
         raise FileNotFoundError(f"Prompt file not found: {path}")
-    return path.read_text(encoding="utf-8").replace("{depth_extras}", load_depth_extras(depth))
+    return path.read_text(encoding="utf-8").replace(
+        "{depth_extras}", load_depth_extras(workflow_id)
+    )
 
 
 @cache
-def load_depth_extras(depth: str) -> str:
-    if depth == "standard":
-        path = files("webresearch.workflows.standard").joinpath("prompts", "depth_extras.md")
-    elif depth == "quick":
-        path = files("webresearch.workflows.quick").joinpath("prompts", "depth_extras.md")
-    else:
-        path = files("webresearch").joinpath("prompts", "depth_extras", f"{depth}.md")
+def load_workflow_prompt(workflow_id: str, name: str) -> str:
+    path = files(f"webresearch.workflows.{workflow_id}") / "prompts" / name
     if not path.is_file():
-        raise FileNotFoundError(f"Depth prompt extras file not found: {path}")
+        raise FileNotFoundError(f"Workflow prompt file not found: {path}")
     return path.read_text(encoding="utf-8").strip()
+
+
+@cache
+def load_depth_extras(workflow_id: str) -> str:
+    return load_workflow_prompt(workflow_id, "depth_extras.md")

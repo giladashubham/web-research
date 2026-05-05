@@ -25,6 +25,7 @@ from webresearch.events.step import (
     step,
 )
 from webresearch.types import Depth
+from webresearch.workflows.deep.config import CONFIG
 from webresearch.workflows.shared.result import build_result
 from webresearch.workflows.shared.state import WorkflowState
 
@@ -42,7 +43,9 @@ if TYPE_CHECKING:
 async def run_deep(input: WorkflowInput) -> WorkflowResult:
     ctx = WorkflowContext()
     run_id = current_run_id()
-    depth = Depth.for_preset("deep").model_copy(update={"max_rounds": 2})
+    depth = Depth.for_preset(CONFIG.depth_preset).model_copy(
+        update={"max_rounds": CONFIG.max_gap_rounds}
+    )
     state = WorkflowState(
         input=input,
         depth=depth,
@@ -71,7 +74,11 @@ async def run_deep(input: WorkflowInput) -> WorkflowResult:
         state.review = cast("ReviewOutput", review.final_output)
 
     round_index = 0
-    while state.review.has_critical_gaps and round_index < state.depth.max_rounds:
+    while (
+        CONFIG.gap_loop_enabled
+        and state.review.has_critical_gaps
+        and round_index < state.depth.max_rounds
+    ):
         round_index += 1
         await emit_loop_iteration("gap", round_index)
         async with step("gap"):
@@ -93,4 +100,4 @@ async def run_deep(input: WorkflowInput) -> WorkflowResult:
         state.final = cast("FinalAnswer", final.final_output)
         await emit_output_text_delta(state.final.answer_markdown)
 
-    return build_result(state, ctx, workflow_id="deep")
+    return build_result(state, ctx, workflow_id=CONFIG.workflow_id)

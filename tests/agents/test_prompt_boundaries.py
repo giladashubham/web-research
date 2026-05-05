@@ -22,7 +22,7 @@ from webresearch.agents.researchers import (
 from webresearch.agents.reviewer import reviewer_agent
 from webresearch.context import WorkflowContext
 from webresearch.types import SourceInput
-from webresearch.workflows.shared.prompt_loader import load_prompt
+from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
 RESEARCH_TOOL_NAMES = [
     "search_web_tool",
@@ -183,17 +183,17 @@ def test_final_prompts_replace_placeholders_and_keep_depth_hook() -> None:
     ]
 
     for prompt_name in prompt_names:
-        prompt = load_prompt(prompt_name)
+        prompt = load_shared_prompt(prompt_name, "standard")
         assert "placeholder prompt" not in prompt.lower()
         assert "{depth_extras}" not in prompt
         assert "Use a balanced amount of source coverage and evidence." in prompt
 
 
 def test_prompt_output_models_are_named_in_boundary_prompts() -> None:
-    assert "PlanOutput" in load_prompt("planner.md")
-    assert "ResearcherOutput" in load_prompt("official.md")
-    assert "ResearcherOutput" in load_prompt("recent.md")
-    assert "ResearcherOutput" in load_prompt("broad.md")
-    assert "ReviewOutput" in load_prompt("reviewer.md")
-    assert "GapResearchOutput" in load_prompt("gap.md")
-    assert "FinalAnswer" in load_prompt("output.md")
+    assert "PlanOutput" in load_shared_prompt("planner.md", "standard")
+    assert "ResearcherOutput" in load_shared_prompt("official.md", "standard")
+    assert "ResearcherOutput" in load_shared_prompt("recent.md", "standard")
+    assert "ResearcherOutput" in load_shared_prompt("broad.md", "standard")
+    assert "ReviewOutput" in load_shared_prompt("reviewer.md", "standard")
+    assert "GapResearchOutput" in load_shared_prompt("gap.md", "standard")
+    assert "FinalAnswer" in load_shared_prompt("output.md", "standard")

@@ -15,9 +15,9 @@ from webresearch.agents.models import (
     ReviewOutput,
 )
 from webresearch.types import WorkflowInput
-from webresearch.workflows import deep
+from webresearch.workflows.deep import workflow as deep
 from webresearch.workflows.registry import WORKFLOWS
-from webresearch.workflows.shared.prompt_loader import load_prompt
+from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -186,7 +186,7 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
 
 
 def test_deep_prompt_uses_same_prompt_with_depth_extras() -> None:
-    prompt = load_prompt("official.md", "deep")
+    prompt = load_shared_prompt("official.md", "deep")
 
     assert "official-source researcher" in prompt
     assert "ResearcherOutput" in prompt

@@ -18,7 +18,7 @@ from webresearch.agents.researchers import (
     recent_researcher_agent,
 )
 from webresearch.agents.reviewer import reviewer_agent
-from webresearch.workflows.shared.prompt_loader import load_prompt
+from webresearch.workflows.shared.prompt_loader import load_shared_prompt
 
 
 @pytest.mark.parametrize(
@@ -49,7 +49,7 @@ def test_agent_factories_return_expected_agent(
     agent = factory()
 
     assert agent.name == name
-    assert agent.instructions == load_prompt(prompt)
+    assert agent.instructions == load_shared_prompt(prompt, "standard")
     if hasattr(agent.output_type, "output_type"):
         assert agent.output_type.output_type is output_type
     else:
@@ -77,4 +77,4 @@ def test_researcher_tools_have_expected_names() -> None:
 
 def test_missing_prompt_raises_clear_file_not_found_error() -> None:
     with pytest.raises(FileNotFoundError, match=r"missing\.md"):
-        load_prompt("missing.md")
+        load_shared_prompt("missing.md", "standard")
