@@ -145,6 +145,7 @@ module = [
     "webresearch.agents.planner",
     "webresearch.agents.researchers",
     "webresearch.agents.reviewer",
+    "webresearch.workflows.technical_due_diligence.workflow",
 ]
 # The Agents SDK exposes Agent with Any-bearing generic defaults.
 disallow_any_explicit = false

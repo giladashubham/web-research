@@ -5,8 +5,14 @@ from pydantic import BaseModel, ConfigDict
 from webresearch.workflows.deep import run_deep
 from webresearch.workflows.quick import run_quick
 from webresearch.workflows.standard import run_standard
+from webresearch.workflows.technical_due_diligence import run_technical_due_diligence
 
-WORKFLOWS = {"standard": run_standard, "quick": run_quick, "deep": run_deep}
+WORKFLOWS = {
+    "standard": run_standard,
+    "quick": run_quick,
+    "deep": run_deep,
+    "technical_due_diligence": run_technical_due_diligence,
+}
 
 
 class WorkflowEntry(BaseModel):
@@ -32,6 +38,13 @@ WORKFLOW_ENTRIES = [
         id="deep",
         name="Deep",
         description="Higher-budget standard workflow with extra gap follow-up.",
+    ),
+    WorkflowEntry(
+        id="technical_due_diligence",
+        name="Technical Due Diligence",
+        description=(
+            "Public technical substance, claims, competitors, and replicability assessment."
+        ),
     ),
 ]
 

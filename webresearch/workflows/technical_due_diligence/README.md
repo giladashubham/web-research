@@ -6,5 +6,6 @@ The planned workflow will evaluate public product claims, docs/API/changelog/cus
 competitor capabilities, public architecture signals, likely technical substance, replication risk,
 and code-review follow-up questions.
 
-This package is intentionally not registered in `WORKFLOWS` yet. `workflow.py` exposes a placeholder
-runner that raises `NotImplementedError` until orchestration is implemented.
+The workflow is registered as `technical_due_diligence`. `workflow.py` orchestrates intake planning,
+claim extraction, evidence research, competitor mapping, technical substance review, gap research,
+and final memo generation.

@@ -81,3 +81,63 @@ class TechnicalDueDiligenceReport(WebResearchModel):
     code_review_follow_ups: list[CodeReviewFollowUp] = Field(default_factory=list)
     evidence_gaps: list[str] = Field(default_factory=list)
     source_urls: list[HttpUrl] = Field(default_factory=list)
+
+
+class IntakePlan(WebResearchModel):
+    target: DiligenceTarget
+    research_questions: list[str] = Field(default_factory=list)
+    likely_claim_areas: list[str] = Field(default_factory=list)
+    competitor_names: list[str] = Field(default_factory=list)
+    priority_urls: list[HttpUrl] = Field(default_factory=list)
+
+
+class ExtractedClaim(WebResearchModel):
+    claim: str = Field(min_length=1)
+    source_urls: list[HttpUrl] = Field(default_factory=list)
+    category: Literal["product", "architecture", "ai_ml", "integration", "customer", "other"]
+    diligence_relevance: Literal["low", "medium", "high"]
+
+
+class ClaimExtraction(WebResearchModel):
+    claims: list[ExtractedClaim] = Field(default_factory=list)
+    unknowns: list[str] = Field(default_factory=list)
+
+
+class EvidenceResearch(WebResearchModel):
+    claim_assessments: list[ClaimAssessment] = Field(default_factory=list)
+    evidence_gaps: list[str] = Field(default_factory=list)
+    source_urls: list[HttpUrl] = Field(default_factory=list)
+
+
+class CompetitorMapping(WebResearchModel):
+    competitors: list[CompetitorAssessment] = Field(default_factory=list)
+    comparison_summary: str = Field(min_length=1)
+
+
+class TechnicalSubstanceReview(WebResearchModel):
+    executive_judgment: ExecutiveJudgment
+    technical_substance: TechnicalSubstanceAssessment
+    replicability: ReplicabilityAssessment
+    code_review_follow_ups: list[CodeReviewFollowUp] = Field(default_factory=list)
+    has_critical_gaps: bool = False
+    follow_up_queries: list[str] = Field(default_factory=list)
+
+
+class DiligenceGapResearch(WebResearchModel):
+    summary: str = Field(min_length=1)
+    additional_claim_assessments: list[ClaimAssessment] = Field(default_factory=list)
+    additional_evidence_gaps: list[str] = Field(default_factory=list)
+    source_urls: list[HttpUrl] = Field(default_factory=list)
+
+
+class DiligenceFinding(WebResearchModel):
+    claim: str = Field(min_length=1)
+    evidence_ids: list[str] = Field(default_factory=list)
+    source_ids: list[str] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"]
+
+
+class FinalMemoOutput(WebResearchModel):
+    answer_markdown: str = Field(min_length=1)
+    report: TechnicalDueDiligenceReport
+    findings: list[DiligenceFinding] = Field(default_factory=list)

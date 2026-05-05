@@ -19,6 +19,7 @@ def test_list_prints_non_empty_table() -> None:
 
     assert result.exit_code == 0
     assert "standard" in result.output
+    assert "technical_due_diligence" in result.output
     assert "description" in result.output
 
 
@@ -28,3 +29,4 @@ def test_list_json_round_trips() -> None:
     assert result.exit_code == 0
     parsed = json.loads(result.output)
     assert parsed[0]["id"] == "standard"
+    assert {entry["id"] for entry in parsed} >= {"technical_due_diligence"}

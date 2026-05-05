@@ -2,14 +2,19 @@
 
 Web Research is a Python CLI and TUI for running OpenAI Agents SDK research workflows.
 It can search the web, fetch and extract pages, rank sources, review coverage gaps, and
-return sourced answers as JSON or Markdown.
+return sourced answers as JSON or Markdown. Workflows are packaged independently, with
+shared workflow infrastructure kept under `webresearch/workflows/shared/`.
 
 ## Features
 
-- Three workflows:
-  - `quick`: planner, official-source research, broad research, final answer.
+- Package-based workflows:
   - `standard`: planner, parallel research, reviewer, one gap pass, final answer.
-  - `deep`: standard workflow shape with deeper source budget and two gap passes.
+  - `quick`: planner, lean official and broad research, final answer.
+  - `deep`: standard workflow shape with a deeper source budget and two gap passes.
+  - `technical_due_diligence`: public technical substance, claims, competitors,
+    replicability, and code-review follow-up assessment.
+- Technical due-diligence output includes a markdown memo plus a structured
+  `TechnicalDueDiligenceReport` validated against the workflow-local JSON Schema.
 - Tavily search when `TAVILY_API_KEY` is configured; mock search provider otherwise.
 - Source registry with stable `src_*` IDs and fetched-page status.
 - Evidence extraction with stable `ev_*` IDs.
@@ -57,6 +62,16 @@ Choose a workflow and depth:
 ```sh
 uv run webresearch run "Compare Python 3.13 migration risks" deep --depth deep
 uv run webresearch run "Summarize the latest Django release" quick --depth quick
+```
+
+Run technical due diligence from public URLs and competitor hints:
+
+```sh
+uv run webresearch run \
+  "Evaluate PRODUCT for technical diligence. URLs: https://example.com/docs. Competitors: ACME, Contoso." \
+  technical_due_diligence \
+  --format json \
+  --out diligence.json
 ```
 
 Write Markdown or JSON output:
@@ -139,6 +154,28 @@ async for event in stream_workflow(run_standard, WorkflowInput(query="Research q
     print(event.kind)
 ```
 
+Use the technical due-diligence workflow directly:
+
+```python
+import asyncio
+
+from webresearch import run_workflow
+from webresearch.types import WorkflowInput
+from webresearch.workflows.technical_due_diligence import run_technical_due_diligence
+
+
+async def main() -> None:
+    result = await run_workflow(
+        run_technical_due_diligence,
+        WorkflowInput(query="Evaluate Example Robotics. URLs: https://example.com/docs"),
+    )
+    print(result.answer_markdown)
+    print(result.structured_data)
+
+
+asyncio.run(main())
+```
+
 ## Development
 
 ```sh
@@ -150,3 +187,40 @@ uv run pre-commit run -a
 ```
 
 Live service tests are skipped unless the required environment variables are set.
+
+## Workflow Layout
+
+Workflows are package-based. Shared workflow infrastructure and shared prompts live under
+`webresearch/workflows/shared/`. Each workflow owns its orchestration, config, README,
+and workflow-specific prompt assets:
+
+```text
+webresearch/workflows/
+  registry.py
+  shared/
+    state.py
+    result.py
+    prompt_loader.py
+    prompts/
+  quick/
+    workflow.py
+    config.py
+    prompts/depth_extras.md
+  standard/
+    workflow.py
+    config.py
+    prompts/depth_extras.md
+  deep/
+    workflow.py
+    config.py
+    prompts/depth_extras.md
+  technical_due_diligence/
+    workflow.py
+    models.py
+    schema.json
+    prompts/
+    examples/
+```
+
+There is no root-level prompts package and no flat workflow modules. Imports should use
+package exports such as `from webresearch.workflows.standard import run_standard`.
