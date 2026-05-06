@@ -4,7 +4,7 @@ import urllib.parse
 from html.parser import HTMLParser
 from typing import TYPE_CHECKING
 
-import defusedxml.ElementTree as ET
+import defusedxml.ElementTree as ET  # type: ignore[import-untyped]
 from pydantic import BaseModel, ConfigDict
 
 from webresearch.sources.url_normalize import normalize_url

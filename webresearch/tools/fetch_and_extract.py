@@ -33,14 +33,14 @@ async def fetch_and_extract(
     if fetch_result.status != "fetched":
         return FetchAndExtractResult(
             url=fetch_result.url,
-            status=fetch_result.status,  # type: ignore[arg-type]
+            status=fetch_result.status,
             reason=fetch_result.reason,
             source_id=fetch_result.source_id,
         )
     extract_result = await extract_content(ctx, fetch_result.url, query)
     return FetchAndExtractResult(
         url=fetch_result.url,
-        status=extract_result.status,  # type: ignore[arg-type]
+        status=extract_result.status,
         text=extract_result.text,
         char_count=extract_result.char_count,
         truncated=extract_result.truncated,

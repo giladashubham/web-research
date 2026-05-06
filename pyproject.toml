@@ -103,6 +103,16 @@ module = "webresearch.tools.fetch_url"
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
+module = "webresearch.tools.fetch_and_extract"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
+module = "webresearch.tools.discover_urls"
+# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
 module = "webresearch.tools.extract_content"
 # Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
