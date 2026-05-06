@@ -163,9 +163,10 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
             # help and we've hit a public-evidence ceiling.
             previous_unresolved_count = len(review.unresolved_claims)
             review = _merge_gap_into_review(review, gap_results[-1])
-            if not gap_results[-1].additional_claim_assessments and len(
-                review.unresolved_claims
-            ) == previous_unresolved_count:
+            if (
+                not gap_results[-1].additional_claim_assessments
+                and len(review.unresolved_claims) == previous_unresolved_count
+            ):
                 break
 
     async with step("final_memo"):
@@ -381,9 +382,7 @@ async def _run_url_selector(
             selected = cast("SelectedPriorityUrls", selection_result.final_output)
             priority_urls = _validated_priority_urls(candidate_urls, selected)
         except Exception as exc:
-            ctx.warnings.append(
-                f"url_selector failed; using deterministic URL selection: {exc}"
-            )
+            ctx.warnings.append(f"url_selector failed; using deterministic URL selection: {exc}")
             priority_urls = _fallback_priority_urls(candidate_urls)
     return plan.model_copy(update={"priority_urls_by_category": priority_urls})
 

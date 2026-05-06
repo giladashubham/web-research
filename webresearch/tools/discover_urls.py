@@ -18,8 +18,15 @@ _SITEMAP_NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 CATEGORY_PATTERNS: dict[str, list[str]] = {
     "docs": [
-        "docs", "documentation", "reference", "developers", "developer",
-        "guides", "guide", "tutorials", "sdk",
+        "docs",
+        "documentation",
+        "reference",
+        "developers",
+        "developer",
+        "guides",
+        "guide",
+        "tutorials",
+        "sdk",
     ],
     "api": ["api", "api-reference", "openapi", "swagger", "graphql"],
     "changelog": ["changelog", "release-notes", "releases", "whats-new", "updates"],
@@ -258,8 +265,7 @@ async def _collect_from_high_value_same_site_pages(
             url
             for category in ("docs", "api", "changelog", "security")
             for url in found[category]
-            if urllib.parse.urlparse(url).netloc != seed_host
-            and _same_site(seed, url)
+            if urllib.parse.urlparse(url).netloc != seed_host and _same_site(seed, url)
         }
     )
     for candidate in candidates[:8]:
@@ -302,9 +308,7 @@ async def _probe_canonical_paths(
                 break
 
 
-async def _probe_well_known(
-    ctx: WorkflowContext, base: str, found: dict[str, set[str]]
-) -> None:
+async def _probe_well_known(ctx: WorkflowContext, base: str, found: dict[str, set[str]]) -> None:
     for path in WELL_KNOWN_PATHS:
         probe_url = _try_normalize(base + path)
         if probe_url:

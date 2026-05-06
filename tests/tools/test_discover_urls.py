@@ -11,18 +11,24 @@ def test_categorize_docs_subdomain_as_docs() -> None:
 
 
 def test_github_releases_url_repo_root() -> None:
-    assert _github_releases_url("https://github.com/wazuh/wazuh") == \
-        "https://github.com/wazuh/wazuh/releases"
+    assert (
+        _github_releases_url("https://github.com/wazuh/wazuh")
+        == "https://github.com/wazuh/wazuh/releases"
+    )
 
 
 def test_github_releases_url_already_releases() -> None:
-    assert _github_releases_url("https://github.com/wazuh/wazuh/releases") == \
-        "https://github.com/wazuh/wazuh/releases"
+    assert (
+        _github_releases_url("https://github.com/wazuh/wazuh/releases")
+        == "https://github.com/wazuh/wazuh/releases"
+    )
 
 
 def test_github_releases_url_deep_path() -> None:
-    assert _github_releases_url("https://github.com/wazuh/wazuh/tree/main") == \
-        "https://github.com/wazuh/wazuh/releases"
+    assert (
+        _github_releases_url("https://github.com/wazuh/wazuh/tree/main")
+        == "https://github.com/wazuh/wazuh/releases"
+    )
 
 
 def test_github_releases_url_not_github() -> None:
@@ -34,8 +40,10 @@ def test_github_releases_url_org_only() -> None:
 
 
 def test_github_releases_url_www_prefix() -> None:
-    assert _github_releases_url("https://www.github.com/wazuh/wazuh") == \
-        "https://github.com/wazuh/wazuh/releases"
+    assert (
+        _github_releases_url("https://www.github.com/wazuh/wazuh")
+        == "https://github.com/wazuh/wazuh/releases"
+    )
 
 
 async def test_discover_urls_follows_high_value_same_site_docs_subdomain(monkeypatch) -> None:
