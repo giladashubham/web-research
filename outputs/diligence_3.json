@@ -1,0 +1,2807 @@
+{
+  "answer_markdown": "## Technical Due Diligence Memo: Wazuh (www.wazuh.com)\n\n### Public Evidence\n- **Core Positioning**: Wazuh publicly presents itself as an open-source security platform delivering unified XDR and SIEM functions for endpoint and cloud workload protection. (homepage, supported by third-party overviews)\n- **Architecture**: Wazuh claims a unified agent and platform architecture covering endpoint, cloud, and on-prem monitoring. High-level block diagrams and descriptions validate an agent-server-indexer model. (homepage, AIMultiple summary)\n- **Main Features**: Monitoring, detection, and alerting are clearly stated SIEM features; Wazuh claims real-time correlation and on-device remediation (\"active response\"), and integration with security data APIs like VirusTotal and TheHive. Detailed implementation is not shown publicly. (homepage)\n- **Cloud Service**: Wazuh Cloud is advertised as a managed, scalable cloud SIEM/XDR service. No architectural overview or operational documentation is directly public. (homepage)\n- **Commercial Model**: Wazuh claims no license cost, full open-source availability, and active community support via standard channels (Slack, Discord, Github, etc.).\n- **Competitors**: Main public competitors identified are Elastic Security, Splunk, Securonix, LogRhythm, and Microsoft Sentinel—all delivering SIEM/XDR functionality, but with significant differences in licensing, depth, and cloud- vs. self-managed orientation (inference synthesized from public landing pages and market summaries).\n\n### Inference\n- **Differentiation**: Wazuh's core differentiators are its open-source model, agent-based response, and community-driven ecosystem, making it attractive for organizations seeking low-cost or highly customizable SIEM/XDR. Competing offerings generally provide broader compliance, enterprise features, and deep ecosystem integration, but these come at significantly higher cost or with less transparency (e.g., Elastic, Splunk).\n- **Feature Depth & Enterprise Maturity**: Based on public materials, Wazuh may lag competitors on some enterprise features (RBAC, multi-tenancy, certifications, managed onboarding) and large-scale production deployments. No public access to detailed documentation or case studies substantiates these aspects—these claims remain at the marketing level.\n- **Technical Progress**: The lack of a public changelog, release notes, or documentation index prevents independent assessment of release cadence, maintenance, or recent innovation.\n\n### Unknowns\n- No public access to API reference, changelog, or full documentation. Thus, breadth and maturity of enterprise capabilities—including depth of integrations, internal role management, multi-tenancy, and technical scale—are unverified.\n- No evidence of external audits, certifications (SOC2, ISO), or detailed compliance mapping.\n- Customer production scaling, deployment patterns, and operational reliability are described anecdotally, with no technical or large-scale case studies accessible.\n\n### Release Activity\n- **Unknown**: There is no public changelog or release notes for Wazuh. Maintenance cadence, security patch frequency, or notable technical progress is unverifiable from public sources.\n\n### Competitors\n- **Elastic Security:** Closest open-source competitor; much broader commercializations and ML analytics features, less focus on agent-based remediation.\n- **Splunk:** Advanced analytics, mature commercial SOAR/UEBA features, enterprise certification focus, high cost/feature gating.\n- **Securonix:** AI-driven, cloud-native, compliance-centric, but closed and less transparent.\n- **LogRhythm, Microsoft Sentinel:** Production-proven, compliance-centric, and more enterprise-aligned, but not open-source.\n\n### Evidence Gaps\n- No direct access to technical, API, or implementation documentation on Wazuh.com.\n- No public changelog; blog access restricted or unavailable, limiting release/cadence insight and technical depth assessment.\n- No independent validation of enterprise features (RBAC, multi-tenancy), certifications, or production deployments at scale.\n\n### Code Review Follow-ups\n1. **Active Response Mechanisms**: Validate source code and configuration implementing on-device remediation. (claim_3)\n2. **Cloud Deployment Architecture**: Review internal documents/code for Wazuh Cloud scalability, multi-tenancy, and operational controls. (claim_5)\n3. **Third-party Integration Coverage**: Inspect code/config for integrations with VirusTotal, TheHive, PagerDuty, etc. (claim_7)\n4. **Blog Recency/Depth**: Confirm availability and technical substance of blog posts over the past quarter. (claim_8)\n5. **Documentation Scope/Recency**: Validate that comprehensive, current technical docs exist, with onboarding, architecture, and integration coverage. (claim_9)",
+  "structured_data": {
+    "target": {
+      "company_name": "Wazuh",
+      "product_name": null,
+      "product_url": "https://wazuh.com/",
+      "known_urls": [
+        "https://wazuh.com/"
+      ],
+      "known_competitors": [],
+      "evaluation_prompt": "Evaluate wazuh for technical diligence."
+    },
+    "claims": [
+      {
+        "claim": "Wazuh is an open-source security platform that provides unified XDR and SIEM protection for endpoints and cloud workloads.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "Wazuh describes itself as 'The Open Source Security Platform,' providing 'Unified XDR and SIEM protection for endpoints and cloud workloads.' It offers endpoint and cloud workload protection through a single agent and platform architecture. It claims active XDR protection, SIEM capabilities, and support for public and private clouds and on-premises data centers. Third-party analysis (AIMultiple) lists Wazuh as the most complete open-source SIEM, providing log analysis, vulnerability detection, configuration assessment, regulatory compliance reporting, alerting, and event-based reporting natively.",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://aimultiple.com/open-source-siem"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh unifies endpoint, cloud, and on-premises security monitoring functions into a single agent and platform architecture.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "The Wazuh homepage directly claims 'Wazuh unifies historically separate functions into a single agent and platform architecture.' AIMMultiple describes its four core components: Indexer, Server, Dashboard, and Agent (which runs on endpoints and forwards events).",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://aimultiple.com/open-source-siem"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh offers real-time correlation and context for threat analysts, including on-device remediation (active response).",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "Wazuh homepage states: 'Wazuh provides analysts with real-time correlation and context. Its active responses are granular and include on-device remediation to keep endpoints clean and operational.' No detailed public evidence is available regarding the implementation or depth of these features beyond marketing statements; technical validation would require access to specific documentation or source code.",
+        "evidence_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": [
+          "claim_3"
+        ]
+      },
+      {
+        "claim": "Wazuh’s SIEM solution provides monitoring, detection, and alerting for security events and incidents.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "The homepage states: 'The Wazuh SIEM solution provides monitoring, detection, and alerting of security events and incidents.' Third-party sources (AIMMultiple) affirm Wazuh provides native security log analysis, alerting, and event-based reporting as open-source SIEM.",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://aimultiple.com/open-source-siem"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh Cloud is a managed and scalable cloud service for security monitoring and endpoint protection.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "Wazuh homepage advertises 'The Wazuh Cloud service offers managed, ready-to-use, and highly scalable cloud environments for security monitoring and endpoint protection.' Lack of independent technical documentation confirms only the existence of the offering, not its technical depth or scalability.",
+        "evidence_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": [
+          "claim_5"
+        ]
+      },
+      {
+        "claim": "Wazuh is available at no cost, is open source, and offers no vendor lock-in or license cost, and is supported by a free community.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "Wazuh claims to be open source, without license cost or vendor lock-in, and states it is supported by a free community. This is further corroborated by AIMultiple, which lists the open-source and free (on-prem) model. Community channels (Slack, GitHub, Reddit, Discord, etc.) are named on the homepage.",
+        "evidence_source_urls": [
+          "https://wazuh.com/",
+          "https://aimultiple.com/open-source-siem"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh supports integration with third-party APIs and solutions such as VirusTotal, TheHive, and PagerDuty, acting as both source and receiver of security data.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "The homepage states: 'Wazuh’s compatibility with third-party APIs and solutions like VirusTotal, TheHive, and PagerDuty enriches its functionality, allowing it to serve as both a source and receiver of security data.' There is no accessible public technical documentation providing implementation detail or coverage breadth, only a claim on a marketing page.",
+        "evidence_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": [
+          "claim_7"
+        ]
+      },
+      {
+        "claim": "Wazuh releases weekly blog posts covering new use cases and integrations for threat detection and response.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "The homepage says: 'Alongside our documentation, we release weekly blog posts that delve into a variety of Wazuh use cases and integrations, offering insights and strategies for effective threat detection and response.' However, the public evidence is limited to this claim; blog access is currently blocked to verify the actual recency and technical depth of blog content.",
+        "evidence_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": [
+          "claim_8"
+        ]
+      },
+      {
+        "claim": "Wazuh offers comprehensive, user-friendly documentation and multiple community channels for support, available on Slack, GitHub, Reddit, Discord, Google Groups, and Twitter.",
+        "claim_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "public_evidence": "The homepage confirms the existence of multiple community support channels and claims comprehensive, user-friendly documentation. Public technical documentation itself was not directly accessible during this assessment but is heavily referenced and cited as available.",
+        "evidence_source_urls": [
+          "https://wazuh.com/"
+        ],
+        "assessment": "partially_supported",
+        "confidence": "medium",
+        "code_review_follow_up_ids": [
+          "claim_9"
+        ]
+      }
+    ],
+    "release_activity": {
+      "source_urls": [
+        "https://wazuh.com/"
+      ],
+      "last_release_date": null,
+      "releases_last_12_months": null,
+      "notable_releases": [],
+      "cadence_description": "No public changelog or release notes available. Unable to assess release cadence, security patching frequency, or notable version updates."
+    },
+    "competitors": [
+      {
+        "competitor_name": "Elastic Security (SIEM/XDR)",
+        "competitor_url": "https://www.elastic.co/security",
+        "similar_capabilities": [
+          "SIEM and XDR functionality (public evidence)",
+          "Integration with 400+ data sources (public)",
+          "Cloud, on-prem, serverless, and hosted deployment options (public)",
+          "Standardized data schema (ECS) for integrations (public)"
+        ],
+        "differentiation_notes": "Both Wazuh and Elastic emphasize open-source roots, broad integrations, and SIEM/XDR convergence. Elastic focuses on broad cloud deployment flexibility (serverless, hosted, on-prem) and deep Elastic Stack integration. Elastic offers extensive commercial cloud/SaaS gating and strong API extensibility for custom ingestion, but does not emphasize agent-based endpoint remediation like Wazuh. The Elastic integrations marketplace is broader based on public catalog (inference). Pricing and packaging transparency leans toward Elastic for larger, enterprise-focused deployments, but public evidence of proprietary architecture is limited; both lack detailed public changelogs or schema depth without login. Differentiation is primarily in deployment models, integration market size, and Elastic's substantial machine learning/AI features for security analytics.",
+        "source_urls": [
+          "https://www.elastic.co/security",
+          "https://www.elastic.co/pricing",
+          "https://www.elastic.co/docs/solutions/security/get-started/automatic-import"
+        ]
+      },
+      {
+        "competitor_name": "Splunk Enterprise Security / SOAR",
+        "competitor_url": "https://www.splunk.com/en_us/products/enterprise-security.html",
+        "similar_capabilities": [
+          "SIEM core platform with advanced detection and analytics (public evidence)",
+          "Security automation (SOAR), UEBA modules (public)",
+          "Comprehensive integration with security ecosystem (inference)",
+          "Cloud/SaaS deployment and on-prem models (public)"
+        ],
+        "differentiation_notes": "Splunk is feature-rich in security analytics, automation, and integration breadth, and emphasizes scalable, multi-modal deployments. Both Wazuh and Splunk offer broad SIEM functionality, but Splunk is far more mature in SOAR, UEBA, and advanced threat intelligence orchestration. Splunk strongly gates many key features (e.g., SOAR, UEBA) behind higher-premium plans, with per-user pricing, limiting accessibility relative to Wazuh’s open-source model. Splunk’s release cadence and product maturity are market-leading (inference from analyst and customer adoption). Splunk does not emphasize active endpoint remediation from the agent (as per Wazuh claims); focus is on analytics, not endpoint controls. Certification and compliance posture is strongly marketed by Splunk (FedRAMP, SOC2—public evidence).",
+        "source_urls": [
+          "https://www.splunk.com/en_us/products/enterprise-security.html",
+          "https://www.splunk.com/en_us/products/pricing/cyber-security.html"
+        ]
+      },
+      {
+        "competitor_name": "Securonix Next-Gen SIEM",
+        "competitor_url": "https://www.securonix.com/products/platform-overview",
+        "similar_capabilities": [
+          "Cloud-native SIEM platform with integrated SOAR (public evidence)",
+          "Advanced detection (AI-driven, MITRE ATT&CK mapping; public)",
+          "Emphasis on rapid, automatic compliance mapping to frameworks (public)"
+        ],
+        "differentiation_notes": "Securonix is cloud-native and AI-augmented, focusing on unified detection/response and automation. Both Securonix and Wazuh address SIEM/XDR fusion and broad cloud and compliance scenarios. Securonix markets unique agentic/AI analyst workflow and seamless compliance mapping, positioning against legacy SIEM and bolt-on XDR. Securonix’s pricing and architecture transparency are low, and proprietary AI/ML depth is difficult to validate without access (unknown). Securonix does not focus publicly on agent-based endpoint controls (Wazuh differentiation). Both lack public API details, changelog, or architecture diagrams beyond high-level abstracts, but Securonix is more production-proven in enterprise from public case studies. Comparison page directly claims superior open architecture, analytics, and MDR integrations versus Splunk and MS Sentinel (public evidence).",
+        "source_urls": [
+          "https://www.securonix.com/products/platform-overview",
+          "https://www.securonix.com/why-securonix/competitive-comparison",
+          "https://www.securonix.com/products/siem-solutions"
+        ]
+      },
+      {
+        "competitor_name": "LogRhythm SIEM",
+        "competitor_url": "https://logrhythm.com/",
+        "similar_capabilities": [
+          "Core SIEM/XDR (public inference)",
+          "Cloud and on-prem support (public)",
+          "Integrations with major cloud providers, compliance standards, and threat intel providers (inference)"
+        ],
+        "differentiation_notes": "LogRhythm presents itself as an enterprise-grade SIEM platform. Its documentation, changelog, and full pricing are not directly accessible, making assessment of its unique features, maturity, or recent innovation cadence mostly unknown. Like Wazuh, it claims compliance, integration, and automation, but the details and gating of features remain opaque. LogRhythm appears to offer deeper enterprise features in some areas compared to the largely community-driven Wazuh suite (inference). Public evidence of product maturity is stronger for LogRhythm in large enterprises (inference), but lacks the open-source or agent-based, remediation-focused differentiators of Wazuh.",
+        "source_urls": [
+          "https://logrhythm.com/"
+        ]
+      },
+      {
+        "competitor_name": "Microsoft Sentinel",
+        "competitor_url": "https://azure.microsoft.com/en-us/products/microsoft-sentinel/",
+        "similar_capabilities": [
+          "Native SIEM/XDR in large cloud environment (public)",
+          "Broad cloud, app, and endpoint integration (inference)",
+          "Public cloud compliance/certification posture (public)"
+        ],
+        "differentiation_notes": "Microsoft Sentinel is tightly integrated with the Azure ecosystem and security toolchain, and is positioned primarily for Microsoft cloud customers. Like Wazuh, it promises open integration and SIEM/XDR fusion, but Sentinel is deeply embedded in Azure Active Directory, Defender, and Microsoft security stack; public evidence shows superior certified compliance, automation, and enterprise deployment scale, but does not market agent-based endpoint remediation. Sentinel’s pricing and changelog are not transparently public, but broad certification coverage, security research, and public scale evidence strongly outpace free/open-source SIEMs like Wazuh in production maturity. Wazuh’s open-source model and agent-based controls are differentiators for cost-sensitive, customizable deployments.",
+        "source_urls": [
+          "https://azure.microsoft.com/en-us/products/microsoft-sentinel/"
+        ]
+      }
+    ],
+    "code_review_follow_ups": [
+      {
+        "id": "claim_3",
+        "area": "product/active response",
+        "question": "Public homepage claims real-time correlation and on-device remediation (active response), but there is no technical documentation or implementation detail. Verify the presence, triggers, and granularity of active response mechanisms directly in the agent/server codebase (e.g., what actions can be executed, and how are they invoked in response to detection events?).",
+        "expected_evidence": [
+          "Source code or configuration files implementing on-device remediation/active response actions",
+          "Workflow showing detection event leading to actual endpoint action (block, quarantine, etc.)"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "claim_5",
+        "area": "product/cloud architecture",
+        "question": "Wazuh homepage advertises 'Wazuh Cloud' as a managed, highly scalable environment, but there is no technical documentation on architecture, scaling strategy, or operational model for multi-tenant use. Review the internal architecture, tenancy model, scalability mechanisms, and cloud-specific controls in code or ops playbooks for Wazuh Cloud.",
+        "expected_evidence": [
+          "Source code, Terraform/scripts, or cloud infrastructure as code defining multi-tenant/managed Wazuh deployments",
+          "SRE/runbooks detailing scaling events, tenant isolation, and failover"
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "claim_7",
+        "area": "integration/api",
+        "question": "Marketing states Wazuh supports integration with third-party APIs (e.g., VirusTotal, TheHive, PagerDuty) as both sender and receiver of data, but no implementation or coverage detail is public. Validate the integration mechanisms and API endpoints, and enumerate available integrations in the code/API docs.",
+        "expected_evidence": [
+          "Code or configuration templates for integrating with VirusTotal, TheHive, PagerDuty, and other third-party APIs",
+          "Integration test results or sample event flows demonstrating third-party interaction"
+        ],
+        "priority": "medium"
+      },
+      {
+        "id": "claim_8",
+        "area": "community/blog",
+        "question": "Homepage claims weekly technical blog posts with new use cases and integrations, but blog access and post recency could not be verified. Confirm the actual frequency and substance of these posts by reviewing the blog repo or CMS export.",
+        "expected_evidence": [
+          "List of blog post publication dates/titles for the last 3 months",
+          "Content snippets showing recent posts address technical depth or integration detail"
+        ],
+        "priority": "low"
+      },
+      {
+        "id": "claim_9",
+        "area": "documentation/support",
+        "question": "Marketing asserts comprehensive, user-friendly documentation and active support channels, but no documentation pages were directly verified in this assessment. Confirm that onboarding, platform architecture, and advanced feature documentation are all available, up-to-date, and technically complete.",
+        "expected_evidence": [
+          "Table of contents or sitemap from public docs/confluence",
+          "Up-to-date (last 3 months) sections describing installation, architecture, integration, and API use"
+        ],
+        "priority": "medium"
+      }
+    ],
+    "evidence_gaps": [
+      "No direct access to technical, API, or implementation documentation on Wazuh.com.",
+      "No public changelog; blog access restricted or unavailable, limiting release/cadence insight and technical depth assessment.",
+      "No independent validation of enterprise features (RBAC, multi-tenancy), certifications, or production deployments at scale."
+    ],
+    "source_urls": [
+      "https://wazuh.com/",
+      "https://aimultiple.com/open-source-siem"
+    ]
+  },
+  "raw_structured_data": null,
+  "structured_data_validation": {
+    "valid": true,
+    "errors": []
+  },
+  "summary": "Wazuh describes itself as 'The Open Source Security Platform,' providing 'Unified XDR and SIEM protection for endpoints and cloud workloads.' It offers endpoint and cloud workload protection through a single agent and platform architecture. It claims active XDR protection, SIEM capabilities, and support for public and private clouds and on-premises data centers. Third-party analysis (AIMultiple) lists Wazuh as the most complete open-source SIEM, providing log analysis, vulnerability detection, configuration assessment, regulatory compliance reporting, alerting, and event-based reporting natively.",
+  "findings": [
+    {
+      "id": "finding_1",
+      "claim": "Wazuh provides open-source unified XDR and SIEM for endpoints/cloud workloads, via a single agent/platform architecture.",
+      "evidence_ids": [],
+      "confidence": 1.0
+    },
+    {
+      "id": "finding_2",
+      "claim": "Implementation depth of on-device remediation and third-party API integrations is unverified—marketing describes these, but supporting code or technical documentation is non-public.",
+      "evidence_ids": [],
+      "confidence": 0.66
+    },
+    {
+      "id": "finding_3",
+      "claim": "Release cadence, major update history, security patch responsiveness, and technical progress are all unknown due to lack of public changelog or technical blog access.",
+      "evidence_ids": [],
+      "confidence": 0.33
+    },
+    {
+      "id": "finding_4",
+      "claim": "No public evidence found for enterprise features (RBAC, multi-tenancy, certifications, or production deployment scale); these require internal documentation or codebase access.",
+      "evidence_ids": [],
+      "confidence": 0.33
+    }
+  ],
+  "sources": [
+    {
+      "id": "src_1",
+      "url": "https://wazuh.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_2",
+      "url": "https://wazuh.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_3",
+      "url": "https://wazuh.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_4",
+      "url": "https://wazuh.com/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_5",
+      "url": "https://wazuh.com/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_6",
+      "url": "https://wazuh.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_7",
+      "url": "https://wazuh.com/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_8",
+      "url": "https://wazuh.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_9",
+      "url": "https://wazuh.com/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_10",
+      "url": "https://wazuh.com/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_11",
+      "url": "https://wazuh.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_12",
+      "url": "https://wazuh.com/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_13",
+      "url": "https://wazuh.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_14",
+      "url": "https://wazuh.com/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_15",
+      "url": "https://wazuh.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_16",
+      "url": "https://wazuh.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_17",
+      "url": "https://wazuh.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_18",
+      "url": "https://wazuh.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_19",
+      "url": "https://wazuh.com/platform/overview",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_20",
+      "url": "https://wazuh.com/platform/siem",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_21",
+      "url": "https://wazuh.com/platform/xdr",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_22",
+      "url": "https://wazuh.com/resources/use-cases/cloud-workload-protection",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_23",
+      "url": "https://wazuh.com/resources/use-cases/container-security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_24",
+      "url": "https://wazuh.com/resources/use-cases/incident-response",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_25",
+      "url": "https://wazuh.com/resources/use-cases/regulatory-compliance",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_26",
+      "url": "https://wazuh.com/services/professional-support",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_27",
+      "url": "https://wazuh.com/services/consulting-services",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_28",
+      "url": "https://wazuh.com/services/training-courses",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_29",
+      "url": "https://wazuh.com/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_30",
+      "url": "https://wazuh.com/our-customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_31",
+      "url": "https://wazuh.com/cloud",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_32",
+      "url": "https://wazuh.com/community",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_33",
+      "url": "https://wazuh.com/resources/case-studies/groupon-deploys-wazuh-to-protect-and-monitor-aws",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_34",
+      "url": "https://wazuh.com/resources/use-cases/file-integrity-monitoring",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_35",
+      "url": "https://wazuh.com/install",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_36",
+      "url": "https://wazuh.com/resources/use-cases/threat-hunting",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_37",
+      "url": "https://www.g2.com/products/wazuh/competitors/alternatives",
+      "title": "Top 10 Wazuh Alternatives & Competitors in 2026 - G2",
+      "snippet": "The best Wazuh alternatives are CrowdStrike Falcon Endpoint Protection Platform, IBM QRadar SIEM, and Datadog. Find top-ranking free & paid apps similar to",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_38",
+      "url": "https://sysadmin.libhunt.com/wazuh-alternatives",
+      "title": "Wazuh Alternatives - SysAdmin Security | LibHunt",
+      "snippet": "### Wazuh - The Open Source Security Platform. Wazuh helps you to gain deeper security visibility into your infrastructure by monitoring hosts at an operating system and application level. This solution, based on lightweight multi-platform agents, provides the following capabilities: log management and analysis, file integrity monitoring, intrusion and anomaly detection, policy and compliance monitoring. Based on the \"Security\" category. 9.2   8.7   L2   Wazuh VS OSQuery. 8.6   8.4   Wazuh VS lynis. 8.3   9.7   Wazuh VS CrowdSec. CrowdSec - the open-source and participative security solution offering crowdsourced protection against malicious IPs and access to the most advanced real-world CTI. 7.8   9.9   Wazuh VS Suricata. Suricata is a network Intrusion Detection System, Intrusion Prevention System and Network Security Monitoring engine developed by the OISF and the Suricata community. 7.7   9.5   L2   Wazuh VS pfSense. 7.4   4.6   L2   Wazuh VS OSSEC. OSSEC is an Open Source Host-based Intrusion Detection System that performs log analysis, file integrity checking, policy monitoring, rootkit detection, real-time alerting and active response.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_39",
+      "url": "https://www.siriusopensource.com/en-us/blog/wazuh-versus-proprietary-xdr-and-siem-platforms-honest-comparison",
+      "title": "Wazuh Versus Proprietary XDR and SIEM Platforms: An Honest Comparison | Sirius Open Source",
+      "snippet": "* View this page in US English. * View this page in English. * View this page in Japanese. This article will honestly and transparently compare Wazuh against its major competitors, explaining the factors that drive architectural choice and Total Cost of Ownership (TCO) up or down, helping you decide what is best for your specific needs. Wazuh retains a native focus on endpoint security and excels in host security baseline functions. Review data indicates that CrowdStrike **outperforms Wazuh in real-time detection** (9.6 vs. | **Cost Model Priority** | TCO Predictability (Agent count) or $0 Licensing | Resource-based Efficiency/Scalability | Feature Maturity / High Volume Ingestion | Efficacy / Managed Service |. **Prioritized EDR Efficacy:** Organizations needing best-in-class, **ML-driven detection**, malware prevention, and proactive threat hunting capabilities should select proprietary EDR/XDR platforms such as CrowdStrike Falcon, which offer superior real-time efficacy scores against emergent threats.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_40",
+      "url": "https://aimultiple.com/open-source-siem",
+      "title": "Top 13 Open Source SIEM Tools in 2026 - AIMultiple",
+      "snippet": "Wazuh and SecurityOnion are the main examples. They're powerful data infrastructure tools, excellent at collecting, storing, and visualizing",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_41",
+      "url": "https://www.reddit.com/r/cybersecurity/comments/1gdthk4/updatewhat_are_some_opensource_siem_tools_that_is",
+      "title": "[UPDATE]What are some open-source SIEM tools that is beginner ...",
+      "snippet": "Our team has eventually decided to use Wazuh for our main tool for the SIEM system. So far the progress is good but not the best.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_42",
+      "url": "https://www.lumificyber.com/blog/8-open-source-siem-tools-you-should-know",
+      "title": "8 Open Source SIEM Tools You Should Know - Lumifi Cybersecurity",
+      "snippet": "While proprietary platforms have much to offer small and mid-sized organizations, many security leaders are attracted to the lower licensing costs offered by open source SIEMs. These options don't always share the same features as proprietary alternatives, but they can present a compelling opportunity for security leaders with tight budgets. By the end of this article, you'll have a clear understanding of open source SIEM tools currently on the market, and whether their capabilities fit your organization's security needs. Security leaders who choose open source SIEM tools often prioritize the following advantages:. AT&T Open Source Security Information Management (OSSIM) is the open source version of AlienVault's USM Anywhere SIEM platform. Like many other entrants on this list, it is not a full-fledged SIEM but a security framework that combines multiple open source projects into a single platform. Many organizations pursue open source SIEM implementations to meet regulatory compliance standards and gain security alert visibility through a centralized platform.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_43",
+      "url": "https://www.apica.io/blog/best-open-source-siem-tools",
+      "title": "8 Best Open Source SIEM Tools » Apica",
+      "snippet": "# 8 Best Open Source SIEM Tools. As with most IT solutions and services, SIEM too has plenty of proprietary and open-source options to choose from. In this article, we’ll take a look at some of the best open-source SIEM tools for businesses of all sizes. ## Is open-source SIEM worth it? While open-source SIEM tools may not be an all-in-one solution, you can still expect some solid functionality. While you may have to use these tools in combination with other tools that support better reporting, visualization, or event correlation, the right open-source tool can be a great (and significantly cheaper) stepping stone to better security for your business. With that said, let’s look at a list of the best open-source SIEM tools that are worth exploring. OSSIM is one of the most popular open-source SIEM systems that combines other open-source tools that aid security, threat detection, and prevention.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_44",
+      "url": "https://www.sentinelone.com/cybersecurity-101/data-and-ai/open-source-siem-tools",
+      "title": "Top 9 Open Source SIEM Tools for 2026",
+      "snippet": "These are cybersecurity software that collect, analyze, and manage security data from various sources within an organization’s IT infrastructure, like applications, servers, and network devices, enabling real-time threat detection and incident response. Moreover, open-source SIEM tools are often designed to integrate seamlessly with other security solutions, enhancing overall effectiveness. Trellix is an open-source SIEM solution for detecting, responding to, and managing security threats. Microsoft Sentinel is a SIEM security open-source solution designed to provide security analytics and threat detection across an organization’s digital landscape. McAfee Enterprise Security Manager (ESM) is an open-source SIEM tool that helps detect, investigate, and respond to security threats. Splunk SIEM, specifically through its Splunk Enterprise Security (ES) offering, is a solution designed to help organizations detect, investigate, and respond to security threats in real time. As an organization, you can assess your security needs by looking for important features like threat detection and log management and ensure the tool can integrate well with their existing systems. #### How do I choose the right open-source SIEM tool for my organization?",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_45",
+      "url": "https://redcanary.com/cybersecurity-101/security-operations/top-free-siem-tools",
+      "title": "The top free and open source SIEM tools for 2025 | Red Canary",
+      "snippet": "###### * Cybersecurity 101 * Security operations * The top free and open source SIEM tools for 2025. By aggregating and correlating this vast amount of information, SIEM tools provide crucial visibility into security events, enabling proactive threat detection, efficient incident response, and compliance management. Furthermore, the open-source nature of many free SIEMs allows for customization and integration with other security tools, providing flexibility to tailor the solution to specific organizational needs. Graylog’s extensibility through plugins allows for integration with various data sources and security tools, enhancing its SIEM capabilities. This open source unified threat management (the UTM in UTMStack) platform integrates various security functions like firewall, intrusion detection and prevention, and virtual private networks (VPN), providing centralized logging across these layers. While not a traditional SIEM, its aggregation of security events from multiple integrated tools offers a holistic view of network security activity, making it a valuable free option for organizations seeking integrated security monitoring and analysis capabilities without the complexity of deploying separate systems.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_46",
+      "url": "https://www.elastic.co/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_47",
+      "url": "https://www.splunk.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_48",
+      "url": "https://cybersecurity.att.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_49",
+      "url": "https://cybersecurity.att.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_50",
+      "url": "https://cybersecurity.att.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_51",
+      "url": "https://www.splunk.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_52",
+      "url": "https://cybersecurity.att.com/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_53",
+      "url": "https://www.elastic.co/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_54",
+      "url": "https://cybersecurity.att.com/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_55",
+      "url": "https://www.splunk.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_56",
+      "url": "https://www.elastic.co/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_57",
+      "url": "https://cybersecurity.att.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_58",
+      "url": "https://cybersecurity.att.com/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_59",
+      "url": "https://www.splunk.com/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_60",
+      "url": "https://www.splunk.com/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_61",
+      "url": "https://www.splunk.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_62",
+      "url": "https://www.elastic.co/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_63",
+      "url": "https://www.splunk.com/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_64",
+      "url": "https://cybersecurity.att.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_65",
+      "url": "https://www.splunk.com/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_66",
+      "url": "https://www.elastic.co/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_67",
+      "url": "https://www.elastic.co/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_68",
+      "url": "https://www.splunk.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_69",
+      "url": "https://www.splunk.com/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_70",
+      "url": "https://www.splunk.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_71",
+      "url": "https://www.splunk.com/jobs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_72",
+      "url": "https://www.splunk.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_73",
+      "url": "https://www.splunk.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_74",
+      "url": "https://www.elastic.co/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_75",
+      "url": "https://www.splunk.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_76",
+      "url": "https://cybersecurity.att.com/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_77",
+      "url": "https://cybersecurity.att.com/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_78",
+      "url": "https://cybersecurity.att.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_79",
+      "url": "https://cybersecurity.att.com/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_80",
+      "url": "https://www.elastic.co/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_81",
+      "url": "https://cybersecurity.att.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_82",
+      "url": "https://cybersecurity.att.com/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_83",
+      "url": "https://www.elastic.co/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_84",
+      "url": "https://cybersecurity.att.com/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_85",
+      "url": "https://cybersecurity.att.com/case-studies",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_86",
+      "url": "https://cybersecurity.att.com/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_87",
+      "url": "https://www.elastic.co/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_88",
+      "url": "https://cybersecurity.att.com/engineering",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_89",
+      "url": "https://cybersecurity.att.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_90",
+      "url": "https://cybersecurity.att.com/jobs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_91",
+      "url": "https://cybersecurity.att.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_92",
+      "url": "https://cybersecurity.att.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_93",
+      "url": "https://cybersecurity.att.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_94",
+      "url": "https://www.graylog.org/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_95",
+      "url": "https://www.graylog.org/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_96",
+      "url": "https://www.graylog.org/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_97",
+      "url": "https://www.graylog.org/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_98",
+      "url": "https://www.graylog.org/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_99",
+      "url": "https://www.graylog.org/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_100",
+      "url": "https://www.graylog.org/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_101",
+      "url": "https://www.graylog.org/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_102",
+      "url": "https://www.graylog.org/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_103",
+      "url": "https://www.graylog.org/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_104",
+      "url": "https://www.graylog.org/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_105",
+      "url": "https://www.graylog.org/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_106",
+      "url": "https://www.graylog.org/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_107",
+      "url": "https://www.graylog.org/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_108",
+      "url": "https://www.graylog.org/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_109",
+      "url": "https://www.graylog.org/case-studies",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_110",
+      "url": "https://www.graylog.org/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_111",
+      "url": "https://www.graylog.org/engineering",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_112",
+      "url": "https://www.graylog.org/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_113",
+      "url": "https://www.graylog.org/jobs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_114",
+      "url": "https://www.graylog.org/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_115",
+      "url": "https://www.graylog.org/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_116",
+      "url": "https://www.graylog.org/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_117",
+      "url": "https://www.crowdstrike.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_118",
+      "url": "https://www.crowdstrike.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_119",
+      "url": "https://www.crowdstrike.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_120",
+      "url": "https://www.crowdstrike.com/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_121",
+      "url": "https://www.crowdstrike.com/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_122",
+      "url": "https://www.crowdstrike.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_123",
+      "url": "https://www.crowdstrike.com/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_124",
+      "url": "https://www.crowdstrike.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_125",
+      "url": "https://www.crowdstrike.com/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_126",
+      "url": "https://www.crowdstrike.com/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_127",
+      "url": "https://www.crowdstrike.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_128",
+      "url": "https://www.crowdstrike.com/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_129",
+      "url": "https://www.crowdstrike.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_130",
+      "url": "https://www.crowdstrike.com/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_131",
+      "url": "https://www.crowdstrike.com/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_132",
+      "url": "https://www.crowdstrike.com/case-studies",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_133",
+      "url": "https://www.crowdstrike.com/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_134",
+      "url": "https://www.crowdstrike.com/engineering",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_135",
+      "url": "https://www.crowdstrike.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_136",
+      "url": "https://www.crowdstrike.com/jobs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_137",
+      "url": "https://www.crowdstrike.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_138",
+      "url": "https://www.crowdstrike.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_139",
+      "url": "https://www.crowdstrike.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_140",
+      "url": "https://www.securonix.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_141",
+      "url": "https://www.securonix.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_142",
+      "url": "https://www.securonix.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_143",
+      "url": "https://www.securonix.com/documentation",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_144",
+      "url": "https://www.securonix.com/developers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_145",
+      "url": "https://www.securonix.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_146",
+      "url": "https://www.securonix.com/api-reference",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_147",
+      "url": "https://www.securonix.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_148",
+      "url": "https://www.securonix.com/release-notes",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_149",
+      "url": "https://www.securonix.com/releases",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_150",
+      "url": "https://www.securonix.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_151",
+      "url": "https://www.securonix.com/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_152",
+      "url": "https://www.securonix.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_153",
+      "url": "https://www.securonix.com/trust",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_154",
+      "url": "https://www.securonix.com/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_155",
+      "url": "https://www.securonix.com/case-studies",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_156",
+      "url": "https://www.securonix.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_157",
+      "url": "https://www.securonix.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_158",
+      "url": "https://www.securonix.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_159",
+      "url": "https://logrhythm.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_160",
+      "url": "https://logrhythm.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_161",
+      "url": "https://logrhythm.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_162",
+      "url": "https://logrhythm.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_163",
+      "url": "https://logrhythm.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_164",
+      "url": "https://logrhythm.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_165",
+      "url": "https://logrhythm.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_166",
+      "url": "https://logrhythm.com/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_167",
+      "url": "https://logrhythm.com/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_168",
+      "url": "https://logrhythm.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_169",
+      "url": "https://logrhythm.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_170",
+      "url": "https://logrhythm.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_171",
+      "url": "https://logrhythm.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_172",
+      "url": "https://azure.microsoft.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_173",
+      "url": "https://azure.microsoft.com/en-us/products/microsoft-sentinel",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_174",
+      "url": "https://azure.microsoft.com/docs",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_175",
+      "url": "https://azure.microsoft.com/api",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_176",
+      "url": "https://azure.microsoft.com/changelog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_177",
+      "url": "https://azure.microsoft.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_178",
+      "url": "https://azure.microsoft.com/security",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_179",
+      "url": "https://azure.microsoft.com/customers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_180",
+      "url": "https://azure.microsoft.com/blog",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_181",
+      "url": "https://azure.microsoft.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_182",
+      "url": "https://azure.microsoft.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_183",
+      "url": "https://azure.microsoft.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_184",
+      "url": "https://azure.microsoft.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_185",
+      "url": "https://www.elastic.co/docs/solutions/security/platform-architecture",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_186",
+      "url": "https://www.elastic.co/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_187",
+      "url": "https://www.elastic.co/docs/solutions/security/get-started/automatic-import",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_188",
+      "url": "https://www.splunk.com/en_us/products/pricing/cyber-security.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_189",
+      "url": "https://www.securonix.com/products/platform-overview",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_190",
+      "url": "https://www.securonix.com/resources-by-topic/siem",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_191",
+      "url": "https://www.securonix.com/resources/alberta-health-services-reduces-false-positives",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_192",
+      "url": "https://www.securonix.com/products/siem-solutions",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_193",
+      "url": "https://www.securonix.com/why-securonix/competitive-comparison",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_1",
+      "source_id": "src_2",
+      "quote": null,
+      "note": "The Open Source\nSecurity Platform\nUnified XDR and SIEM protection\nfor endpoints\nand cloud workloads.\nEndpoint and Cloud\nWorkload Protection\nWazuh unifies historically separate functions into a single agent and platform architecture.\nProtection is provided for public clouds, private clouds, and on-premises data centers.\nEndpoint Security\nThreat Intelligence\nSecurity Operations\nCloud Security\nActive XDR protection\nfrom modern threats\nWazuh provides analysts with real-time correlation and context. Its active responses are granular and include on-device remediation to keep endpoints clean and operational.\nLearn more about XDRA comprehensive\nSIEM solution\nThe Wazuh Security Information and Event Management (SIEM) solution provides monitoring, detection, and alerting of security events and incidents.\nLearn more about SIEMExplore the potential\nof Wazuh Cloud\nThe Wazuh Cloud service offers managed, ready-to-use, and highly scalable cloud environments for security monitoring and endpoint protection.\nStart your free trialWhy everyone open source\nFlexible, scalable, no vendor lock-in, and no license cost.\nFree community support and trusted by thousands of enterprise users.\nThe world's most widely used open source security solution\nProtected endpoints\nEnterprise users\nDownloads per year\nWhat our customers\nsay about us\nLearn more about Wazuh\nWazuh is available at no cost and adopts an open-source approach to security, which ensures transparency, flexibility, constant improvement, and free community support. As an open source platform, Wazuh benefits from rapid capability development, offers comprehensive documentation, and fosters high user engagement.\nWazuh is an open-source platform for threat detection and incident response, renowned for its adaptability and integration capabilities. The development team continuously enhances the platform, supported by rigorous testing and auditing processes. We encourage user contributions, such as functional modules and code enhancements, which undergo thorough quality assurance checks to align with our high standards.\nUsers benefit from the flexibility to modify the source code, tailoring Wazuh to their specific security needs. Furthermore, Wazuh's compatibility with third-party APIs and solutions like VirusTotal, TheHive, and PagerDuty enriches its functionality, allowing it to serve as both a source and receiver of security data. This blend of collaborative development, customization, and robust integration options positions Wazuh as a versatile tool in the cybersecurity landscape.\nIn addition to continually developing and enhancing Wazuh, our team prioritizes providing comprehensive and user-friendly documentation. This resource offers detailed step-by-step guidance for deploying and utilizing Wazuh effectively, catering to users with varying levels of expertise.\nAlongside our documentation, we release weekly blog posts that delve into a variety of Wazuh use cases and integrations, offering insights and strategies for effective threat detection and response. These blog posts serve as a valuable resource for staying updated with the latest in cybersecurity practices and Wazuh capabilities.\nWazuh users have access to multiple community channels where they can engage with product developers and fellow users. These channels consist of Wazuh's internal developers, users, and contributors. They provide quick-response technical support and foster discussions about the platform. You can find some of these communities on platforms like Slack, GitHub, Reddit, Discord, Google Groups, and Twitter, each offering a unique way to connect and share insights about Wazuh.\nNeed more information?\nOur team will contact you soon.",
+      "relevance": "SIEM XDR architecture features integrations API open source enterprise pricing customer"
+    },
+    {
+      "id": "ev_2",
+      "source_id": "src_2",
+      "quote": null,
+      "note": "The Open Source\nSecurity Platform\nUnified XDR and SIEM protection\nfor endpoints\nand cloud workloads.\nEndpoint and Cloud\nWorkload Protection\nWazuh unifies historically separate functions into a single agent and platform architecture.\nProtection is provided for public clouds, private clouds, and on-premises data centers.\nEndpoint Security\nThreat Intelligence\nSecurity Operations\nCloud Security\nActive XDR protection\nfrom modern threats\nWazuh provides analysts with real-time correlation and context. Its active responses are granular and include on-device remediation to keep endpoints clean and operational.\nLearn more about XDRA comprehensive\nSIEM solution\nThe Wazuh Security Information and Event Management (SIEM) solution provides monitoring, detection, and alerting of security events and incidents.\nLearn more about SIEMExplore the potential\nof Wazuh Cloud\nThe Wazuh Cloud service offers managed, ready-to-use, and highly scalable cloud environments for security monitoring and endpoint protection.\nStart your free trialWhy everyone open source\nFlexible, scalable, no vendor lock-in, and no license cost.\nFree community support and trusted by thousands of enterprise users.\nThe world's most widely used open source security solution\nProtected endpoints\nEnterprise users\nDownloads per year\nWhat our customers\nsay about us\nLearn more about Wazuh\nWazuh is available at no cost and adopts an open-source approach to security, which ensures transparency, flexibility, constant improvement, and free community support. As an open source platform, Wazuh benefits from rapid capability development, offers comprehensive documentation, and fosters high user engagement.\nWazuh is an open-source platform for threat detection and incident response, renowned for its adaptability and integration capabilities. The development team continuously enhances the platform, supported by rigorous testing and auditing processes. We encourage user contributions, such as functional modules and code enhancements, which undergo thorough quality assurance checks to align with our high standards.\nUsers benefit from the flexibility to modify the source code, tailoring Wazuh to their specific security needs. Furthermore, Wazuh's compatibility with third-party APIs and solutions like VirusTotal, TheHive, and PagerDuty enriches its functionality, allowing it to serve as both a source and receiver of security data. This blend of collaborative development, customization, and robust integration options positions Wazuh as a versatile tool in the cybersecurity landscape.\nIn addition to continually developing and enhancing Wazuh, our team prioritizes providing comprehensive and user-friendly documentation. This resource offers detailed step-by-step guidance for deploying and utilizing Wazuh effectively, catering to users with varying levels of expertise.\nAlongside our documentation, we release weekly blog posts that delve into a variety of Wazuh use cases and integrations, offering insights and strategies for effective threat detection and response. These blog posts serve as a valuable resource for staying updated with the latest in cybersecurity practices and Wazuh capabilities.\nWazuh users have access to multiple community channels where they can engage with product developers and fellow users. These channels consist of Wazuh's internal developers, users, and contributors. They provide quick-response technical support and foster discussions about the platform. You can find some of these communities on platforms like Slack, GitHub, Reddit, Discord, Google Groups, and Twitter, each offering a unique way to connect and share insights about Wazuh.\nNeed more information?\nOur team will contact you soon.",
+      "relevance": "open source, SIEM, XDR, endpoints, cloud workloads"
+    },
+    {
+      "id": "ev_3",
+      "source_id": "src_40",
+      "quote": null,
+      "note": "There is no single open-source tool that delivers a complete, production-ready SIEM out of the box. Every option involves a trade-off: you either get a purpose-built SIEM with gaps in analytics, or a powerful logging and analytics stack that requires you to wire in security detection yourself.\nHere are free open source tools adjacent to SIEM category to build your own solution from the ground up:\nOpen source SIEM tools\nTool | GitHub stars | Primary use case | Pricing |\n|---|---|---|---|\nWazuh | 11,000+ | SIEM | ✅ Free (on-prem version) |\nGraylog | 7,600+ | SIEM | ➕ Freemium |\nOSSEC | 4,600+ | SIEM | ➕ Freemium |\nSecurityOnion | 3,600+ | SIEM | ✅ Free |\nAlienVault OSSIM | 120+ | SIEM | ✅ Free |\nThe ELK Stack | 17,000+ | Logging repository and analytics | ➕ Freemium |\nFluentd | 13,000+ | Logging repository and analytics | ➕ Freemium |\nOpenSearch | 10,000+ | Logging repository and analytics | ➕ Freemium |\nSuricata | 5,000+ | Intrusion detection | ➕ Freemium |\nSnort3 | 2,800+ | Intrusion detection | ➕ Freemium |\nThese tools typically store logs in Elasticsearch indices for a configurable retention period, based on storage and data policies. For long-term storage, additional archival procedures or integrations may be needed.\nSIEM capabilities\n*❌: Requires third-party agent integrations (e.g., Elastic Agent).\nSIEM platforms rely on accurate endpoint data. Discover how endpoint management software enhances detection and response by ensuring devices are well-managed and secure.\nTwo types of open-source tools\nSIEM-focused tools provide most core capabilities natively: log correlation, alerting, visualization, and some compliance reporting. They’re more opinionated and easier to get running. Wazuh and SecurityOnion fall here.\nLogging and analytics platforms are powerful data infrastructure tools, excellent at collecting, storing, and visualizing logs, but they don’t ship with security detection logic. Think of them as the foundation you build a SIEM on top of. The ELK Stack, OpenSearch, and Graylog Open fall here.\nCommercial alternatives\nOpen-source SIEM tools commonly lack the intuitive rule-creation interfaces found in commercial tools. Additionally, their correlation functionalities are more basic and mostly do not offer the out-of-the-box capabilities like:\n- ready-made dashboards for log management\n- compliance reports (e.g., PCI-DSS, HIPAA)\n- integrations with other enterprise tools, such as firewalls, endpoint protection systems,\nCommercial SIEM tools provide core SIEM capabilities, including:\n- event correlation, log analytics\n- ability to do risk scoring\n- providing recommended actions based on risk scores\n- long-term retention up to 12 months\n- user and entity behaviour analytics with pre-built machine learning models\nCommercial SIEM tools also provide various orchestration and response functions, and ways to automate SOC tasks. Some SIEM vendors have incorporated SOAR capabilities to be more responsive. This is typical as more security tools add more automation features to make them easier to use and more productive. In some cases, this moves these products into the SOAR category.\nOpen source SIEM tools explained\nWazuh\nWazuh is the most complete open-source SIEM available today. It ships as a full platform with four components: an Indexer (built on OpenSearch, stores and indexes alerts), a Server (the core engine collects logs from agents, analyzes events, and identifies indicators of compromise), a Dashboard (web UI for visualizing events and threats), and an Agent(runs on endpoints and forwards events to the server).\nIt provides security log analysis, vulnerability detection, security configuration assessment, and regulatory compliance reporting natively, along with alerting and event-based reporting without significant third-party integration.\nSee Wazuh’s concept:\nGraylog\nGraylog centralizes logs and provides alerting and dashboards through a polished interface. It’s worth knowing that Graylog is licensed under the Server Side Public License (SSPL), which is not an OSI-approved open-source license it’s more accurately described as open-core or source-available.\n1The free tier covers basic log aggregation and alerting. Features more relevant to SIEM use, such as log search filtering, log archiving, anomaly detection, pre-built visualizations, and compliance reports, are in the paid Graylog Security tier. Graylog 7.0 introduced an experimental Model Context Protocol (MCP) endpoint that allows LLM clients to connect directly to a Graylog instance for live querying using plain-English prompts.\nOSSEC\nOSSEC is an open-source Host Intrusion Detection System (HIDS). It collects and analyzes log data and provides some SIEM-adjacent capabilities, but lacks the log management and analytics components expected of a full SIEM. It has largely been superseded by Wazuh, which was derived from OSSEC and continues to receive active development.\nComponents:\n- Manager: Collects logs from data sources.\n- Agents: Collect and process logs.\nOpenSearch as a SIEM solution: OSSEC provides core SIEM capabilities: it collects and analyzes data; however, it lacks some of the basic log management and analysis components required.\nSecurityOnion\nSecurityOnion functions as a SIEM and intrusion detection system (IDS). It integrates other open-source tools like Snort, Suricata, and Wazuh to offer comprehensive monitoring and detection features for network and host-based intrusion.\nSecurityOnion includes useful tools for deep analysis, such as Wireshark for network traffic analysis and Network Miner for packet capture and network forensics.\nSecurityOnion as a SIEM solution:\n- Host-based & network-based IDS: Monitors and detects suspicious activity on hosts and networks.\n- Full packet capture (FPC): Captures network traffic with netsniff-ng to detect data exfiltration, malware, phishing, and other attacks.\n- Threat detection: Uses SGUIL in SecurityOnion to identify malicious activity, including failed logins to firewalls and domain controllers, enhancing visibility and insights.\nAlienVault OSSIM\nOSSIM is the open-source version of AlienVault’s Unified Security Management platform. Its notable strength is the inclusion of OpenVAS, an open-source vulnerability scanner, which enables it to correlate IDS alerts from Snort and Suricata with vulnerability scan results, a genuinely useful capability.\nAlienVault OSSIM as a SIEM solution: A key strength of OSSIM is the inclusion of OpenVAS (an open-source vulnerability scanner). This allows OSSIM to correlate IDS logs (from tools like Snort and Suricata) with vulnerability scanner results.\nOSSIM offers:\n- Event collection and processing.\n- Correlation of security data from multiple sources.\n- Vulnerability assessment with OpenVAS integration.\n- Alerting based on security events.\nMissing key features:\nThe open-source version of OSSIM lacks some SIEM features available in the commercial version, such as:\n- Reporting\n- Real-time event response or alerting console\n- Ability to tag and separate logs\nELK Stack\nThe ELK stack is an infrastructure for log storage, processing, and visualization. It is not a SIEM; it’s the platform on which you build SIEM-like functionality. The detection rules, correlation logic, and alerting are yours to create. The stack is no longer fully open-source; a free edition remains available under Elastic’s proprietary license.\nComponents: Elasticsearch (storage and indexing), Logstash (log aggregation and normalization), Kibana (visualization), and Beats (lightweight log shippers). What’s missing for SIEM use: no built-in correlation engine in the free version (the open-source tool Elastalert partially fills this gap), no built-in security rules, and no native alerting or reporting.\nELK Stack as a SIEM solution: ELK stack provides log aggregation, processing, and visualization; however, it is not a complete SIEM system.\n- Missing key features:\n- Correlation engine: ELK Stack’s free version does not include a built-in cor",
+      "relevance": "Wazuh competitors, open-source SIEM, XDR, alternatives"
+    },
+    {
+      "id": "ev_4",
+      "source_id": "src_186",
+      "quote": null,
+      "note": "Elastic pricing\nElastic Cloud makes it easy to launch and scale Search, Observability, and Security with flexible hosted and serverless options. Compare solutions and deployment to find the right fit.\nElastic Cloud: Hosted vs. Serverless\nThe flexibility to choose between control and simplicity\nHosted\nServerless\nSelf-managed\nOperations\nFull visibility and control over HW configuration, clusters size, node count, and versions\nFully managed, just bring your data. Elastic manages all HW configuration, clusters size, node count, and versions.\nFull control over deployment location, HW setup and configuration, orchestration, clusters size, node count, and versions\nScalability\nCustom control over cluster capacity\nAutomatically scales up and down based on search and indexing load to optimize performance\nCustom control over cluster capacity, storage-based autoscaling available in ECE and ECK\nCloud and regions\nAWS, GCP, Azure, Alibaba, FedRamp 60 regions across AWS, Azure, and GCP\nCurrently generally available in AWS, GCP, and Azure (see a list of supported regions)\nDeploy anywhere: on-prem or in private or public cloud\nCapabilities\nAll solutions and platform capabilities\nMost solution and platform capabilities\nNotable upcoming features: traffic filtering, cross project search, and bring your own key\nSee a detailed roadmap of upcoming features\nNotable upcoming features: traffic filtering, cross project search, and bring your own key\nSee a detailed roadmap of upcoming features\nAll solutions and platform capabilities\nSupport\nFour support tiers, depending on the Elastic Cloud subscription tier\nFour support tiers, depending on the Elastic Cloud subscription tier\nTwo subscription tiers (Platinum and Enterprise) with identical support SLA\nUptime SLA\n99.95% Monthly Uptime SLA for Platinum and Enterprise subscription tiers. See Elastic Cloud Hosted SLA for more details.\n99.95% Monthly Uptime SLA for Platinum and Enterprise subscription tiers. See Elastic Cloud Serverless SLA for more details.\nNot applicable, as infrastructure is self-managed by the customer\nOperations\nScalability\nPricing\nCloud and regions\nCapabilities\nSupport\nUptime SLA\nHosted\nServerless\nSelf-managed\nFull visibility and control over HW configuration, clusters size, node count, and versions\nFully managed, just bring your data. Elastic manages all HW configuration, clusters size, node count, and versions.\nFull control over deployment location, HW setup and configuration, orchestration, clusters size, node count, and versions\nCustom control over cluster capacity\nAutomatically scales up and down based on search and indexing load to optimize performance\nCustom control over cluster capacity, storage-based autoscaling available in ECE and ECK\nAWS, GCP, Azure, Alibaba, FedRamp 60 regions across AWS, Azure, and GCP\nCurrently generally available in AWS, GCP, and Azure (see a list of supported regions)\nDeploy anywhere: on-prem or in private or public cloud\nAll solutions and platform capabilities\nMost solution and platform capabilities\nNotable upcoming features: traffic filtering, cross project search, and bring your own key\nSee a detailed roadmap of upcoming features\nNotable upcoming features: traffic filtering, cross project search, and bring your own key\nSee a detailed roadmap of upcoming features\nAll solutions and platform capabilities\nFour support tiers, depending on the Elastic Cloud subscription tier\nFour support tiers, depending on the Elastic Cloud subscription tier\nTwo subscription tiers (Platinum and Enterprise) with identical support SLA\n99.95% Monthly Uptime SLA for Platinum and Enterprise subscription tiers. See Elastic Cloud Hosted SLA for more details.\n99.95% Monthly Uptime SLA for Platinum and Enterprise subscription tiers. See Elastic Cloud Serverless SLA for more details.\nNot applicable, as infrastructure is self-managed by the customer",
+      "relevance": "SIEM security XDR pricing tiers feature gating free open-source"
+    },
+    {
+      "id": "ev_5",
+      "source_id": "src_188",
+      "quote": null,
+      "note": "Enterprise Security is the leading AI-powered SecOps platform that delivers the best analyst experience, unifying best in-class SIEM, SOAR, UEBA, threat intelligence, and detection engineering.\n| Capability | Description | Essentials Edition | Premier Edition |\n|---|---|---|---|\n| SIEM | The market-leading SIEM that provides comprehensive visibility, accurate detections, and operational efficiency across your security operations. | ✓ | ✓ |\n| Threat Intelligence | Gain comprehensive coverage, valuable context, and intelligence enrichment to effectively detect, investigate, and respond to threats. Accelerate investigations with integrated threat intelligence enrichment and leverage Cisco Talos threat intelligence at no additional cost. | ✓ | ✓ |\n| Detection Studio | As a capability of Splunk Enterprise Security, Detection Studio provides the complete detection lifecycle experience that enables detection engineers to seamlessly plan, develop, test, deploy and monitor detections, thereby improving confidence in detection deployment and enabling faster mean-time-to-detect. | ✓ | ✓ |\n| Exposure Analytics | Continuously identifies all entities (assets and users), enriches security findings with detailed context, and delivers comprehensive reporting – supporting better risk prioritization, faster threat detection, accelerated investigations, and exposure identification. | ✓ | ✓ |\n| SOAR | Automate security workflows, reducing manual effort, alert fatigue, and response times. Seamlessly integrated with Splunk Enterprise Security, it empowers TDIR automation at scale. | — | ✓ |\n| UEBA | UEBA uses behavior-based anomaly detection and machine learning to detect subtle deviations in user and entity behavior, enabling early identification and neutralization of insider threats and advanced threats, such as account misuse, compromised credentials, and lateral movement. | — | ✓ |\nSecurity orchestration, automation, and response\nAvailable Pricing Plans:\nPer user pricing\n- Orchestrate a response plan across your infrastructure efficiently\n- Automate triage and context enrichment activities\n- Respond faster and with better precision\n- Premium security solution for any-sized organization\n- Pricing based on number of user seats (the number of security analysts that use the technology)\n- Standard support included. Premium support available\nWays to Buy\nFind the best way to purchase Splunk for your needs",
+      "relevance": "SIEM XDR security pricing tiers licensing feature gating free open-source"
+    },
+    {
+      "id": "ev_6",
+      "source_id": "src_187",
+      "quote": null,
+      "note": "Automatic Import for Elastic Security\nAutomatic Import parses, ingests, and maps data to ECS for sources that don’t yet have prebuilt Elastic integrations. It works with Elastic Security, Observability, and other solutions that rely on Elastic Agent and integrations. This lets you onboard custom or niche data sources without building a full integration manually.\nAutomatic Import uses a large language model (LLM) with specialized instructions to analyze source data and generate a custom integration.\nElastic integrations, including those created by Automatic Import, normalize data to the Elastic Common Schema (ECS). This standardization provides consistent use across dashboards, search, alerts, and machine learning features.\nRefer to prebuilt data integrations for a full list of Elastic’s 400+ integrations.\nRefer to Automatic Import for requirements, supported sample formats, recommended models, and step-by-step instructions.",
+      "relevance": "API endpoint reference SIEM integrations authentication"
+    },
+    {
+      "id": "ev_7",
+      "source_id": "src_189",
+      "quote": null,
+      "note": "AI-Reinforced SIEM Platform for Advanced Cybersecurity Operations\nTransform your Threat Detection, Investigation, and Response (TDIR) with our 5x Gartner MQ Leading SIEM Platform, enhanced with AI-powered capabilities. Elevate your security operations with our integrated SIEM and SOAR solution, and discover a security analytics platform that scales with your needs.",
+      "relevance": "SIEM XDR architecture API authentication integrations changelog"
+    },
+    {
+      "id": "ev_8",
+      "source_id": "src_190",
+      "quote": null,
+      "note": "- Why Securonix?\n- Products\n-\n- Overview\n- Agentic AI\n-\n- Securonix Cloud Advantage\n-\n- Solutions\n-\n- Monitoring the Cloud\n- Cloud Security Monitoring\n- Gain visibility to detect and respond to cloud threats.\n- Amazon Web Services\n- Achieve faster response to threats across AWS.\n- Google Cloud Platform\n- Improve detection and response across GCP.\n- Microsoft Azure\n- Expand security monitoring across Azure services.\n- Microsoft 365\n- Benefit from detection and response on Office 365.\n-\n- Featured Use Case\n- Insider Threat\n- Monitor and mitigate malicious and negligent users.\n- EMR Monitoring\n- Increase patient data privacy and prevent data snooping.\n- MITRE ATT&CK\n- Align alerts and analytics to the MITRE ATT&CK framework.\n- MSSPs\n- Scale multi-tenant security with predictable economics.\n-\n- Resources\n- Partners\n- Company\n- Blog",
+      "relevance": "SIEM XDR product maturity API integration architecture endpoint reference"
+    },
+    {
+      "id": "ev_9",
+      "source_id": "src_191",
+      "quote": null,
+      "note": "Prior to adopting Securonix, Alberta Health Services (AHS) leveraged the on-prem solution from RSA, NetWitness. This solution relied on a large amount of hardware, making maintenance expensive and time-consuming for their SOC. AHS spent 2-3 hours a day just on maintenance and struggled to get adequate support from their vendor. On top of dealing with constant tuning issues, they also faced alert fatigue and a highly manual investigation process.\nBy adopting Securonix, AHS now has a cloud-native platform with better visibility and security insights. Download this case study to find out more about the benefits of Securonix Next-Gen SIEM.",
+      "relevance": "SIEM deployment scale production customer use case product maturity"
+    },
+    {
+      "id": "ev_10",
+      "source_id": "src_192",
+      "quote": null,
+      "note": "Simplified Compliance\nBuilt-in insights mapped to frameworks like SEC, GDPR, and DORA give security leaders continuous visibility into how controls are performing against regulatory expectations. Instead of manually gathering evidence across disconnected tools, the platform automatically aligns detections, investigations, response actions, and policy enforcement to recognized compliance requirements.\nDashboards translate technical activity into audit-ready artifacts. You can show which controls were triggered, how incidents were handled, who approved actions, and whether response timelines met policy thresholds. Evidence is time-stamped, traceable, and exportable, reducing the scramble that typically surrounds quarterly reviews or formal audits.",
+      "relevance": "SIEM XDR API surface integrations architecture authentication"
+    },
+    {
+      "id": "ev_11",
+      "source_id": "src_193",
+      "quote": null,
+      "note": "How Does Securonix Compare?\nCompare Securonix to Crowdstrike, Microsoft Sentinel, Splunk, Exabeam, and Palo Alto at a single glance.\nSecurity teams face growing pressure to respond faster, work smarter, and cover more ground across cloud, identity, and hybrid environments. To meet this challenge, a modern SIEM must deliver real-time visibility, intelligent detection, seamless response, and cost-optimized data management all in one platform. It’s not just about collecting data; it’s about transforming that data into action, giving analysts the speed and clarity they need to stay ahead.\nSecuronix outperforms legacy SIEMs, bolt-on XDRs, and automation-heavy “SIEM alternatives” across the capabilities that matter most to organizations: open architecture, advanced detection, integration with existing tools, and AI-driven analyst efficiency.\nIf you’re evaluating a new SIEM, Securonix delivers what others don’t: unified detection, Agentic AI that accelerates triage and decision-making, and transparent pricing with cloud-scale data flexibility.",
+      "relevance": "SIEM XDR feature comparison to competitors"
+    },
+    {
+      "id": "ev_12",
+      "source_id": "src_187",
+      "quote": null,
+      "note": "Automatic Import for Elastic Security\nAutomatic Import parses, ingests, and maps data to ECS for sources that don’t yet have prebuilt Elastic integrations. It works with Elastic Security, Observability, and other solutions that rely on Elastic Agent and integrations. This lets you onboard custom or niche data sources without building a full integration manually.\nAutomatic Import uses a large language model (LLM) with specialized instructions to analyze source data and generate a custom integration.\nElastic integrations, including those created by Automatic Import, normalize data to the Elastic Common Schema (ECS). This standardization provides consistent use across dashboards, search, alerts, and machine learning features.\nRefer to prebuilt data integrations for a full list of Elastic’s 400+ integrations.\nRefer to Automatic Import for requirements, supported sample formats, recommended models, and step-by-step instructions.",
+      "relevance": "API authentication integrations endpoint schemas SIEM XDR"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_1",
+      "title": "Extracted evidence for https://wazuh.com/",
+      "created_at": "2026-05-06T14:19:38.949362Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_1"
+      ]
+    },
+    {
+      "id": "artifact_2",
+      "title": "Extracted evidence for https://wazuh.com/",
+      "created_at": "2026-05-06T14:21:20.850717Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_2"
+      ]
+    },
+    {
+      "id": "artifact_3",
+      "title": "Extracted evidence for https://aimultiple.com/open-source-siem",
+      "created_at": "2026-05-06T14:21:39.819021Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_3"
+      ]
+    },
+    {
+      "id": "artifact_4",
+      "title": "Extracted evidence for https://www.elastic.co/pricing",
+      "created_at": "2026-05-06T14:26:43.937051Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_4"
+      ]
+    },
+    {
+      "id": "artifact_5",
+      "title": "Extracted evidence for https://www.splunk.com/en_us/products/pricing/cyber-security.html",
+      "created_at": "2026-05-06T14:26:44.010497Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_5"
+      ]
+    },
+    {
+      "id": "artifact_6",
+      "title": "Extracted evidence for https://www.elastic.co/docs/solutions/security/get-started/automatic-import",
+      "created_at": "2026-05-06T14:26:45.042794Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_6"
+      ]
+    },
+    {
+      "id": "artifact_7",
+      "title": "Extracted evidence for https://www.securonix.com/products/platform-overview",
+      "created_at": "2026-05-06T14:26:56.539041Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_7"
+      ]
+    },
+    {
+      "id": "artifact_8",
+      "title": "Extracted evidence for https://www.securonix.com/resources-by-topic/siem",
+      "created_at": "2026-05-06T14:27:00.343355Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_8"
+      ]
+    },
+    {
+      "id": "artifact_9",
+      "title": "Extracted evidence for https://www.securonix.com/resources/alberta-health-services-reduces-false-positives",
+      "created_at": "2026-05-06T14:27:05.833160Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_9"
+      ]
+    },
+    {
+      "id": "artifact_10",
+      "title": "Extracted evidence for https://www.securonix.com/products/siem-solutions",
+      "created_at": "2026-05-06T14:27:13.010016Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_10"
+      ]
+    },
+    {
+      "id": "artifact_11",
+      "title": "Extracted evidence for https://www.securonix.com/why-securonix/competitive-comparison",
+      "created_at": "2026-05-06T14:27:21.009989Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_11"
+      ]
+    },
+    {
+      "id": "artifact_12",
+      "title": "Extracted evidence for https://www.elastic.co/docs/solutions/security/get-started/automatic-import",
+      "created_at": "2026-05-06T14:27:25.213860Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_12"
+      ]
+    }
+  ],
+  "warnings": [
+    "https://wazuh.com/docs: HTTP status 404",
+    "https://wazuh.com/documentation: HTTP status 404",
+    "https://wazuh.com/developers: HTTP status 404",
+    "https://wazuh.com/api: HTTP status 404",
+    "https://wazuh.com/api-reference: HTTP status 404",
+    "https://wazuh.com/changelog: HTTP status 404",
+    "https://wazuh.com/release-notes: HTTP status 404",
+    "https://wazuh.com/releases: HTTP status 404",
+    "https://wazuh.com/pricing: HTTP status 404",
+    "https://wazuh.com/plans: HTTP status 404",
+    "https://wazuh.com/security: HTTP status 404",
+    "https://wazuh.com/trust: HTTP status 404",
+    "https://wazuh.com/.well-known/security.txt: HTTP status 404",
+    "https://wazuh.com/llms.txt: HTTP status 404",
+    "https://wazuh.com/docs: HTTP status 404",
+    "https://wazuh.com/documentation: HTTP status 404",
+    "https://wazuh.com/developers: HTTP status 404",
+    "https://wazuh.com/api: HTTP status 404",
+    "https://wazuh.com/api-reference: HTTP status 404",
+    "https://wazuh.com/changelog: HTTP status 404",
+    "https://wazuh.com/release-notes: HTTP status 404",
+    "https://wazuh.com/releases: HTTP status 404",
+    "https://wazuh.com/pricing: HTTP status 404",
+    "https://wazuh.com/plans: HTTP status 404",
+    "https://wazuh.com/security: HTTP status 404",
+    "https://wazuh.com/trust: HTTP status 404",
+    "https://wazuh.com/.well-known/security.txt: HTTP status 404",
+    "https://wazuh.com/llms.txt: HTTP status 404",
+    "https://wazuh.com/docs: HTTP status 404",
+    "https://wazuh.com/documentation: HTTP status 404",
+    "https://wazuh.com/developers: HTTP status 404",
+    "https://wazuh.com/api: HTTP status 404",
+    "https://wazuh.com/api-reference: HTTP status 404",
+    "https://wazuh.com/changelog: HTTP status 404",
+    "https://wazuh.com/release-notes: HTTP status 404",
+    "https://wazuh.com/releases: HTTP status 404",
+    "https://wazuh.com/pricing: HTTP status 404",
+    "https://wazuh.com/plans: HTTP status 404",
+    "https://wazuh.com/security: HTTP status 404",
+    "https://wazuh.com/trust: HTTP status 404",
+    "https://wazuh.com/.well-known/security.txt: HTTP status 404",
+    "https://wazuh.com/llms.txt: HTTP status 404",
+    "https://www.g2.com/products/wazuh/competitors/alternatives: HTTP status 403",
+    "https://sysadmin.libhunt.com/wazuh-alternatives: HTTP status 403",
+    "https://cybersecurity.att.com/sitemap.xml: HTTP status 403",
+    "https://cybersecurity.att.com/: HTTP status 403",
+    "https://cybersecurity.att.com/docs: HTTP status 403",
+    "https://www.elastic.co/sitemap.xml: response body truncated to 5 MB",
+    "https://cybersecurity.att.com/documentation: HTTP status 403",
+    "https://cybersecurity.att.com/developers: HTTP status 403",
+    "https://cybersecurity.att.com/api: HTTP status 403",
+    "https://www.splunk.com/docs: HTTP status 404",
+    "https://www.splunk.com/documentation: Blocked content type: unknown",
+    "https://www.splunk.com/developers: Blocked content type: unknown",
+    "https://www.elastic.co/api: HTTP status 404",
+    "https://www.splunk.com/changelog: HTTP status 404",
+    "https://cybersecurity.att.com/api-reference: HTTP status 403",
+    "https://www.splunk.com/release-notes: HTTP status 404",
+    "https://www.elastic.co/api-reference: HTTP status 404",
+    "https://www.elastic.co/changelog: HTTP status 404",
+    "https://www.splunk.com/releases: HTTP status 404",
+    "https://www.splunk.com/security: Blocked content type: unknown",
+    "https://www.splunk.com/trust: Blocked content type: unknown",
+    "https://www.splunk.com/careers: Blocked content type: unknown",
+    "https://www.splunk.com/jobs: HTTP status 404",
+    "https://www.splunk.com/.well-known/security.txt: Blocked content type: unknown",
+    "https://www.elastic.co/release-notes: HTTP status 404",
+    "https://www.splunk.com/llms.txt: HTTP status 404",
+    "https://cybersecurity.att.com/changelog: HTTP status 403",
+    "https://cybersecurity.att.com/release-notes: HTTP status 403",
+    "https://cybersecurity.att.com/releases: HTTP status 403",
+    "https://cybersecurity.att.com/pricing: HTTP status 403",
+    "https://www.elastic.co/releases: HTTP status 404",
+    "https://cybersecurity.att.com/plans: HTTP status 403",
+    "https://cybersecurity.att.com/security: HTTP status 403",
+    "https://www.elastic.co/.well-known/security.txt: HTTP status 404",
+    "https://cybersecurity.att.com/trust: HTTP status 403",
+    "https://cybersecurity.att.com/customers: HTTP status 403",
+    "https://cybersecurity.att.com/case-studies: HTTP status 403",
+    "https://www.elastic.co/llms.txt: HTTP status 404",
+    "https://cybersecurity.att.com/blog: HTTP status 403",
+    "https://cybersecurity.att.com/engineering: HTTP status 403",
+    "https://cybersecurity.att.com/careers: HTTP status 403",
+    "https://cybersecurity.att.com/jobs: HTTP status 403",
+    "https://cybersecurity.att.com/llms.txt: HTTP status 503",
+    "https://www.graylog.org/sitemap.xml: Blocked content type: unknown",
+    "https://www.graylog.org/: Blocked content type: unknown",
+    "https://www.graylog.org/docs: Blocked content type: unknown",
+    "https://www.graylog.org/documentation: Blocked content type: unknown",
+    "https://www.graylog.org/developers: Blocked content type: unknown",
+    "https://www.graylog.org/api: Blocked content type: unknown",
+    "https://www.graylog.org/api-reference: Blocked content type: unknown",
+    "https://www.graylog.org/changelog: Blocked content type: unknown",
+    "https://www.graylog.org/release-notes: Blocked content type: unknown",
+    "https://www.graylog.org/releases: Blocked content type: unknown",
+    "https://www.graylog.org/pricing: Blocked content type: unknown",
+    "https://www.graylog.org/plans: Blocked content type: unknown",
+    "https://www.graylog.org/security: Blocked content type: unknown",
+    "https://www.graylog.org/trust: Blocked content type: unknown",
+    "https://www.graylog.org/customers: Blocked content type: unknown",
+    "https://www.graylog.org/case-studies: Blocked content type: unknown",
+    "https://www.graylog.org/blog: Blocked content type: unknown",
+    "https://www.graylog.org/engineering: Blocked content type: unknown",
+    "https://www.graylog.org/careers: Blocked content type: unknown",
+    "https://www.graylog.org/jobs: Blocked content type: unknown",
+    "https://www.graylog.org/.well-known/security.txt: Blocked content type: unknown",
+    "https://www.graylog.org/llms.txt: Blocked content type: unknown",
+    "https://www.graylog.org/robots.txt: Blocked content type: unknown",
+    "https://www.crowdstrike.com/sitemap.xml: HTTP status 404",
+    "https://www.crowdstrike.com/: Blocked content type: unknown",
+    "https://www.crowdstrike.com/docs: HTTP status 404",
+    "https://www.crowdstrike.com/documentation: HTTP status 404",
+    "https://www.crowdstrike.com/developers: HTTP status 404",
+    "https://www.crowdstrike.com/api: HTTP status 404",
+    "https://www.crowdstrike.com/api-reference: HTTP status 404",
+    "https://www.crowdstrike.com/changelog: HTTP status 404",
+    "https://www.crowdstrike.com/release-notes: HTTP status 404",
+    "https://www.crowdstrike.com/releases: HTTP status 404",
+    "https://www.crowdstrike.com/pricing: Blocked content type: unknown",
+    "https://www.crowdstrike.com/plans: HTTP status 404",
+    "https://www.crowdstrike.com/security: HTTP status 404",
+    "https://www.crowdstrike.com/trust: HTTP status 404",
+    "https://www.crowdstrike.com/customers: HTTP status 404",
+    "https://www.crowdstrike.com/case-studies: HTTP status 404",
+    "https://www.crowdstrike.com/blog: Blocked content type: unknown",
+    "https://www.crowdstrike.com/engineering: HTTP status 404",
+    "https://www.crowdstrike.com/careers: Blocked content type: unknown",
+    "https://www.crowdstrike.com/jobs: HTTP status 404",
+    "https://www.crowdstrike.com/llms.txt: HTTP status 404",
+    "https://www.securonix.com/docs: HTTP status 404",
+    "https://www.securonix.com/documentation: HTTP status 404",
+    "https://www.securonix.com/developers: HTTP status 404",
+    "https://www.securonix.com/api: HTTP status 404",
+    "https://www.securonix.com/api-reference: HTTP status 404",
+    "https://www.securonix.com/changelog: HTTP status 404",
+    "https://www.securonix.com/release-notes: HTTP status 404",
+    "https://www.securonix.com/releases: HTTP status 404",
+    "https://www.securonix.com/pricing: HTTP status 404",
+    "https://www.securonix.com/plans: HTTP status 404",
+    "https://www.securonix.com/security: HTTP status 404",
+    "https://www.securonix.com/trust: HTTP status 404",
+    "https://www.securonix.com/customers: HTTP status 404",
+    "https://www.securonix.com/case-studies: HTTP status 404",
+    "https://www.securonix.com/.well-known/security.txt: HTTP status 404",
+    "https://www.securonix.com/llms.txt: HTTP status 404",
+    "https://logrhythm.com/.well-known/security.txt: HTTP status 404",
+    "https://logrhythm.com/llms.txt: HTTP status 404",
+    "https://www.elastic.co/docs/solutions/security/platform-architecture: HTTP status 404"
+  ],
+  "metadata": {
+    "run_id": "run_68908d43258e4a78bcf7b9d4f77ad4bb",
+    "workflow_id": "technical_due_diligence",
+    "started_at": "2026-05-06T14:18:21.899147Z",
+    "finished_at": "2026-05-06T14:28:56.129914Z",
+    "cost_usd": null,
+    "tokens": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+    }
+  }
+}

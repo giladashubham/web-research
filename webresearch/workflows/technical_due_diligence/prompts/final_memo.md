@@ -5,6 +5,4 @@ Produce a concise markdown memo and a TechnicalDueDiligenceReport. The memo must
 - inference: reasoned conclusions from public signals
 - unknowns: what requires product, customer, or code review access
 
-Cover claims, evidence strength, competitor overlap, architecture differentiation, wrapper risk,
-replicability, unresolved gaps, and concrete code-review follow-up questions. Do not present inferred
-implementation details as facts.
+Cover claims (with evidence strength per claim), release activity (factual cadence and notable changes from `release_activity`), competitor overlap, unresolved gaps, and concrete code-review follow-up questions. Do not produce holistic verdicts on technical substance, wrapper risk, or architecture differentiation — those require code access. Do not present inferred implementation details as facts.

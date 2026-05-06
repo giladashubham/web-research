@@ -14,11 +14,12 @@ async def discover_urls_tool(
     ctx: RunContextWrapper[WorkflowContext],
     seed_url: str,
 ) -> DiscoveredUrls:
-    """Expand a seed URL into categorised high-value pages on the same domain.
+    """Expand a seed URL into categorised high-value pages on the site.
 
     Use this before search_web_tool. Fetches sitemap.xml, parses anchor links,
-    and probes canonical paths (/docs, /changelog, /api, /pricing, /security,
-    /customers, /blog, /careers). Returns zero Tavily calls.
+    follows high-value same-site docs/API subdomains one hop, and probes canonical
+    paths (/docs, /changelog, /api, /pricing, /security, /customers, /blog,
+    /careers). Returns zero Tavily calls.
     """
     return await discover_urls(ctx.context, seed_url)
 

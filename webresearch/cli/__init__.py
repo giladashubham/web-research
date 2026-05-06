@@ -6,7 +6,6 @@ import typer
 
 from webresearch.cli.list_cmd import list_workflows
 from webresearch.cli.run_cmd import run_command
-from webresearch.tui.app import run as run_tui
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -26,4 +25,3 @@ def main(
 
 app.command(name="list")(list_workflows)
 app.command(name="run")(run_command)
-app.command(name="tui")(run_tui)

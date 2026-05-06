@@ -8,7 +8,6 @@ from jsonschema import validate
 
 from webresearch.types import (
     ResearchFinding,
-    StructuredDataValidation,
     WorkflowMetadata,
     WorkflowResult,
 )
@@ -28,17 +27,13 @@ def build_result(
         msg = "Cannot build WorkflowResult before final output is set"
         raise ValueError(msg)
 
-    structured_data, raw_structured_data, validation = _structured_data(state)
     warnings = [*state.warnings, *ctx.warnings]
-
-    if validation is not None and not validation.valid:
-        warnings.extend(validation.errors)
+    structured_data, validation_errors = _structured_data(state)
+    warnings.extend(validation_errors)
 
     return WorkflowResult(
         answer_markdown=state.final.answer_markdown,
         structured_data=structured_data,
-        raw_structured_data=raw_structured_data,
-        structured_data_validation=validation,
         summary=_summary(state),
         findings=[
             _finding_from_ref(index, finding)
@@ -76,28 +71,17 @@ def _finding_from_ref(index: int, finding: ResearchFindingRef) -> ResearchFindin
 
 def _structured_data(
     state: WorkflowState,
-) -> tuple[dict[str, object] | None, dict[str, object] | None, StructuredDataValidation | None]:
+) -> tuple[dict[str, object] | None, list[str]]:
     if state.input.output_schema is None:
-        return None, None, None
+        return None, []
 
     structured_data = state.final.structured_data if state.final is not None else None
     if structured_data is None:
-        return (
-            None,
-            None,
-            StructuredDataValidation(valid=False, errors=["Structured data was not provided"]),
-        )
+        return None, ["Structured data was not provided"]
 
     try:
         validate(instance=structured_data, schema=state.input.output_schema)
     except JsonSchemaValidationError as exc:
-        return (
-            None,
-            structured_data,
-            StructuredDataValidation(
-                valid=False,
-                errors=[f"Structured data invalid: {exc.message}"],
-            ),
-        )
+        return None, [f"Structured data invalid: {exc.message}"]
 
-    return structured_data, None, StructuredDataValidation(valid=True)
+    return structured_data, []

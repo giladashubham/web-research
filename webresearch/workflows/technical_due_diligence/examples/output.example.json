@@ -13,19 +13,6 @@
     ],
     "evaluation_prompt": "Assess whether the company has defensible autonomy software or mostly wraps commodity models."
   },
-  "executive_judgment": {
-    "technical_substance": "mixed",
-    "confidence": "medium",
-    "summary": "Public evidence suggests a real product surface, but defensibility needs code review.",
-    "key_risks": [
-      "Limited public architecture detail",
-      "Several claims depend on demos rather than technical documentation"
-    ],
-    "key_strengths": [
-      "Public docs describe multiple integration surfaces",
-      "Changelog suggests active product iteration"
-    ]
-  },
   "claims": [
     {
       "claim": "The product provides autonomous workflow planning.",
@@ -43,15 +30,17 @@
       ]
     }
   ],
-  "technical_substance": {
-    "product_depth": "moderate",
-    "proprietary_architecture": "unclear",
-    "wrapper_risk": "medium",
-    "evidence": [
-      "Public API docs expose multiple workflow primitives",
-      "No public details confirm proprietary model or orchestration internals"
+  "release_activity": {
+    "source_urls": [
+      "https://example.com/changelog"
     ],
-    "reasoning": "The public product surface appears broader than a demo, but the core architecture is not externally verifiable."
+    "last_release_date": "2025-03-28",
+    "releases_last_12_months": 24,
+    "notable_releases": [
+      "v2.1: added webhook delivery retry with exponential backoff",
+      "v2.0: new authentication model with short-lived tokens"
+    ],
+    "cadence_description": "approximately bi-weekly releases over the past 12 months"
   },
   "competitors": [
     {
@@ -67,16 +56,6 @@
       ]
     }
   ],
-  "replicability": {
-    "estimated_replication_time": "3_to_6_months",
-    "competitor_replication_risk": "medium",
-    "drivers": [
-      "Most visible capabilities are common SaaS and LLM orchestration patterns"
-    ],
-    "constraints": [
-      "Production reliability and domain integrations may take longer than the demo surface"
-    ]
-  },
   "code_review_follow_ups": [
     {
       "id": "cr-1",

@@ -1,5 +1,63 @@
 {
   "$defs": {
+    "ChangelogObservations": {
+      "additionalProperties": false,
+      "properties": {
+        "source_urls": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Source Urls",
+          "type": "array"
+        },
+        "last_release_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Release Date"
+        },
+        "releases_last_12_months": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Releases Last 12 Months"
+        },
+        "notable_releases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notable Releases",
+          "type": "array"
+        },
+        "cadence_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cadence Description"
+        }
+      },
+      "title": "ChangelogObservations",
+      "type": "object"
+    },
     "ClaimAssessment": {
       "additionalProperties": false,
       "properties": {
@@ -218,166 +276,12 @@
       ],
       "title": "DiligenceTarget",
       "type": "object"
-    },
-    "ExecutiveJudgment": {
-      "additionalProperties": false,
-      "properties": {
-        "technical_substance": {
-          "enum": [
-            "real_asset",
-            "mixed",
-            "thin",
-            "unclear"
-          ],
-          "title": "Technical Substance",
-          "type": "string"
-        },
-        "confidence": {
-          "enum": [
-            "low",
-            "medium",
-            "high"
-          ],
-          "title": "Confidence",
-          "type": "string"
-        },
-        "summary": {
-          "minLength": 1,
-          "title": "Summary",
-          "type": "string"
-        },
-        "key_risks": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Key Risks",
-          "type": "array"
-        },
-        "key_strengths": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Key Strengths",
-          "type": "array"
-        }
-      },
-      "required": [
-        "technical_substance",
-        "confidence",
-        "summary"
-      ],
-      "title": "ExecutiveJudgment",
-      "type": "object"
-    },
-    "ReplicabilityAssessment": {
-      "additionalProperties": false,
-      "properties": {
-        "estimated_replication_time": {
-          "enum": [
-            "under_3_months",
-            "3_to_6_months",
-            "6_to_12_months",
-            "over_12_months",
-            "unclear"
-          ],
-          "title": "Estimated Replication Time",
-          "type": "string"
-        },
-        "competitor_replication_risk": {
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unclear"
-          ],
-          "title": "Competitor Replication Risk",
-          "type": "string"
-        },
-        "drivers": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Drivers",
-          "type": "array"
-        },
-        "constraints": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Constraints",
-          "type": "array"
-        }
-      },
-      "required": [
-        "estimated_replication_time",
-        "competitor_replication_risk"
-      ],
-      "title": "ReplicabilityAssessment",
-      "type": "object"
-    },
-    "TechnicalSubstanceAssessment": {
-      "additionalProperties": false,
-      "properties": {
-        "product_depth": {
-          "enum": [
-            "deep",
-            "moderate",
-            "thin",
-            "unclear"
-          ],
-          "title": "Product Depth",
-          "type": "string"
-        },
-        "proprietary_architecture": {
-          "enum": [
-            "clear",
-            "partial",
-            "commodity",
-            "unclear"
-          ],
-          "title": "Proprietary Architecture",
-          "type": "string"
-        },
-        "wrapper_risk": {
-          "enum": [
-            "low",
-            "medium",
-            "high",
-            "unclear"
-          ],
-          "title": "Wrapper Risk",
-          "type": "string"
-        },
-        "evidence": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Evidence",
-          "type": "array"
-        },
-        "reasoning": {
-          "minLength": 1,
-          "title": "Reasoning",
-          "type": "string"
-        }
-      },
-      "required": [
-        "product_depth",
-        "proprietary_architecture",
-        "wrapper_risk",
-        "reasoning"
-      ],
-      "title": "TechnicalSubstanceAssessment",
-      "type": "object"
     }
   },
   "additionalProperties": false,
   "properties": {
     "target": {
       "$ref": "#/$defs/DiligenceTarget"
-    },
-    "executive_judgment": {
-      "$ref": "#/$defs/ExecutiveJudgment"
     },
     "claims": {
       "items": {
@@ -386,8 +290,16 @@
       "title": "Claims",
       "type": "array"
     },
-    "technical_substance": {
-      "$ref": "#/$defs/TechnicalSubstanceAssessment"
+    "release_activity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ChangelogObservations"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "competitors": {
       "items": {
@@ -395,9 +307,6 @@
       },
       "title": "Competitors",
       "type": "array"
-    },
-    "replicability": {
-      "$ref": "#/$defs/ReplicabilityAssessment"
     },
     "code_review_follow_ups": {
       "items": {
@@ -423,10 +332,7 @@
     }
   },
   "required": [
-    "target",
-    "executive_judgment",
-    "technical_substance",
-    "replicability"
+    "target"
   ],
   "title": "TechnicalDueDiligenceReport",
   "type": "object"

@@ -1,0 +1,943 @@
+{
+  "answer_markdown": "## Technical Due Diligence Memo — Wazuh\n\n### Public Evidence (firmly supported by published sources)\n- **Architecture**: Wazuh’s official documentation explicitly describes an architecture composed of a multi-platform agent (Linux, Windows, macOS, Solaris, AIX, HP-UX), a server, indexer, and dashboard ([docs](https://documentation.wazuh.com/current/getting-started/architecture.html)). Data collection (agent/agentless), analysis (server), indexing (indexer), and visualization (dashboard) steps are clearly outlined and supported.\n- **Deployment and Scalability**: Public docs support all-in-one, single-node, and multi-node deployments with stated support for hundreds to thousands of agents and horizontal scalability via clusters ([docs](https://documentation.wazuh.com/current/getting-started/components/index.html)).\n- **Security Protocols**: Component communication defaults to encrypted protocols: AES between agent/server, Filebeat+TLS server-indexer, HTTPS/TLS for API/dashboard ([docs](https://documentation.wazuh.com/current/getting-started/architecture.html)).\n- **APIs**: The Wazuh RESTful API is documented as open source and enables agent management, cluster control, rules/FIM controls, MITRE ATT&CK mapping, Syscollector, RBAC, and user management; capability lists are detailed in public API references ([docs](https://documentation.wazuh.com/current/user-manual/api/index.html)).\n- **Agentless & Integrations**: Confirmed agentless monitoring for network devices via Syslog and SSH ([docs](https://documentation.wazuh.com/current/getting-started/architecture.html)).\n- **Compliance and Features**: Default rulesets for PCI DSS, NIST 800-53, HIPAA, TSC, GDPR are documented; core XDR/SIEM features (log analysis, FIM, malware/intrusion, config/vuln assessment) are enumerated ([docs](https://documentation.wazuh.com/current/compliance/index.html)).\n- **Threat Intelligence**: Wazuh Cyber Threat Intelligence (CTI) module is described as publicly accessible and integrated with the Vulnerability Detection engine ([docs](https://documentation.wazuh.com/current/getting-started/architecture.html)).\n- **Release Activity**: Public changelog confirms a **~monthly** cadence with 15 releases in the last 12 months. Notables include recent 4.14.x series (Azure/Docker module expansion, new API/filtering features, FIM/engine improvements), plus frequent patches ([release notes](https://documentation.wazuh.com/current/release-notes/index.html)).\n\n### Inference (based on public signals, not directly proven)\n- **Scalability Real-World Limits**: Wazuh's claim of managing thousands of agents is plausible given its public clustering logic and multi-node reference, but real-world performance, bottlenecks, and cloud-native elastic scaling cannot be verified without deployment telemetry or code review.\n- **ML/AI Capabilities**: While threat intelligence (CTI) and rule-based detection are confirmed, there is no public evidence of Wazuh employing deep learning, anomaly detection, or advanced ML natively as part of detection pipelines (unlike Elastic Security or CrowdStrike Falcon).\n- **Cloud/SaaS Model**: There is no public evidence for an official SaaS or managed cloud service offering or its packaging/pricing. Wazuh appears mainly as self-managed software.\n\n### Unknowns (requires code, live product, or deep customer visibility)\n- **RBAC/Endpoint Implementation**: Actual code-level enforcement of endpoint RBAC and coverage of all documented API features is not verifiable from documentation alone—requires code/API review.\n- **Encryption Defaults & Protocol Hardening**: The presence of secure protocol defaults and absence of dangerous downgrade paths can only be confirmed by reviewing configuration, startup logic, and error handling in code.\n- **Cluster/Scaling Code Quality**: Real-world fault tolerance, elasticity, and scale (e.g., handling agent surges, split-brain scenarios in cluster mode) cannot be judged without access to logs or code.\n- **Customer Deployment Scale and Success**: While case studies exist in summary, there’s no extractable, detailed evidence of customer scale, SLA experience, production deployment topology, or platform performance under sustained enterprise workloads in public sources.\n- **AI/ML Model Usage**: Specifics on algorithms or analytics depth beyond classic rule-matching are absent.\n\n### Competitor Landscape (public evidence & comparison)\n- **AlienVault OSSIM**: Directly comparable in open-source SIEM base, but has less frequent releases than Wazuh. USM (commercial) brings more advanced features.\n- **Elastic Security/ELK**: Stronger in ML/AI, SaaS/built-in Cloud, and core extensibility; Wazuh matches on agent flexibility and compliance breadth.\n- **Splunk/QRadar/CrowdStrike**: Commercial, greater managed/advanced detection, mature UIs and ecosystems; Wazuh is differentiated by open core, agility, and transparent agent/integrations, but lags on proprietary ML, SOAR, and SaaS delivery (publicly visible).\n\n### Evidence Gaps\n- No public evidence for SaaS/hosted service.\n- No extractable real-world deployment/scale benchmarks.\n- No public code or documentation references to proprietary ML, deep learning, or automation beyond rule-based detection and CTI.\n\n### Code Review Follow-up (specific, unresolved questions)\n1. **API/Feature Implementation (High Priority)**: Review code to verify that all documented API endpoints and role-based access controls are present and enforced as described. [(crf_1)]\n2. **Security/Protocol Defaults (High Priority)**: Confirm, in code, that all inter-component communications use secure-by-default protocols with no silent fallback to insecure variants. [(crf_2)]\n3. **Cluster Scaling (Medium Priority)**: Analyze cluster management code for scalability logic, max agent handling, fault tolerance, and cluster-member state consistency. [(crf_3)]\n\n---\n\n**Summary**: Wazuh, by public documentation, is a mature, rapidly-evolving open-source SIEM/XDR with robust OS agent coverage and compliance integrations. Documentation is thorough regarding architecture, API surface, and feature claims, but real-world performance, enterprise scalability, SaaS maturity, and code-level security/encryption defaults cannot be confirmed without further internal or codebase access.\n",
+  "structured_data": {
+    "target": {
+      "company_name": "Wazuh",
+      "product_name": null,
+      "product_url": "https://wazuh.com/",
+      "known_urls": [
+        "https://wazuh.com/"
+      ],
+      "known_competitors": [],
+      "evaluation_prompt": "Evaluate wazuh for technical diligence. URLs: https://wazuh.com/ find its Competitors too"
+    },
+    "claims": [
+      {
+        "claim": "Wazuh architecture is composed of a multi-platform Wazuh agent and three central components: the Wazuh server, Wazuh indexer, and Wazuh dashboard.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Explicitly stated architecture in documentation.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh agents are deployed on endpoints to collect and forward security data to the Wazuh server for analysis; analyzed data is then forwarded to the Wazuh indexer for indexing and storage, and subsequently to the Wazuh dashboard for alerting and visualization.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Clear data flow described between agents, server, indexer, and dashboard in documentation.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh supports agentless monitoring for network devices such as firewalls, switches, routers, and access points via Syslog and SSH.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Confirmed agentless monitoring with Syslog and SSH in docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh central components can be deployed in all-in-one, single-node, or multi-node configurations for scalability and high availability.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Deployment and scalability options detailed in documentation.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Component communication in Wazuh uses encrypted protocols such as AES (between agent and server), Filebeat with TLS (server to indexer), and HTTPS/TLS for API and dashboard traffic.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Encryption defaults and protocols explicitly documented.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": [
+          "crf_2"
+        ]
+      },
+      {
+        "claim": "Wazuh Cyber Threat Intelligence (CTI) is a publicly accessible service which provides vulnerability intelligence integrated with the Wazuh Vulnerability Detection module.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "public_evidence": "Public docs describe CTI/vulnerability integration.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/architecture.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "The Wazuh platform provides XDR and SIEM features including log data analysis, intrusion/malware detection, file integrity monitoring, configuration assessment, vulnerability detection, and regulatory compliance support.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "public_evidence": "Docs list these features in detail as platform capabilities.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh server can analyze data from hundreds to thousands of agents and supports horizontal scaling in a cluster setup.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "public_evidence": "Stated server scalability features and cluster deployment in docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": [
+          "crf_3"
+        ]
+      },
+      {
+        "claim": "Wazuh agents run on Linux, Windows, macOS, Solaris, AIX, and HP-UX.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "public_evidence": "Supported OS list is explicit in product docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/getting-started/components/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      },
+      {
+        "claim": "Wazuh API is an open source RESTful API enabling secure interaction with the Wazuh server for agent management, configuration, and monitoring.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "public_evidence": "API description and endpoints are well-documented and open source.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": [
+          "crf_1"
+        ]
+      },
+      {
+        "claim": "API capabilities include Wazuh agent management, manager/cluster control, file integrity monitoring control, MITRE ATT&CK mapping, rules management, syscollector, RBAC, and user management.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "public_evidence": "Capabilties comprehensively listed in API docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/user-manual/api/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": [
+          "crf_1"
+        ]
+      },
+      {
+        "claim": "Wazuh default rule sets support PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR compliance frameworks.",
+        "claim_source_urls": [
+          "https://documentation.wazuh.com/current/compliance/index.html"
+        ],
+        "public_evidence": "Compliance frameworks listed in default rule set docs.",
+        "evidence_source_urls": [
+          "https://documentation.wazuh.com/current/compliance/index.html"
+        ],
+        "assessment": "supported",
+        "confidence": "high",
+        "code_review_follow_up_ids": []
+      }
+    ],
+    "release_activity": {
+      "source_urls": [
+        "https://documentation.wazuh.com/current/release-notes/index.html"
+      ],
+      "last_release_date": "2026-04-23",
+      "releases_last_12_months": 15,
+      "notable_releases": [
+        "4.14.5: frequent releases including stability and improvement patches",
+        "4.14.x: improvements to Microsoft Azure and Docker modules, performance improvements for FIM and Analysis engines, advanced API filtering, distributed API requests in cluster mode",
+        "New features in Kibana and Splunk plugins"
+      ],
+      "cadence_description": "Releases occur approximately monthly, with both major and minor incremental updates."
+    },
+    "competitors": [
+      {
+        "competitor_name": "AlienVault OSSIM",
+        "competitor_url": "https://cybersecurity.att.com/products/ossim",
+        "similar_capabilities": [
+          "Open-source SIEM platform",
+          "Universal agent and agentless collection (Syslog/SNMP)",
+          "Threat detection, FIM, vulnerability assessment",
+          "Compliance templates (PCI DSS, HIPAA, ISO 27001, etc.)",
+          "RESTful and plugin-based integration APIs",
+          "Multi-node deployments"
+        ],
+        "differentiation_notes": "Open source foundation and similar agent/agentless collection. Wazuh moves faster on OSS releases and may offer more flexible distributed deployments. AlienVault USM (commercial add-on) brings more mature threat intelligence and SaaS options.",
+        "source_urls": [
+          "https://cybersecurity.att.com/products/ossim",
+          "https://cybersecurity.att.com/documentation/ossim/",
+          "https://cybersecurity.att.com/documentation/ossim/api/"
+        ]
+      },
+      {
+        "competitor_name": "Elastic Security (ELK Stack)",
+        "competitor_url": "https://www.elastic.co/security",
+        "similar_capabilities": [
+          "Endpoint security (via Elastic Agent/Beats)",
+          "Log analytics, SIEM/XDR capabilities",
+          "Cloud, container, and OS-level integrations",
+          "MITRE ATT&CK mapping support",
+          "RESTful APIs for data and rule management",
+          "Active development and release cycle"
+        ],
+        "differentiation_notes": "ELK-based SIEM has stronger built-in ML and Cloud/SaaS. Wazuh is more open around agent distribution and compliance templates.",
+        "source_urls": [
+          "https://www.elastic.co/guide/en/security/current/index.html",
+          "https://www.elastic.co/guide/en/elasticsearch/reference/current/rest-apis.html",
+          "https://www.elastic.co/what-is/siem"
+        ]
+      },
+      {
+        "competitor_name": "Splunk",
+        "competitor_url": "https://www.splunk.com/en_us/software/splunk-enterprise/security.html",
+        "similar_capabilities": [
+          "SIEM and log analytics platform",
+          "Endpoint and agent integrations, app/plugin ecosystem",
+          "Compliance frameworks and reporting modules",
+          "REST API surface for data ingest, search, and automation",
+          "Multi-node high-availability deployments"
+        ],
+        "differentiation_notes": "Splunk is commercial, feature-rich, and SaaS-enabled, with advanced ML and SOAR, but Wazuh provides open source transparency and agent flexibility.",
+        "source_urls": [
+          "https://docs.splunk.com/Documentation/Splunk/latest/Security/About",
+          "https://docs.splunk.com/Documentation/Splunk/latest/RESTUM/RESTusing",
+          "https://www.splunk.com/en_us/pricing.html"
+        ]
+      },
+      {
+        "competitor_name": "CrowdStrike Falcon",
+        "competitor_url": "https://www.crowdstrike.com/products/falcon-endpoint-protection/",
+        "similar_capabilities": [
+          "Endpoint detection and response (EDR)",
+          "Threat intelligence integration",
+          "Compliance reporting modules"
+        ],
+        "differentiation_notes": "CrowdStrike Falcon's EDR/XDR is proprietary, cloud-native, and advanced in ML and managed response; Wazuh is open, customizable, and rules-focused.",
+        "source_urls": [
+          "https://www.crowdstrike.com/products/falcon-endpoint-protection/",
+          "https://www.crowdstrike.com/resources/tech-center/falcon-api-documentation/"
+        ]
+      },
+      {
+        "competitor_name": "IBM QRadar",
+        "competitor_url": "https://www.ibm.com/products/qradar-siem",
+        "similar_capabilities": [
+          "SIEM platform with log analytics, threat detection",
+          "Compliance and regulatory reporting",
+          "Integration with endpoint, network, and cloud sources",
+          "RESTful APIs for automation/integration"
+        ],
+        "differentiation_notes": "QRadar is a commercial SIEM/XDR with advanced orchestrations, broad plugin/integration support, and SaaS-scale. Wazuh is differentiated on open core, release velocity, and customization.",
+        "source_urls": [
+          "https://www.ibm.com/docs/en/qradar-common?topic=overview-qradar-restful-api",
+          "https://www.ibm.com/products/qradar-siem/features",
+          "https://www.ibm.com/docs/en/qradar-common?topic=overview-deployment-options"
+        ]
+      }
+    ],
+    "code_review_follow_ups": [
+      {
+        "id": "crf_1",
+        "area": "api",
+        "question": "Docs confirm the Wazuh API exposes endpoints for agent management, cluster control, file integrity monitoring, MITRE ATT&CK mapping, rules management, syscollector, RBAC, and user management. Review the actual code and endpoint definitions to verify that all of these capabilities are implemented as described and that least-privilege RBAC is enforced for sensitive operations.",
+        "expected_evidence": [
+          "Enumeration and implementation of each claimed endpoint and functionality in the server-side API code.",
+          "Role-based access control logic present for sensitive operations in the API codebase."
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "crf_2",
+        "area": "security",
+        "question": "Documentation states that communication between components uses encrypted protocols (AES agent-server, Filebeat+TLS server-indexer, HTTPS/TLS API and dashboard). Confirm in code that these encryption defaults are properly enforced and not configurable to insecure settings without explicit overrides; verify keys/cert handling in deployment scripts and server/client startup routines.",
+        "expected_evidence": [
+          "Code sections or configuration templates defaulting to secure protocols.",
+          "Explicit code paths/disabling of insecure protocol fallback; documentation and implementation alignment for key/cert usage."
+        ],
+        "priority": "high"
+      },
+      {
+        "id": "crf_3",
+        "area": "architecture",
+        "question": "Docs claim the Wazuh server can handle data from 'hundreds to thousands' of agents and support cluster-based horizontal scaling. Examine cluster management code and data ingestion/processing logic for evidence of tested scalability limits, and mechanisms for horizontal scaling.",
+        "expected_evidence": [
+          "Code references to clustering, horizontal scaling logic, and agent connection management.",
+          "README/tests/dev documentation citing cluster scalability or resource constraints."
+        ],
+        "priority": "medium"
+      }
+    ],
+    "evidence_gaps": [
+      "No public evidence found regarding Wazuh's pricing structure or SaaS/cloud-hosted options.",
+      "No extractable evidence on deployment scale or deep customer specifics due to failed extraction from case studies.",
+      "No evidence found on detailed use of specific AI/ML models for detection beyond mention of rule-based engine and CTI aggregation; no evidence of deep-learning or advanced ML analytics used natively."
+    ],
+    "source_urls": [
+      "https://documentation.wazuh.com/current/getting-started/architecture.html",
+      "https://documentation.wazuh.com/current/getting-started/components/index.html",
+      "https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "https://documentation.wazuh.com/current/compliance/index.html",
+      "https://documentation.wazuh.com/current/release-notes/index.html"
+    ]
+  },
+  "summary": "Explicitly stated architecture in documentation.",
+  "findings": [
+    {
+      "id": "finding_1",
+      "claim": "Wazuh implements a modular, multi-platform SIEM/XDR architecture with agent, server, indexer, and dashboard separation, supporting both agent-based and agentless data collection.",
+      "evidence_ids": [
+        "claim_1",
+        "claim_2",
+        "claim_3"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "id": "finding_2",
+      "claim": "Wazuh claims horizontal scalability and high-availability cluster deployment suitable for enterprise use, but real-world scaling/topology evidence is limited in public docs.",
+      "evidence_ids": [
+        "claim_4",
+        "claim_8"
+      ],
+      "confidence": 0.66
+    },
+    {
+      "id": "finding_3",
+      "claim": "API surface is comprehensive by documentation (agent, rule, cluster, RBAC management), but enforcement and endpoint parity need code review.",
+      "evidence_ids": [
+        "claim_10",
+        "claim_11"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "id": "finding_4",
+      "claim": "Core SIEM/XDR features (FIM, compliance, vulnerability detection, log analysis, etc.) are documented and regularly updated.",
+      "evidence_ids": [
+        "claim_7",
+        "claim_12"
+      ],
+      "confidence": 1.0
+    }
+  ],
+  "sources": [
+    {
+      "id": "src_1",
+      "url": "https://wazuh.com/sitemap.xml",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_2",
+      "url": "https://wazuh.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_3",
+      "url": "https://documentation.wazuh.com/",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "blocked"
+    },
+    {
+      "id": "src_4",
+      "url": "https://documentation.wazuh.com/current/getting-started/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_5",
+      "url": "https://documentation.wazuh.com/current/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_6",
+      "url": "https://documentation.wazuh.com/current/installation-guide/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_7",
+      "url": "https://documentation.wazuh.com/current/quickstart.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_8",
+      "url": "https://wazuh.com/pricing",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_9",
+      "url": "https://wazuh.com/plans",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_10",
+      "url": "https://wazuh.com/careers",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_11",
+      "url": "https://wazuh.com/.well-known/security.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_12",
+      "url": "https://wazuh.com/llms.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "failed"
+    },
+    {
+      "id": "src_13",
+      "url": "https://wazuh.com/robots.txt",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_14",
+      "url": "https://documentation.wazuh.com/current/getting-started/architecture.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_15",
+      "url": "https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_16",
+      "url": "https://documentation.wazuh.com/current/release-notes/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_17",
+      "url": "https://documentation.wazuh.com/current/getting-started/components/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_18",
+      "url": "https://documentation.wazuh.com/current/user-manual/capabilities/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_19",
+      "url": "https://documentation.wazuh.com/current/compliance/index.html",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_20",
+      "url": "https://wazuh.com/resources/case-studies/groupon-deploys-wazuh-to-protect-and-monitor-aws",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_21",
+      "url": "https://wazuh.com/resources/case-studies/ita-la-scalable-cybersecurity",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_22",
+      "url": "https://wazuh.com/resources/case-studies/university-of-chichester-achieving-proactive-defense",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_23",
+      "url": "https://wazuh.com/platform/overview",
+      "title": null,
+      "snippet": null,
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_24",
+      "url": "https://www.siriusopensource.com/en-us/blog/wazuh-versus-proprietary-xdr-and-siem-platforms-honest-comparison",
+      "title": "Wazuh Versus Proprietary XDR and SIEM Platforms: An Honest Comparison | Sirius Open Source",
+      "snippet": "* View this page in US English. * View this page in English. * View this page in Japanese. This article will honestly and transparently compare Wazuh against its major competitors, explaining the factors that drive architectural choice and Total Cost of Ownership (TCO) up or down, helping you decide what is best for your specific needs. Wazuh retains a native focus on endpoint security and excels in host security baseline functions. Review data indicates that CrowdStrike **outperforms Wazuh in real-time detection** (9.6 vs. | **Cost Model Priority** | TCO Predictability (Agent count) or $0 Licensing | Resource-based Efficiency/Scalability | Feature Maturity / High Volume Ingestion | Efficacy / Managed Service |. **Prioritized EDR Efficacy:** Organizations needing best-in-class, **ML-driven detection**, malware prevention, and proactive threat hunting capabilities should select proprietary EDR/XDR platforms such as CrowdStrike Falcon, which offer superior real-time efficacy scores against emergent threats.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": "fetched"
+    },
+    {
+      "id": "src_25",
+      "url": "https://www.reddit.com/r/cybersecurity/comments/1gf6euj/wazuh_vs_elk_siem",
+      "title": "Wazuh vs ELK SIEM : r/cybersecurity",
+      "snippet": "Wazuh is better and provides XDR capabilities too, and it is really open source. Elastic instead has a hybrid license where some features are not open source.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_26",
+      "url": "https://cybersectools.com/compare/cybrhawk-siem-xdr-vs-wazuh",
+      "title": "CybrHawk SIEM XDR vs Wazuh: 2026 Comparison",
+      "snippet": "CybrHawk SIEM XDR is a commercial extended detection and response tool by CybrHawk. Wazuh is a free extended detection and response tool. Compare features,",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_27",
+      "url": "http://www.tetrain.com/tetra-blogs/post/107/wazuh-vs-other-siem-tools.html",
+      "title": "Wazuh vs Other SIEM Tools",
+      "snippet": "Wazuh offers a robust set of features that rival commercial SIEM tools like Splunk, QRadar, ArcSight, and AlienVault at a fraction of the cost.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_28",
+      "url": "https://www.selecthub.com/siem-tools/wazuh/alternatives",
+      "title": "Top Wazuh Alternatives & Competitors 2026",
+      "snippet": "Many users crave user-friendly and feature-rich solutions for tasks like Dashboards and Reporting, Log Collection and Management, and Platform Capabilities. LogRhythm, ArcSight ESM, Datadog, and Graylog. User reviews from the last year reveal a potent yet demanding security platform. Users consistently highlight the steep learning curve, citing the need for technical expertise in setup and configuration. In essence, Wazuh is a powerhouse of a platform, best suited for tech-savvy teams and organizations with in-house security expertise. User reviews for LogRhythm highlight its strengths in robust security, real-time monitoring, and effective threat intelligence integration. While ArcSight is praised for its powerful real-time correlation engine, which provides critical insights from security data, and its extensive integration options, making it a good fit for complex security environments, users also point out some significant drawbacks. A recurring concern is the product's complexity, which translates into a steep learning curve and makes it challenging to deploy and manage, especially for organizations with limited IT resources.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_29",
+      "url": "https://cybersilo.tech/how-does-wazuh-compare-to-other-siem-tools",
+      "title": "How Does Wazuh Compare to Other SIEM Tools?",
+      "snippet": "Discover Wazuh's strengths and weaknesses as an open source SIEM platform, focusing on cost, scalability, and security monitoring capabilities.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_30",
+      "url": "https://www.reddit.com/r/cybersecurity/comments/1j8qfw0/siem_comparaison_logrhythm_qradar_fortisiem",
+      "title": "LogRhythm, QRadar, FortiSIEM, Arcsight ESM, Wazuh and ...",
+      "snippet": "I am currently working on a comparaison sheet to figure out which SIEM solution is the most suitable to deploy in our environment.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_31",
+      "url": "https://medium.com/@marketing_38143/5-open-source-siem-solutions-an-honest-analysis-from-the-trenches-5f7c5c34b0d4",
+      "title": "5 Open Source SIEM Solutions: An Honest Analysis from the Trenches",
+      "snippet": "# 5 Open Source SIEM Solutions: An Honest Analysis from the Trenches | by UTMStack | Medium. # 5 Open Source SIEM Solutions: An Honest Analysis from the Trenches. If you are reading this, you probably already know what a SIEM (Security Information and Event Management) is and why your CISO or compliance auditor is asking for one. The reality is this: the commercial SIEM market is incredibly expensive. However, opting for “Open Source” doesn’t mean it’s free; you simply pay with engineering time instead of licensing fees. Below, we analyze the 5 most relevant options in the current market, not based on their marketing spec sheets, but on how they actually behave in a production environment, integrating community opinions and real-world implementation experiences. Architecture: Is the tool “purpose-built” from scratch, or is it a “Frankenstein” of various projects taped together? UTMStack distinguishes itself from the rest by being a solution built from the ground up as a SIEM.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_32",
+      "url": "https://external.pi.gpi.aws.gartner.com/reviews/market/security-information-event-management/vendor/wazuh/alternatives",
+      "title": "Top Wazuh Competitors & Alternatives 2026",
+      "snippet": "Learn more about the top Wazuh competitors & alternatives. Read the latest reviews and find the best Security Information and Event Management software.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    },
+    {
+      "id": "src_33",
+      "url": "https://www.lumificyber.com/blog/8-open-source-siem-tools-you-should-know",
+      "title": "8 Open Source SIEM Tools You Should Know - Lumifi Cybersecurity",
+      "snippet": "While proprietary platforms have much to offer small and mid-sized organizations, many security leaders are attracted to the lower licensing costs offered by open source SIEMs. These options don't always share the same features as proprietary alternatives, but they can present a compelling opportunity for security leaders with tight budgets. By the end of this article, you'll have a clear understanding of open source SIEM tools currently on the market, and whether their capabilities fit your organization's security needs. Security leaders who choose open source SIEM tools often prioritize the following advantages:. AT&T Open Source Security Information Management (OSSIM) is the open source version of AlienVault's USM Anywhere SIEM platform. Like many other entrants on this list, it is not a full-fledged SIEM but a security framework that combines multiple open source projects into a single platform. Many organizations pursue open source SIEM implementations to meet regulatory compliance standards and gain security alert visibility through a centralized platform.",
+      "publisher": null,
+      "published_at": null,
+      "accessed_at": null,
+      "is_primary": false,
+      "fetch_status": null
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_1",
+      "source_id": "src_18",
+      "quote": null,
+      "note": "Blog\nDocumentation\nContact us\nSearch here\nClose\nSearch\nWazuh\nPlatform\nOverview\nXDR\nSIEM\nCloud\nCTI\nServices\nProfessional support\nConsulting services\nTraining courses\nPartners\nBecome a partner\nFind a partner\nCompany\nCustomers\nAbout us\nOur team\nResources\nCommunity\nOverview\nAmbassadors\nEvents\nContact us\nSearch term\nSearch now!\nGetting started\nComponents\nWazuh indexer\nWazuh server\nWazuh dashboard\nWazuh agent\nArchitecture\nUse cases\nConfiguration assessment\nMalware detection\nFile integrity monitoring\nThreat hunting\nLog data analysis\nVulnerability detection\nIncident response\nRegulatory compliance\nIT hygiene\nContainer security\nPosture management\nCloud workload protection\nQuickstart\nInstallation guide\nWazuh indexer\nAssisted installation\nStep-by-step installation\nWazuh server\nAssisted installation\nStep-by-step installation\nWazuh dashboard\nAssisted installation\nStep-by-step installation\nWazuh agent\nLinux\nWindows\nmacOS\nSolaris\nAIX\nHP-UX\nPackages list\nUninstalling Wazuh\nUninstalling the Wazuh central components\nUninstalling the Wazuh agent\nInstallation alternatives\nVirtual machine (VM)\nAmazon Machine Images (AMI)\nDeployment on Docker\nWazuh Docker deployment\nChanging the default password of Wazuh users\nBuilding Docker images locally\nWazuh Docker utilities\nUpgrading Wazuh Docker\nUninstalling the Wazuh Docker deployment\nDeployment on Kubernetes\nKubernetes configuration\nDeployment\nUpgrade Wazuh installed in Kubernetes\nClean Up\nOffline installation guide\nInstall Wazuh components using the assisted method\nInstall Wazuh components step by step\nInstallation from sources\nInstalling the Wazuh manager from sources\nInstalling the Wazuh agent from sources\nDeployment with Ansible\nRequirements\nInstalling Ansible\nRemote endpoint connection\nDeploying Wazuh\nRoles\nWazuh indexer\nWazuh dashboard\nFilebeat\nWazuh manager\nWazuh agent\nVariables references\nDeployment with Puppet\nSet up Puppet\nInstalling Puppet master\nInstalling Puppet agent\nSetting up Puppet certificates\nWazuh Puppet module\nWazuh manager class\nWazuh agent class\nUser manual\nWazuh server\nWazuh manager\nIndexer integration\nAlert management\nEvent logging\nExternal API integration\nQueuing mechanisms\nWazuh server cluster\nArchitecture overview\nTypes of nodes in a Wazuh server cluster\nHow the Wazuh server cluster works\nWazuh cluster nodes configuration\nData synchronization\nCertificates deployment\nAdding new Wazuh server nodes\nAll-in-one deployment\nDistributed deployment\nWazuh agent connections\nLoad balancers\nWazuh server API\nGetting started\nUnderstanding the Wazuh server API requests and responses\nPractical examples of Wazuh server API usage\nConfiguration\nSecuring the Wazuh server API\nRole-Based Access Control\nHow it works\nConfiguration\nAuthorization Context\nRBAC Reference\nFiltering data using Wazuh Query Language (WQL)\nWazuh server API use cases\nReference\nWazuh indexer\nWazuh indexer indices\nRe-indexing\nWazuh indexer tuning\nMigrating Wazuh indices\nWazuh indexer configuration on hardened endpoints\nWazuh indexer cluster\nCertificates deployment\nAdding new Wazuh indexer nodes\nWazuh indexer cluster tuning\nIndex lifecycle management\nCluster management\nWazuh indexer API\nGetting started\nConfiguration\nSecuring the Wazuh indexer API\nUse cases\nReference\nWazuh dashboard\nNavigating the Wazuh dashboard\nCreating custom dashboards\nFiltering data using Wazuh Query Language (WQL)\nEnabling multi-tenancy\nConfiguring third-party SSL certificates\nConfiguring SSL certificates on the Wazuh dashboard using Let’s Encrypt\nConfiguring SSL certificates on the Wazuh dashboard using NGINX\nSetting up custom branding\nWazuh dashboard settings\nWazuh global queries\nTroubleshooting\nCertificates deployment\nWazuh agent\nWazuh agent enrollment\nRequirements\nWazuh agent life cycle\nEnrollment methods\nEnrollment via agent configuration\nLinux/Unix\nWindows\nmacOS\nEnrollment via Wazuh server API\nRequesting the client key\nImporting the client key to the Wazuh agent\nAdditional security options\nUsing password authentication\nWazuh manager identity verification\nWazuh agent identity verification\nDeployment variables\nLinux\nWindows\nmacOS\nAIX\nTroubleshooting\nWazuh agent connection\nWazuh agent administration\nQuerying the Wazuh agent configuration\nGrouping agents\nListing agents\nListing agents using the CLI\nListing agents using the Wazuh server API\nListing agents using the Wazuh dashboard\nAnti-tampering\nRemoving agents\nRemove agents using the CLI\nRemove agents using the Wazuh server API\nRemote upgrading\nUpgrading the Wazuh agent\nWazuh signed package (WPK) files\nCreating a custom WPK\nInstalling a custom WPK\nWPK List\nAgent upgrade module - How it works\nWazuh agent queue\nAgent labels\nAgent key request\nData analysis\nDecoders\nJSON decoder\nDynamic fields\nSibling Decoders\nCustom decoders\nRules\nDefault rules\nCustom rules\nRules classification\nRuleset XML syntax\nDecoders Syntax\nRules Syntax\nRegular Expression Syntax\nPerl-compatible Regular Expressions\nTesting decoders and rules\nUsing CDB lists\nMITRE ATT&CK framework\nUser administration\nPassword management\nWazuh RBAC - How to create and map internal users\nSingle Sign-On\nOkta\nMicrosoft Entra ID\nPingOne\nGoogle Workspace\nJumpcloud\nOneLogin\nKeycloak\nActive Directory and LDAP integration\nCapabilities\nFile integrity monitoring\nHow it works\nHow to configure the FIM module\nInterpreting the FIM module analysis\nBasic settings\nCreating custom FIM rules\nAdvanced settings\nUse cases\nDetecting malware persistence technique\nDetecting account manipulation\nMonitoring files at specific intervals\nReporting file changes\nMonitoring configuration changes\nWindows Registry monitoring\nMalware detection\nFile integrity monitoring and threat detection rules\nRootkits behavior detection\nCDB lists and threat intelligence\nVirusTotal integration\nFile integrity monitoring and YARA\nClamAV logs collection\nWindows Defender logs collection\nCustom rules to detect malware IOC\nSecurity Configuration Assessment\nHow SCA works\nHow to configure SCA\nAvailable SCA policies\nCreating custom SCA policies\nUse cases\nActive Response\nHow to configure Active Response\nDefault active response scripts\nCustom active response scripts\nUse cases\nBlocking SSH brute-force attack with Active Response\nRestarting the Wazuh agent with Active Response\nDisabling a Linux user account with Active Response\nAdditional information\nLog data collection\nHow it works\nConfiguration for monitoring log files\nConfiguring syslog on the Wazuh server\nJournald log collection\nUsing multiple socket outputs\nConfiguring log collection for different operating systems\nLog data analysis\nUse cases\nVulnerability detection\nHow it works\nConfiguration\nCommand monitoring\nHow it works\nConfiguration\nCommand output analysis\nUse cases\nMonitoring running processes\nDisk space utilization\nCheck if the output changed\nDetect USB Storage\nLoad average\nContainer security\nUsing Wazuh to monitor Docker\nUse cases\nSystem inventory\nHow it works\nConfiguration\nViewing system inventory data\nGenerating system inventory reports\nAvailable inventory fields\nCompatibility matrix\nUsing Syscollector information to trigger alerts\nUse cases\nOsquery\nMonitoring system calls\nHow it works\nConfiguration\nUse cases\nMonitoring file and directory access\nMonitoring commands run as root\nPrivilege abuse\nAgentless monitoring\nHow it works\nConnection\nConfiguration\nVisualization\nUse cases\nReference\nLocal configuration (ossec.conf)\nactive-response\nagentless\nagent-upgrade\nalerts\nanti_tampering\nauth\nclient\nclient_buffer\ncluster\ncommand\ndatabase_output\nemail_alerts\nglobal\ngithub\nindexer\nintegration\nlabels\nlocalfile\nlogging\nms-graph\noffice365\nremote\nreports\nrootcheck\nsca\nrule_test\nruleset\nsocket\nsyscheck\nsyslog_output\ntask-manager\nfluent-forward\ngcp-pubsub\ngcp-bucket\nvulnerability-detection\nwodle name=\"command\"\nwodle name=\"aws-s3\"\nwodle name=\"syscollector\"\nwazuh-db\nwodle name=\"osquery\"\nwodle name=\"docker-listener\"\nwodle name=\"azure-logs\"\nwodle name=\"agent-key-polling\"\nVerifying configuration\nCentralized configuration (agent.conf)\nInternal configuration\nDaemons\nwazuh-agentd\nwazuh-agentlessd\nwazuh-analy",
+      "relevance": "capabilities"
+    },
+    {
+      "id": "ev_2",
+      "source_id": "src_17",
+      "quote": null,
+      "note": "Components\nThe Wazuh platform provides XDR and SIEM features to protect your cloud, container, and server workloads. These include log data analysis, intrusion and malware detection, file integrity monitoring, configuration assessment, vulnerability detection, and support for regulatory compliance.\nThe Wazuh solution is based on the Wazuh agent, which is deployed on the monitored endpoints, and on three central components: the Wazuh server, the Wazuh indexer, and the Wazuh dashboard.\nThe Wazuh indexer is a highly scalable, full-text search and analytics engine. This central component indexes and stores alerts generated by the Wazuh server.\nThe Wazuh server analyzes data received from the agents. It processes it through decoders and rules, using threat intelligence to look for well-known indicators of compromise (IOCs). A single server can analyze data from hundreds or thousands of agents, and scale horizontally when set up as a cluster. This central component is also used to manage the agents, configuring and upgrading them remotely when necessary.\nThe Wazuh dashboard is the web user interface for data visualization and analysis. It includes out-of-the-box dashboards for threat hunting, regulatory compliance (e.g., PCI DSS, GDPR, CIS, HIPAA, NIST 800-53), detected vulnerable applications, file integrity monitoring data, configuration assessment results, cloud infrastructure monitoring events, and others. It is also used to manage Wazuh configuration and to monitor its status.\nWazuh agents are installed on endpoints such as laptops, desktops, servers, cloud instances, or virtual machines. They provide threat prevention, detection, and response capabilities. They run on operating systems such as Linux, Windows, macOS, Solaris, AIX, and HP-UX.\nIn addition to agent-based monitoring capabilities, the Wazuh platform can monitor agent-less devices such as firewalls, switches, routers, or network IDS, among others. For example, a system log data can be collected via Syslog, and its configuration can be monitored through periodic probing of its data, via SSH or through an API.\nThe diagram below represents the Wazuh components and data flow.",
+      "relevance": "platform components"
+    },
+    {
+      "id": "ev_3",
+      "source_id": "src_19",
+      "quote": null,
+      "note": "Regulatory compliance\nWazuh helps implement compliance requirements for regulatory compliance support and visibility. This is done by providing automation, improved security controls, log analysis, and incident response.\nThe default Wazuh ruleset supports the PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR frameworks and standards. Wazuh rules and decoders are used to detect attacks, system errors, security misconfigurations, and policy violations. In addition to the default compliance frameworks and standards provided by Wazuh, it is possible to monitor for custom compliance standards by adding the compliance identifier in the <group>\ntag of rules. Refer to the ruleset section for more information.\nLearn more about achieving compliance with Wazuh in the sections below:",
+      "relevance": "compliance"
+    },
+    {
+      "id": "ev_4",
+      "source_id": "src_14",
+      "quote": null,
+      "note": "Architecture\nThe Wazuh architecture is composed of a multi-platform Wazuh agent and three central components: the Wazuh server, Wazuh indexer, and Wazuh dashboard. The agent is deployed on endpoints to collect and forward security data to the Wazuh server for analysis. The analyzed data is then forwarded to the Wazuh indexer for indexing and storage, and subsequently to the Wazuh dashboard for alerting and visualization.\nWazuh also supports agentless monitoring for systems and devices where installing the Wazuh agent is not possible. Network devices such as firewalls, switches, routers, and access points can actively forward log data via Syslog and SSH.\nThe Wazuh central components can be deployed in different ways, depending on scalability and availability needs:\nAll-in-one deployment: All Wazuh components (server, indexer, and dashboard) are installed on a single server. Best suited for labs and small environments with a limited number of monitored endpoints.\nSingle-node deployment: The Wazuh server, indexer, and dashboard are each deployed on separate servers. Recommended for medium environments that require higher performance than an all-in-one setup.\nMulti-node deployment: Typically, one instance of the Wazuh dashboard and multiple instances of the Wazuh server (Wazuh server cluster) and indexer (Wazuh indexer cluster) are deployed on their individual servers, respectively. The number of instances varies depending on your needs. This deployment is recommended for large environments with high event throughput, or when fault tolerance and high availability are required.\nVisit the installation guide and installation alternatives documentation to learn about the different ways to deploy Wazuh.\nThe diagram below represents a Wazuh deployment architecture. It shows how the Wazuh server and the Wazuh indexer nodes can be configured as clusters, providing load balancing and high availability.\nComponent communication\nWazuh agent - Wazuh server\nThe Wazuh agent continuously sends events to the Wazuh server for analysis and threat detection. To start shipping this data, the agent establishes a connection with the Wazuh server service for agent connection, which listens on TCP port 1514 by default (this is configurable). The Wazuh server then decodes and matches rules against the received events, utilizing the Wazuh Analysis engine.\nThe Wazuh messages protocol uses AES encryption by default, with 128 bits per block and 256-bit keys. Blowfish encryption is optional.\nNote\nRead the Benefits of using AES in the Wazuh communications document for more information.\nWazuh server - Wazuh indexer\nThe Wazuh server uses Filebeat to send alert and event data to the Wazuh indexer, using TLS encryption. Filebeat reads the Wazuh server output data and sends it to the Wazuh indexer (by default listening on port 9200/TCP). Once the data is indexed by the Wazuh indexer, the Wazuh dashboard is used to query and visualize the security information.\nWazuh dashboard - Wazuh dashboard/Wazuh indexer\nThe Wazuh dashboard queries the Wazuh server API (by default listening on port 55000/TCP on the Wazuh server) to display configuration and status-related information of the Wazuh server and agents. This communication is encrypted with TLS and authenticated with a username and password.\nThe Wazuh dashboard visualizes and queries the information indexed on the Wazuh indexer.\nRequired ports\nWazuh components communicate using several services. The list of default ports used by these services is shown below. Users can modify these port numbers when necessary.\nComponent |\nPort |\nProtocol |\nPurpose |\n|---|---|---|---|\nWazuh server |\n1514 |\nTCP (default) |\nAgent connection service |\n1514 |\nUDP (optional) |\nAgent connection service (disabled by default) |\n|\n1515 |\nTCP |\nAgent enrollment service |\n|\n1516 |\nTCP |\nWazuh cluster daemon |\n|\n514 |\nUDP (default) |\nWazuh Syslog collector (disabled by default) |\n|\n514 |\nTCP (optional) |\nWazuh Syslog collector (disabled by default) |\n|\n55000 |\nTCP |\nWazuh server RESTful API |\n|\nWazuh indexer |\n9200 |\nTCP |\nWazuh indexer RESTful API |\n9300-9400 |\nTCP |\nWazuh indexer cluster communication |\n|\nWazuh dashboard |\n443 |\nTCP |\nWazuh web user interface |\nWazuh CTI\nThe Wazuh Cyber Threat Intelligence (CTI) service is a publicly accessible platform that collects, analyzes, and disseminates actionable information on emerging cyber threats and vulnerabilities. This service currently focuses on vulnerability intelligence, delivering timely updates on Common Vulnerabilities and Exposures (CVEs), severity scores, exploitability insights, and mitigation strategies. It aggregates and sanitizes data from trusted sources, including operating system vendors and major vulnerability databases, to ensure high-quality, relevant intelligence.\nThis service is integrated directly with the Wazuh Vulnerability Detection module, but is also publicly available at the Wazuh CTI website.",
+      "relevance": "architecture"
+    },
+    {
+      "id": "ev_5",
+      "source_id": "src_16",
+      "quote": null,
+      "note": "Release notes\nThis section summarizes the most important features of each Wazuh release.\nWazuh version |\nRelease date |\n|---|---|\n23 April 2026 |\n|\n17 March 2026 |\n|\n11 February 2026 |\n|\n14 January 2026 |\n|\n12 November 2025 |\n|\n23 October 2025 |\n|\n24 September 2025 |\n|\n18 September 2025 |\n|\n7 May 2025 |\n|\n1 April 2025 |\n|\n12 March 2025 |\n|\n20 February 2025 |\n|\n19 August 2025 |\n|\n22 May 2025 |\n|\n16 January 2025 |\n|\n9 January 2025 |\n|\n4 November 2024 |\n|\n17 October 2024 |\n|\n5 September 2024 |\n|\n20 August 2024 |\n|\n18 July 2024 |\n|\n12 June 2024 |\n|\n30 May 2024 |\n|\n29 April 2024 |\n|\n4 March 2024 |\n|\n10 January 2024 |\n|\n20 December 2023 |\n|\n27 November 2023 |\n|\n31 October 2023 |\n|\n23 October 2023 |\n|\n10 October 2023 |\n|\n6 September 2023 |\n|\n24 August 2023 |\n|\n10 August 2023 |\n|\n10 July 2023 |\n|\n13 June 2023 |\n|\n25 May 2023 |\n|\n18 May 2023 |\n|\n12 April 2023 |\n|\n28 March 2023 |\n|\n24 April 2023 |\n|\n16 November 2022 |\n|\n13 October 2022 |\n|\n19 September 2022 |\n|\n24 August 2022 |\n|\n20 July 2022 |\n|\n29 June 2022 |\n|\n8 June 2022 |\n|\n1 June 2022 |\n|\n30 May 2022 |\n|\n18 May 2022 |\n|\n5 May 2022 |\n|\n30 May 2022 |\n|\n28 March 2022 |\n|\n15 November 2021 |\n|\n20 October 2021 |\n|\n6 October 2021 |\n|\n28 September 2021 |\n|\n3 September 2021 |\n|\n25 August 2021 |\n|\n22 April 2021 |\n|\n25 March 2021 |\n|\n23 March 2021 |\n|\n8 March 2021 |\n|\n25 February 2021 |\n|\n15 February 2021 |\n|\n14 January 2021 |\n|\n30 November 2020 |\n|\n24 November 2020 |\n|\n11 November 2020 |\n|\n23 October 2020 |\n|\n19 September 2022 |\n|\n24 August 2022 |\n|\n30 May 2022 |\n|\n28 April 2021 |\n|\n22 September 2020 |\n|\n15 July 2020 |\n|\n22 June 2020 |\n|\n30 April 2020 |\n|\n9 April 2020 |\n|\n8 April 2020 |\n|\n24 March 2020 |\n|\n25 February 2020 |\n|\n28 January 2020 |\n|\n22 January 2020 |\n|\n10 January 2020 |\n|\n23 December 2019 |\n|\n23 September 2019 |\n|\n19 September 2019 |\n|\n18 September 2019 |\n|\n8 August 2019 |\n|\n7 August 2019 |\n|\n9 July 2019 |\n|\n10 June 2019 |\n|\n21 May 2019 |\n|\n2 May 2019 |\n|\n31 January 2019 |\n|\n24 January 2019 |\n|\n18 January 2019 |\n|\n17 December 2018 |\n|\n5 December 2018 |\n|\n10 November 2018 |\n|\n7 September 2018 |\n|\n29 August 2018 |\n|\n10 August 2018 |\n|\n24 July 2018 |\n|\n18 June 2018 |\n|\n8 June 2018 |\n|\n1 June 2018 |\n|\n28 May 2018 |\n|\n7 May 2018 |\n|\n2 March 2018 |\n|\n8 February 2018 |\n|\n22 December 2017 |\n|\n3 December 2017 |\n|\n17 August 2017 |\n- 4.x\n- 4.14.5 Release notes\n- 4.14.4 Release notes\n- 4.14.3 Release notes\n- 4.14.2 Release notes\n- 4.14.1 Release notes\n- 4.14.0 Release notes\n- 4.13.1 Release notes\n- 4.13.0 Release notes\n- 4.12.0 Release notes\n- 4.11.2 Release notes\n- 4.11.1 Release notes\n- 4.11.0 Release notes\n- 4.10.3 Release notes\n- 4.10.2 Release notes\n- 4.10.1 Release notes\n- 4.10.0 Release notes\n- 4.9.2 Release notes\n- 4.9.1 Release notes\n- 4.9.0 Release notes\n- 4.8.2 Release notes\n- 4.8.1 Release notes\n- 4.8.0 Release notes\n- 4.7.5 Release notes\n- 4.7.4 Release notes\n- 4.7.3 Release notes\n- 4.7.2 Release notes\n- 4.7.1 Release notes\n- 4.7.0 Release notes\n- 4.6.0 Release notes\n- 4.5.4 Release notes\n- 4.5.3 Release notes\n- 4.5.2 Release notes\n- 4.5.1 Release notes\n- 4.5.0 Release notes\n- 4.4.5 Release notes\n- 4.4.4 Release notes\n- 4.4.3 Release notes\n- 4.4.2 Release notes\n- 4.4.1 Release notes\n- 4.4.0 Release notes\n- 4.3.11 Release notes\n- 4.3.10 Release notes\n- 4.3.9 Release notes\n- 4.3.8 Release notes\n- 4.3.7 Release notes\n- 4.3.6 Release notes\n- 4.3.5 Release notes\n- 4.3.4 Release notes\n- 4.3.3 Release notes\n- 4.3.2 Release notes\n- 4.3.1 Release notes\n- 4.3.0 Release notes\n- 4.2.7 Release notes\n- 4.2.6 Release notes\n- 4.2.5 Release notes\n- 4.2.4 Release notes\n- 4.2.3 Release notes\n- 4.2.2 Release notes\n- 4.2.1 Release notes\n- 4.2.0 Release notes\n- 4.1.5 Release notes\n- 4.1.4 Release notes\n- 4.1.3 Release notes\n- 4.1.2 Release notes\n- 4.1.1 Release notes\n- 4.1.0 Release notes\n- 4.0.4 Release notes\n- 4.0.3 Release notes\n- 4.0.2 Release notes\n- 4.0.1 Release notes\n- 4.0.0 Release notes\n- 3.x\n- 3.13.6 Release notes\n- 3.13.5 Release notes\n- 3.13.4 Release notes\n- 3.13.3 Release notes\n- 3.13.2 Release notes\n- 3.13.1 Release notes\n- 3.13.0 Release notes\n- 3.12.3 Release notes\n- 3.12.2 Release notes\n- 3.12.1 Release notes\n- 3.12.0 Release notes\n- 3.11.4 Release notes\n- 3.11.3 Release notes\n- 3.11.2 Release notes\n- 3.11.1 Release notes\n- 3.11.0 Release notes\n- 3.10.2 Release notes\n- 3.10.1 Release notes\n- 3.10.0 Release notes\n- 3.9.5 Release notes\n- 3.9.4 Release notes\n- 3.9.3 Release notes\n- 3.9.2 Release notes\n- 3.9.1 Release notes\n- 3.9.0 Release notes\n- 3.8.2 Release notes\n- 3.8.1 Release notes\n- 3.8.0 Release notes\n- 3.7.2 Release notes\n- 3.7.1 Release notes\n- 3.7.0 Release notes\n- Adding agents to multiple groups\n- New module to monitor Microsoft Azure\n- New module to monitor Docker\n- Query remote configuration\n- Improved performance of FIM and Analysis engines\n- Distributed API requests in cluster mode\n- Advanced API filtering using queries\n- New features for Kibana plugin\n- New features for Splunk plugin\n- 3.6.1 Release notes\n- 3.6.0 Release notes\n- 3.5.0 Release notes\n- 3.4.0 Release notes\n- 3.3.1 Release notes\n- 3.3.0 Release notes\n- 3.2.4 Release notes\n- 3.2.3 Release notes\n- 3.2.2 Release notes\n- 3.2.1 Release notes\n- 3.2.0 Release notes\n- 3.1.0 Release notes\n- 3.0.0 Release notes\n- 2.x",
+      "relevance": "release notes"
+    },
+    {
+      "id": "ev_6",
+      "source_id": "src_15",
+      "quote": null,
+      "note": "Wazuh server API\nThe Wazuh server API is an open source RESTful API that enables secure interaction with the Wazuh server infrastructure. You can interact with it using the built-in API console in the Wazuh dashboard, a command-line tool such as cURL, or any script or program capable of making web requests.\nThe Wazuh dashboard relies on the Wazuh server API to remotely manage the Wazuh server infrastructure. You can utilize the Wazuh server API to perform common tasks such as adding agents, restarting the manager(s) or agent(s), or retrieving detailed File Integrity Monitoring (FIM) events and status, managing users, roles, and permissions and more.\nHere is a list of the Wazuh server API capabilities:\nWazuh agent management\nWazuh manager control and overview\nCluster control and overview\nFile integrity monitoring control and search\nMITRE ATT&CK overview\nRuleset information\nTesting and verification of rules and decoders\nSyscollector information\nRole-Based Access Control (RBAC)\nAPI management (HTTPS, configuration)\nUsers management\nStatistical information\nError handling\nQuery remote configuration\nRefer to the Wazuh server API reference for details about all the Wazuh server API endpoints. For practical, real-world examples of how to use these capabilities, see the use cases section.",
+      "relevance": "API reference"
+    },
+    {
+      "id": "ev_7",
+      "source_id": "src_14",
+      "quote": null,
+      "note": "Architecture\nThe Wazuh architecture is composed of a multi-platform Wazuh agent and three central components: the Wazuh server, Wazuh indexer, and Wazuh dashboard. The agent is deployed on endpoints to collect and forward security data to the Wazuh server for analysis. The analyzed data is then forwarded to the Wazuh indexer for indexing and storage, and subsequently to the Wazuh dashboard for alerting and visualization.\nWazuh also supports agentless monitoring for systems and devices where installing the Wazuh agent is not possible. Network devices such as firewalls, switches, routers, and access points can actively forward log data via Syslog and SSH.\nThe Wazuh central components can be deployed in different ways, depending on scalability and availability needs:\nAll-in-one deployment: All Wazuh components (server, indexer, and dashboard) are installed on a single server. Best suited for labs and small environments with a limited number of monitored endpoints.\nSingle-node deployment: The Wazuh server, indexer, and dashboard are each deployed on separate servers. Recommended for medium environments that require higher performance than an all-in-one setup.\nMulti-node deployment: Typically, one instance of the Wazuh dashboard and multiple instances of the Wazuh server (Wazuh server cluster) and indexer (Wazuh indexer cluster) are deployed on their individual servers, respectively. The number of instances varies depending on your needs. This deployment is recommended for large environments with high event throughput, or when fault tolerance and high availability are required.\nVisit the installation guide and installation alternatives documentation to learn about the different ways to deploy Wazuh.\nThe diagram below represents a Wazuh deployment architecture. It shows how the Wazuh server and the Wazuh indexer nodes can be configured as clusters, providing load balancing and high availability.\nComponent communication\nWazuh agent - Wazuh server\nThe Wazuh agent continuously sends events to the Wazuh server for analysis and threat detection. To start shipping this data, the agent establishes a connection with the Wazuh server service for agent connection, which listens on TCP port 1514 by default (this is configurable). The Wazuh server then decodes and matches rules against the received events, utilizing the Wazuh Analysis engine.\nThe Wazuh messages protocol uses AES encryption by default, with 128 bits per block and 256-bit keys. Blowfish encryption is optional.\nNote\nRead the Benefits of using AES in the Wazuh communications document for more information.\nWazuh server - Wazuh indexer\nThe Wazuh server uses Filebeat to send alert and event data to the Wazuh indexer, using TLS encryption. Filebeat reads the Wazuh server output data and sends it to the Wazuh indexer (by default listening on port 9200/TCP). Once the data is indexed by the Wazuh indexer, the Wazuh dashboard is used to query and visualize the security information.\nWazuh dashboard - Wazuh dashboard/Wazuh indexer\nThe Wazuh dashboard queries the Wazuh server API (by default listening on port 55000/TCP on the Wazuh server) to display configuration and status-related information of the Wazuh server and agents. This communication is encrypted with TLS and authenticated with a username and password.\nThe Wazuh dashboard visualizes and queries the information indexed on the Wazuh indexer.\nRequired ports\nWazuh components communicate using several services. The list of default ports used by these services is shown below. Users can modify these port numbers when necessary.\nComponent |\nPort |\nProtocol |\nPurpose |\n|---|---|---|---|\nWazuh server |\n1514 |\nTCP (default) |\nAgent connection service |\n1514 |\nUDP (optional) |\nAgent connection service (disabled by default) |\n|\n1515 |\nTCP |\nAgent enrollment service |\n|\n1516 |\nTCP |\nWazuh cluster daemon |\n|\n514 |\nUDP (default) |\nWazuh Syslog collector (disabled by default) |\n|\n514 |\nTCP (optional) |\nWazuh Syslog collector (disabled by default) |\n|\n55000 |\nTCP |\nWazuh server RESTful API |\n|\nWazuh indexer |\n9200 |\nTCP |\nWazuh indexer RESTful API |\n9300-9400 |\nTCP |\nWazuh indexer cluster communication |\n|\nWazuh dashboard |\n443 |\nTCP |\nWazuh web user interface |\nWazuh CTI\nThe Wazuh Cyber Threat Intelligence (CTI) service is a publicly accessible platform that collects, analyzes, and disseminates actionable information on emerging cyber threats and vulnerabilities. This service currently focuses on vulnerability intelligence, delivering timely updates on Common Vulnerabilities and Exposures (CVEs), severity scores, exploitability insights, and mitigation strategies. It aggregates and sanitizes data from trusted sources, including operating system vendors and major vulnerability databases, to ensure high-quality, relevant intelligence.\nThis service is integrated directly with the Wazuh Vulnerability Detection module, but is also publicly available at the Wazuh CTI website.",
+      "relevance": "Wazuh architecture, agent, server, indexer, dashboard, communication protocols, deployment models, agentless monitoring, Cyber Threat Intelligence"
+    },
+    {
+      "id": "ev_8",
+      "source_id": "src_17",
+      "quote": null,
+      "note": "Components\nThe Wazuh platform provides XDR and SIEM features to protect your cloud, container, and server workloads. These include log data analysis, intrusion and malware detection, file integrity monitoring, configuration assessment, vulnerability detection, and support for regulatory compliance.\nThe Wazuh solution is based on the Wazuh agent, which is deployed on the monitored endpoints, and on three central components: the Wazuh server, the Wazuh indexer, and the Wazuh dashboard.\nThe Wazuh indexer is a highly scalable, full-text search and analytics engine. This central component indexes and stores alerts generated by the Wazuh server.\nThe Wazuh server analyzes data received from the agents. It processes it through decoders and rules, using threat intelligence to look for well-known indicators of compromise (IOCs). A single server can analyze data from hundreds or thousands of agents, and scale horizontally when set up as a cluster. This central component is also used to manage the agents, configuring and upgrading them remotely when necessary.\nThe Wazuh dashboard is the web user interface for data visualization and analysis. It includes out-of-the-box dashboards for threat hunting, regulatory compliance (e.g., PCI DSS, GDPR, CIS, HIPAA, NIST 800-53), detected vulnerable applications, file integrity monitoring data, configuration assessment results, cloud infrastructure monitoring events, and others. It is also used to manage Wazuh configuration and to monitor its status.\nWazuh agents are installed on endpoints such as laptops, desktops, servers, cloud instances, or virtual machines. They provide threat prevention, detection, and response capabilities. They run on operating systems such as Linux, Windows, macOS, Solaris, AIX, and HP-UX.\nIn addition to agent-based monitoring capabilities, the Wazuh platform can monitor agent-less devices such as firewalls, switches, routers, or network IDS, among others. For example, a system log data can be collected via Syslog, and its configuration can be monitored through periodic probing of its data, via SSH or through an API.\nThe diagram below represents the Wazuh components and data flow.",
+      "relevance": "Wazuh components, agent support, analysis, scaling, operating systems, integrations"
+    },
+    {
+      "id": "ev_9",
+      "source_id": "src_15",
+      "quote": null,
+      "note": "Wazuh server API\nThe Wazuh server API is an open source RESTful API that enables secure interaction with the Wazuh server infrastructure. You can interact with it using the built-in API console in the Wazuh dashboard, a command-line tool such as cURL, or any script or program capable of making web requests.\nThe Wazuh dashboard relies on the Wazuh server API to remotely manage the Wazuh server infrastructure. You can utilize the Wazuh server API to perform common tasks such as adding agents, restarting the manager(s) or agent(s), or retrieving detailed File Integrity Monitoring (FIM) events and status, managing users, roles, and permissions and more.\nHere is a list of the Wazuh server API capabilities:\nWazuh agent management\nWazuh manager control and overview\nCluster control and overview\nFile integrity monitoring control and search\nMITRE ATT&CK overview\nRuleset information\nTesting and verification of rules and decoders\nSyscollector information\nRole-Based Access Control (RBAC)\nAPI management (HTTPS, configuration)\nUsers management\nStatistical information\nError handling\nQuery remote configuration\nRefer to the Wazuh server API reference for details about all the Wazuh server API endpoints. For practical, real-world examples of how to use these capabilities, see the use cases section.",
+      "relevance": "Wazuh API, REST, agent management, RBAC, endpoints, capabilities"
+    },
+    {
+      "id": "ev_10",
+      "source_id": "src_19",
+      "quote": null,
+      "note": "Regulatory compliance\nWazuh helps implement compliance requirements for regulatory compliance support and visibility. This is done by providing automation, improved security controls, log analysis, and incident response.\nThe default Wazuh ruleset supports the PCI DSS, HIPAA, NIST 800-53, TSC, and GDPR frameworks and standards. Wazuh rules and decoders are used to detect attacks, system errors, security misconfigurations, and policy violations. In addition to the default compliance frameworks and standards provided by Wazuh, it is possible to monitor for custom compliance standards by adding the compliance identifier in the <group>\ntag of rules. Refer to the ruleset section for more information.\nLearn more about achieving compliance with Wazuh in the sections below:",
+      "relevance": "Wazuh compliance, PCI DSS, HIPAA, NIST 800-53, GDPR, default rule sets"
+    },
+    {
+      "id": "ev_11",
+      "source_id": "src_16",
+      "quote": null,
+      "note": "Release notes\nThis section summarizes the most important features of each Wazuh release.\nWazuh version |\nRelease date |\n|---|---|\n23 April 2026 |\n|\n17 March 2026 |\n|\n11 February 2026 |\n|\n14 January 2026 |\n|\n12 November 2025 |\n|\n23 October 2025 |\n|\n24 September 2025 |\n|\n18 September 2025 |\n|\n7 May 2025 |\n|\n1 April 2025 |\n|\n12 March 2025 |\n|\n20 February 2025 |\n|\n19 August 2025 |\n|\n22 May 2025 |\n|\n16 January 2025 |\n|\n9 January 2025 |\n|\n4 November 2024 |\n|\n17 October 2024 |\n|\n5 September 2024 |\n|\n20 August 2024 |\n|\n18 July 2024 |\n|\n12 June 2024 |\n|\n30 May 2024 |\n|\n29 April 2024 |\n|\n4 March 2024 |\n|\n10 January 2024 |\n|\n20 December 2023 |\n|\n27 November 2023 |\n|\n31 October 2023 |\n|\n23 October 2023 |\n|\n10 October 2023 |\n|\n6 September 2023 |\n|\n24 August 2023 |\n|\n10 August 2023 |\n|\n10 July 2023 |\n|\n13 June 2023 |\n|\n25 May 2023 |\n|\n18 May 2023 |\n|\n12 April 2023 |\n|\n28 March 2023 |\n|\n24 April 2023 |\n|\n16 November 2022 |\n|\n13 October 2022 |\n|\n19 September 2022 |\n|\n24 August 2022 |\n|\n20 July 2022 |\n|\n29 June 2022 |\n|\n8 June 2022 |\n|\n1 June 2022 |\n|\n30 May 2022 |\n|\n18 May 2022 |\n|\n5 May 2022 |\n|\n30 May 2022 |\n|\n28 March 2022 |\n|\n15 November 2021 |\n|\n20 October 2021 |\n|\n6 October 2021 |\n|\n28 September 2021 |\n|\n3 September 2021 |\n|\n25 August 2021 |\n|\n22 April 2021 |\n|\n25 March 2021 |\n|\n23 March 2021 |\n|\n8 March 2021 |\n|\n25 February 2021 |\n|\n15 February 2021 |\n|\n14 January 2021 |\n|\n30 November 2020 |\n|\n24 November 2020 |\n|\n11 November 2020 |\n|\n23 October 2020 |\n|\n19 September 2022 |\n|\n24 August 2022 |\n|\n30 May 2022 |\n|\n28 April 2021 |\n|\n22 September 2020 |\n|\n15 July 2020 |\n|\n22 June 2020 |\n|\n30 April 2020 |\n|\n9 April 2020 |\n|\n8 April 2020 |\n|\n24 March 2020 |\n|\n25 February 2020 |\n|\n28 January 2020 |\n|\n22 January 2020 |\n|\n10 January 2020 |\n|\n23 December 2019 |\n|\n23 September 2019 |\n|\n19 September 2019 |\n|\n18 September 2019 |\n|\n8 August 2019 |\n|\n7 August 2019 |\n|\n9 July 2019 |\n|\n10 June 2019 |\n|\n21 May 2019 |\n|\n2 May 2019 |\n|\n31 January 2019 |\n|\n24 January 2019 |\n|\n18 January 2019 |\n|\n17 December 2018 |\n|\n5 December 2018 |\n|\n10 November 2018 |\n|\n7 September 2018 |\n|\n29 August 2018 |\n|\n10 August 2018 |\n|\n24 July 2018 |\n|\n18 June 2018 |\n|\n8 June 2018 |\n|\n1 June 2018 |\n|\n28 May 2018 |\n|\n7 May 2018 |\n|\n2 March 2018 |\n|\n8 February 2018 |\n|\n22 December 2017 |\n|\n3 December 2017 |\n|\n17 August 2017 |\n- 4.x\n- 4.14.5 Release notes\n- 4.14.4 Release notes\n- 4.14.3 Release notes\n- 4.14.2 Release notes\n- 4.14.1 Release notes\n- 4.14.0 Release notes\n- 4.13.1 Release notes\n- 4.13.0 Release notes\n- 4.12.0 Release notes\n- 4.11.2 Release notes\n- 4.11.1 Release notes\n- 4.11.0 Release notes\n- 4.10.3 Release notes\n- 4.10.2 Release notes\n- 4.10.1 Release notes\n- 4.10.0 Release notes\n- 4.9.2 Release notes\n- 4.9.1 Release notes\n- 4.9.0 Release notes\n- 4.8.2 Release notes\n- 4.8.1 Release notes\n- 4.8.0 Release notes\n- 4.7.5 Release notes\n- 4.7.4 Release notes\n- 4.7.3 Release notes\n- 4.7.2 Release notes\n- 4.7.1 Release notes\n- 4.7.0 Release notes\n- 4.6.0 Release notes\n- 4.5.4 Release notes\n- 4.5.3 Release notes\n- 4.5.2 Release notes\n- 4.5.1 Release notes\n- 4.5.0 Release notes\n- 4.4.5 Release notes\n- 4.4.4 Release notes\n- 4.4.3 Release notes\n- 4.4.2 Release notes\n- 4.4.1 Release notes\n- 4.4.0 Release notes\n- 4.3.11 Release notes\n- 4.3.10 Release notes\n- 4.3.9 Release notes\n- 4.3.8 Release notes\n- 4.3.7 Release notes\n- 4.3.6 Release notes\n- 4.3.5 Release notes\n- 4.3.4 Release notes\n- 4.3.3 Release notes\n- 4.3.2 Release notes\n- 4.3.1 Release notes\n- 4.3.0 Release notes\n- 4.2.7 Release notes\n- 4.2.6 Release notes\n- 4.2.5 Release notes\n- 4.2.4 Release notes\n- 4.2.3 Release notes\n- 4.2.2 Release notes\n- 4.2.1 Release notes\n- 4.2.0 Release notes\n- 4.1.5 Release notes\n- 4.1.4 Release notes\n- 4.1.3 Release notes\n- 4.1.2 Release notes\n- 4.1.1 Release notes\n- 4.1.0 Release notes\n- 4.0.4 Release notes\n- 4.0.3 Release notes\n- 4.0.2 Release notes\n- 4.0.1 Release notes\n- 4.0.0 Release notes\n- 3.x\n- 3.13.6 Release notes\n- 3.13.5 Release notes\n- 3.13.4 Release notes\n- 3.13.3 Release notes\n- 3.13.2 Release notes\n- 3.13.1 Release notes\n- 3.13.0 Release notes\n- 3.12.3 Release notes\n- 3.12.2 Release notes\n- 3.12.1 Release notes\n- 3.12.0 Release notes\n- 3.11.4 Release notes\n- 3.11.3 Release notes\n- 3.11.2 Release notes\n- 3.11.1 Release notes\n- 3.11.0 Release notes\n- 3.10.2 Release notes\n- 3.10.1 Release notes\n- 3.10.0 Release notes\n- 3.9.5 Release notes\n- 3.9.4 Release notes\n- 3.9.3 Release notes\n- 3.9.2 Release notes\n- 3.9.1 Release notes\n- 3.9.0 Release notes\n- 3.8.2 Release notes\n- 3.8.1 Release notes\n- 3.8.0 Release notes\n- 3.7.2 Release notes\n- 3.7.1 Release notes\n- 3.7.0 Release notes\n- Adding agents to multiple groups\n- New module to monitor Microsoft Azure\n- New module to monitor Docker\n- Query remote configuration\n- Improved performance of FIM and Analysis engines\n- Distributed API requests in cluster mode\n- Advanced API filtering using queries\n- New features for Kibana plugin\n- New features for Splunk plugin\n- 3.6.1 Release notes\n- 3.6.0 Release notes\n- 3.5.0 Release notes\n- 3.4.0 Release notes\n- 3.3.1 Release notes\n- 3.3.0 Release notes\n- 3.2.4 Release notes\n- 3.2.3 Release notes\n- 3.2.2 Release notes\n- 3.2.1 Release notes\n- 3.2.0 Release notes\n- 3.1.0 Release notes\n- 3.0.0 Release notes\n- 2.x",
+      "relevance": "Wazuh release cadence, recent releases, major/minor updates, stability, new features"
+    },
+    {
+      "id": "ev_12",
+      "source_id": "src_24",
+      "quote": null,
+      "note": "Here at Sirius, we often get asked, \"How does Wazuh stack up against commercial giants like Splunk, Elastic, or CrowdStrike?\" This is a very good question, and one that deserves a clear, honest answer. We understand that before making a major technology decision, buyers are fascinated with comparisons and naturally research multiple options to find the best fit.\nWe want to be upfront: Wazuh is a powerful Open Source security platform available at zero licensing cost, offering a compelling unified Extended Detection and Response (XDR) and Security Information and Event Management (SIEM) solution. However, adopting Wazuh involves accepting operational and architectural trade-offs compared to proprietary solutions. For certain organizational needs—particularly maximum detection efficacy or high out-of-the-box maturity—a proprietary alternative may, in fact, offer superior value.\nThis article will honestly and transparently compare Wazuh against its major competitors, explaining the factors that drive architectural choice and Total Cost of Ownership (TCO) up or down, helping you decide what is best for your specific needs. We aim to be fiercely transparent, allowing you to make the most informed decision possible.\nI. Strategic Context and Economic Model Comparison\nWazuh holds a unique market position by combining SIEM and XDR functionalities into a single, open-source platform. This dual role places it in competition with distinct groups of commercial vendors, summarized by their foundational economic models.\n1. Cost Model Divergence: Licensing vs. Labor\nThe fundamental economic comparison of security platforms centers on the structure of cost accumulation.\n| Model Priority | Wazuh (FOSS/Cloud) | Splunk ES (Proprietary) | Elastic Security (Open-Core) |\n|---|---|---|---|\n| Licensing | $0 licensing cost for the core platform. Vendor recovery via managed cloud hosting and SLA-based support. | Proprietary; heavily dependent on data volume (GB/day ingestion). | Open-core strategy; free base components, proprietary licenses required for essential enterprise features, advanced ML, or full support. |\n| Cost Predictability | High predictability through agent-based pricing in the Cloud service. | Low predictability; costs escalate steeply with data growth or spikes. | Variable, based on proprietary feature adoption and resource utilization. |\n| TCO Structure | TCO shifts entirely to specialized labor, expertise, and infrastructure management (OpEx). | TCO dominated by high, unpredictable licensing fees. | TCO includes infrastructure plus proprietary license fees. |\nThe greatest financial error in evaluating Wazuh is equating its zero licensing cost with a zero-cost operation. For a self-managed deployment, the absence of a license fee converts a Capital Expenditure (CapEx) into a substantial Operational Expenditure (OpEx) dominated by the cost of specialized labor and expertise. Most mid-sized organizations find a necessity for formal, paid commercial engagement, with a median annual expenditure of $16,234 observed for support services alone.\n2. Operational Overhead Comparison\nThe Total Cost of Ownership analysis confirms that the decision to adopt Wazuh hinges on an organization's internal technical capacity.\nEase of Deployment/Evaluation: Wazuh is consistently rated higher than proprietary counterparts (like Splunk Enterprise and QRadar) for being easier to integrate, deploy, and evaluate. The low friction allows teams to rapidly prototype without lengthy procurement cycles and financial commitment.\nComplexity at Scale: While easy to start, Wazuh is characterized by a steep and difficult learning curve required for operational mastery, particularly for scaling and configuration. This complexity is the greatest cost multiplier for self-managed Wazuh. In contrast, proprietary vendors (like CrowdStrike) generally provide polished UIs and comprehensive vendor support to reduce constant deep system configuration.\nII. Functional Comparison: Detection Efficacy vs. Customization\nA fundamental strategic trade-off exists between Wazuh’s customization flexibility and the detection efficacy of proprietary specialists.\n1. Host Security and Compliance Strength (Wazuh vs. Traditional SIEM)\nWazuh retains a native focus on endpoint security and excels in host security baseline functions.\nWazuh Strength: Wazuh integrates in-built File Integrity Monitoring (FIM) and Security Configuration Assessment (SCA) capabilities. This FIM provides granular alerting and superior control over sensitive assets. The SCA feature directly supports regulatory compliance efforts by assessing systems against industry guidelines like the Center for Internet Security (CIS) benchmark.\nTraditional SIEM Weakness: Traditional proprietary SIEM systems, such as IBM QRadar or ArcSight, typically require external modules or third-party tools to replicate this level of granular FIM, increasing complexity and OpEx.\nFor organizations where the primary mandate is satisfying audit requirements and minimizing configuration drift (PCI-DSS, HIPAA, NIST), Wazuh’s native compliance-centric capabilities offer superior control and economic advantages.\n2. XDR/EDR Detection Methodology Comparison\nWazuh’s detection relies on customizable, rule-based behavioral analysis and log data analysis. This fundamentally diverges from the methods used by specialized proprietary rivals.\nProprietary Efficacy (Endpoint Titans): Proprietary XDR specialists (like CrowdStrike Falcon) achieve superior raw efficacy in identifying emergent threats. Review data indicates that CrowdStrike outperforms Wazuh in real-time detection (9.6 vs. 8.5) and automated remediation (9.1 vs. 8.9). These proprietary platforms rely on high-fidelity, AI/ML-driven Indicators of Attack (IOA).\nCommercial SIEM Features (Ingestion Giants): Splunk Enterprise Security (ES) utilizes features like Risk-Based Alerting (RBA), integrated Security Orchestration, Automation, and Response (SOAR) capabilities, and User and Entity Behavior Analytics (UEBA), often supported by an AI Assistant to accelerate investigation. Elastic Defend also offers a modern EDR stack featuring ML-powered protection and kernel-level sensors.\nWazuh Trade-off: Wazuh offers unparalleled customization and control over detection rules. However, sustaining a high-level security posture against sophisticated, unknown threats requires substantial, continuous investment in specialized internal labor to configure and tune the rule set, as it relies on pattern recognition rather than automated ML analysis.\nOrganizations whose primary goals are minimizing operational overhead and leveraging advanced detection techniques (AI/ML correlation or kernel-level protection) should strongly consider commercial solutions.\nIII. Architectural and Integration Differences\nArchitectural design dictates performance, scalability, and maintenance requirements.\n1. Data Indexing Methodology\nThe architectural choice of the data layer creates a divergence in how data is processed.\nWazuh's Schema-on-Write: Wazuh and Elastic environments rely on the OpenSearch Indexer, which utilizes a schema-on-write methodology. This requires careful upfront data parsing and normalization (via the Manager's decoders or external tools like Logstash) to ensure data is structured before indexing. This approach results in highly efficient search and storage for structured data.\nSplunk's Schema-on-Read: Splunk is known for its proprietary Search Processing Language (SPL) and schema-on-read capability. This allows massive amounts of unstructured machine data to be ingested instantaneously, applying the structure (schema) dynamically at the moment of search. This offers high flexibility for ad-hoc analysis but can lead to greater CPU utilization and cost during complex queries.\n2. Integration and Latency\nWazuh 4.6 and later discontinued native plugins for proprietary SIEMs (like Splunk and Elastic), requiring the use of data forwarders (e.g., Logstash or ",
+      "relevance": "Wazuh competitors, functional comparison, SIEM, XDR, open source, commercial tools"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact_1",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/user-manual/capabilities/index.html",
+      "created_at": "2026-05-06T15:06:31.368472Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_1"
+      ]
+    },
+    {
+      "id": "artifact_2",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/getting-started/components/index.html",
+      "created_at": "2026-05-06T15:06:31.395343Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_2"
+      ]
+    },
+    {
+      "id": "artifact_3",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/compliance/index.html",
+      "created_at": "2026-05-06T15:06:31.419865Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_3"
+      ]
+    },
+    {
+      "id": "artifact_4",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/getting-started/architecture.html",
+      "created_at": "2026-05-06T15:06:31.437337Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_4"
+      ]
+    },
+    {
+      "id": "artifact_5",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/release-notes/index.html",
+      "created_at": "2026-05-06T15:06:31.690846Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_5"
+      ]
+    },
+    {
+      "id": "artifact_6",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "created_at": "2026-05-06T15:06:31.710757Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_6"
+      ]
+    },
+    {
+      "id": "artifact_7",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/getting-started/architecture.html",
+      "created_at": "2026-05-06T15:06:54.905137Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_7"
+      ]
+    },
+    {
+      "id": "artifact_8",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/getting-started/components/index.html",
+      "created_at": "2026-05-06T15:06:54.923214Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_8"
+      ]
+    },
+    {
+      "id": "artifact_9",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/user-manual/api/index.html",
+      "created_at": "2026-05-06T15:06:54.942753Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_9"
+      ]
+    },
+    {
+      "id": "artifact_10",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/compliance/index.html",
+      "created_at": "2026-05-06T15:06:54.959282Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_10"
+      ]
+    },
+    {
+      "id": "artifact_11",
+      "title": "Extracted evidence for https://documentation.wazuh.com/current/release-notes/index.html",
+      "created_at": "2026-05-06T15:06:55.124396Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_11"
+      ]
+    },
+    {
+      "id": "artifact_12",
+      "title": "Extracted evidence for https://www.siriusopensource.com/en-us/blog/wazuh-versus-proprietary-xdr-and-siem-platforms-honest-comparison",
+      "created_at": "2026-05-06T15:07:09.135328Z",
+      "kind": "evidence",
+      "evidence_ids": [
+        "ev_12"
+      ]
+    }
+  ],
+  "warnings": [
+    "https://documentation.wazuh.com/: Blocked content type: unknown",
+    "https://wazuh.com/pricing: HTTP status 404",
+    "https://wazuh.com/plans: HTTP status 404",
+    "https://wazuh.com/.well-known/security.txt: HTTP status 404",
+    "https://wazuh.com/llms.txt: HTTP status 404"
+  ],
+  "metadata": {
+    "run_id": "run_a5c70eec9df04268802719fab6a7f81c",
+    "workflow_id": "technical_due_diligence",
+    "started_at": "2026-05-06T15:05:12.773368Z",
+    "finished_at": "2026-05-06T15:10:09.879963Z",
+    "cost_usd": null,
+    "tokens": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "total_tokens": 0
+    }
+  }
+}

@@ -120,11 +120,6 @@ class ResearchFinding(WebResearchModel):
     confidence: float | None = Field(default=None, ge=0, le=1)
 
 
-class StructuredDataValidation(WebResearchModel):
-    valid: bool
-    errors: list[str] = Field(default_factory=list)
-
-
 class Artifact(WebResearchModel):
     id: str
     title: str
@@ -188,8 +183,6 @@ class UrlsByCategory(WebResearchModel):
 class WorkflowResult(WebResearchModel):
     answer_markdown: str
     structured_data: dict[str, object] | None = None
-    raw_structured_data: dict[str, object] | None = None
-    structured_data_validation: StructuredDataValidation | None = None
     summary: str
     findings: list[ResearchFinding] = Field(default_factory=list)
     sources: list[SourceRecord] = Field(default_factory=list)

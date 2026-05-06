@@ -43,7 +43,7 @@ WORKFLOW_ENTRIES = [
         id="technical_due_diligence",
         name="Technical Due Diligence",
         description=(
-            "Public technical substance, claims, competitors, and replicability assessment."
+            "Public technical claims, release activity, competitors, and code-review follow-ups."
         ),
     ),
 ]

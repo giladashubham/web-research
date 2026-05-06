@@ -7,6 +7,7 @@ from webresearch.workflows.technical_due_diligence.workflow import WORKFLOW_ID
 def test_diligence_prompts_label_evidence_inference_and_unknowns() -> None:
     prompt_names = [
         "intake_planner.md",
+        "url_selector.md",
         "claim_extractor.md",
         "evidence_researcher.md",
         "competitor_mapper.md",

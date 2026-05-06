@@ -16,11 +16,13 @@ from webresearch.workflows.technical_due_diligence import (
     EvidenceResearch,
     FinalMemoOutput,
     IntakePlan,
+    SelectedPriorityUrls,
     TechnicalSubstanceReview,
     UnresolvedClaim,
     run_technical_due_diligence,
 )
 from webresearch.workflows.technical_due_diligence.workflow import (
+    _validated_priority_urls,
     claim_extractor_agent,
     competitor_mapper_agent,
     evidence_researcher_agent,
@@ -28,6 +30,7 @@ from webresearch.workflows.technical_due_diligence.workflow import (
     gap_researcher_agent,
     intake_planner_agent,
     technical_substance_reviewer_agent,
+    url_selector_agent,
 )
 
 PACKAGE = "webresearch.workflows.technical_due_diligence"
@@ -48,6 +51,8 @@ def _agent(name: str, output_type: type[object], final_output: dict[str, object]
 
 def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
     report = _example_report()
+    final_report = dict(report)
+    final_report["release_activity"] = None
     target = report["target"]
     claim = report["claims"][0]
     competitor = report["competitors"][0]
@@ -63,6 +68,32 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                 "likely_claim_areas": ["technical substance"],
                 "competitor_names": ["Competitor One"],
                 "priority_urls_by_category": {
+                    "docs": [
+                        "https://example.com/docs",
+                        "https://example.com/docs/deep-installation",
+                    ],
+                    "api": [],
+                    "changelog": [
+                        "https://example.com/changelog",
+                        "https://example.com/changelog/v1",
+                    ],
+                    "pricing": [],
+                    "security": [],
+                    "customers": [],
+                    "blog": [],
+                    "careers": [],
+                    "other": [],
+                },
+            },
+        ),
+    )
+    monkeypatch.setattr(
+        f"{WORKFLOW_MODULE}.url_selector_agent",
+        lambda: _agent(
+            "url_selector",
+            SelectedPriorityUrls,
+            {
+                "priority_urls_by_category": {
                     "docs": ["https://example.com/docs"],
                     "api": [],
                     "changelog": ["https://example.com/changelog"],
@@ -73,6 +104,8 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                     "careers": [],
                     "other": [],
                 },
+                "selection_rationale": ["Use docs and changelog index pages."],
+                "rejected_patterns": ["deep installation pages"],
             },
         ),
     )
@@ -92,6 +125,13 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                     }
                 ],
                 "unknowns": ["Implementation details are not public."],
+                "release_activity": {
+                    "source_urls": ["https://example.com/changelog"],
+                    "last_release_date": "2025-03-28",
+                    "releases_last_12_months": 24,
+                    "notable_releases": ["v2.1: added webhook support"],
+                    "cadence_description": "approximately bi-weekly",
+                },
             },
         ),
     )
@@ -141,9 +181,6 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             "review",
             TechnicalSubstanceReview,
             {
-                "executive_judgment": report["executive_judgment"],
-                "technical_substance": report["technical_substance"],
-                "replicability": report["replicability"],
                 "code_review_follow_ups": report["code_review_follow_ups"],
                 "unresolved_claims": unresolved,
             },
@@ -174,7 +211,7 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                     "Inference: architecture depth is unclear.\n\n"
                     "Unknowns: code review is required."
                 ),
-                "report": report,
+                "report": final_report,
                 "findings": [
                     {
                         "claim": claim["claim"],
@@ -198,8 +235,6 @@ async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None
     result = await run_technical_due_diligence(WorkflowInput(query="Evaluate Example Robotics"))
 
     assert result.metadata.workflow_id == "technical_due_diligence"
-    assert result.structured_data_validation is not None
-    assert result.structured_data_validation.valid is True
     assert result.structured_data is not None
     assert result.structured_data["target"]["company_name"] == "Example Robotics"
     assert result.findings[0].claim == "The product provides autonomous workflow planning."
@@ -253,9 +288,48 @@ async def test_priority_urls_by_category_is_categorised() -> None:
     assert cat.api == []
 
 
+async def test_url_selection_guardrails_reject_unknown_urls_and_fill_minimum_coverage() -> None:
+    candidates = UrlsByCategory(
+        docs=["https://example.com/docs", "https://example.com/docs/architecture"],
+        api=["https://example.com/api/reference"],
+        changelog=["https://example.com/release-notes", "https://example.com/release-notes/v2"],
+        security=["https://example.com/security"],
+    )
+    selected = SelectedPriorityUrls(
+        priority_urls_by_category=UrlsByCategory(
+            docs=[
+                "https://example.com/docs/architecture",
+                "https://attacker.example/docs",
+            ],
+            changelog=["https://example.com/release-notes/v2"],
+        )
+    )
+
+    guarded = _validated_priority_urls(candidates, selected)
+
+    assert guarded.docs == ["https://example.com/docs/architecture"]
+    assert guarded.api == ["https://example.com/api/reference"]
+    assert guarded.changelog == ["https://example.com/release-notes/v2"]
+    assert guarded.security == ["https://example.com/security"]
+
+
+async def test_url_selection_guardrails_enforce_category_budgets() -> None:
+    candidates = UrlsByCategory(
+        docs=[f"https://example.com/docs/page-{index}" for index in range(12)],
+        changelog=[f"https://example.com/release-notes/v{index}" for index in range(8)],
+    )
+    selected = SelectedPriorityUrls(priority_urls_by_category=candidates)
+
+    guarded = _validated_priority_urls(candidates, selected)
+
+    assert guarded.docs == candidates.docs[:8]
+    assert guarded.changelog == candidates.changelog[:5]
+
+
 def test_diligence_agents_disable_openai_response_storage() -> None:
     agents = [
         intake_planner_agent(),
+        url_selector_agent(),
         claim_extractor_agent(),
         evidence_researcher_agent(),
         competitor_mapper_agent(),
@@ -265,3 +339,9 @@ def test_diligence_agents_disable_openai_response_storage() -> None:
     ]
 
     assert all(agent.model_settings.store is False for agent in agents)
+
+
+def test_url_selector_agent_uses_selector_model_env(monkeypatch) -> None:
+    monkeypatch.setenv("WEBRESEARCH_URL_SELECTOR_MODEL", "gpt-test-selector")
+
+    assert url_selector_agent().model == "gpt-test-selector"

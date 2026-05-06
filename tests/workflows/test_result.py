@@ -77,9 +77,7 @@ def test_structured_output_validates_and_sets_structured_data() -> None:
     result = build_result(state, WorkflowContext())
 
     assert result.structured_data == {"status": "ok"}
-    assert result.raw_structured_data is None
-    assert result.structured_data_validation is not None
-    assert result.structured_data_validation.valid is True
+    assert result.warnings == []
 
 
 def test_invalid_structured_output_moves_to_raw_and_adds_warning() -> None:
@@ -97,9 +95,6 @@ def test_invalid_structured_output_moves_to_raw_and_adds_warning() -> None:
     result = build_result(state, WorkflowContext())
 
     assert result.structured_data is None
-    assert result.raw_structured_data == {"status": "ok"}
-    assert result.structured_data_validation is not None
-    assert result.structured_data_validation.valid is False
     assert result.warnings
 
 
@@ -107,8 +102,6 @@ def test_missing_output_schema_leaves_structured_data_undefined() -> None:
     result = build_result(_state(WorkflowInput(query="Query")), WorkflowContext())
 
     assert result.structured_data is None
-    assert result.raw_structured_data is None
-    assert result.structured_data_validation is None
 
 
 def test_build_result_requires_final_output() -> None:

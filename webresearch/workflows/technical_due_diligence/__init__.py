@@ -1,4 +1,5 @@
 from webresearch.workflows.technical_due_diligence.models import (
+    ChangelogObservations,
     ClaimAssessment,
     ClaimExtraction,
     CodeReviewFollowUp,
@@ -8,19 +9,18 @@ from webresearch.workflows.technical_due_diligence.models import (
     DiligenceGapResearch,
     DiligenceTarget,
     EvidenceResearch,
-    ExecutiveJudgment,
     ExtractedClaim,
     FinalMemoOutput,
     IntakePlan,
-    ReplicabilityAssessment,
+    SelectedPriorityUrls,
     TechnicalDueDiligenceReport,
-    TechnicalSubstanceAssessment,
     TechnicalSubstanceReview,
     UnresolvedClaim,
 )
 from webresearch.workflows.technical_due_diligence.workflow import run_technical_due_diligence
 
 __all__ = [
+    "ChangelogObservations",
     "ClaimAssessment",
     "ClaimExtraction",
     "CodeReviewFollowUp",
@@ -30,13 +30,11 @@ __all__ = [
     "DiligenceGapResearch",
     "DiligenceTarget",
     "EvidenceResearch",
-    "ExecutiveJudgment",
     "ExtractedClaim",
     "FinalMemoOutput",
     "IntakePlan",
-    "ReplicabilityAssessment",
+    "SelectedPriorityUrls",
     "TechnicalDueDiligenceReport",
-    "TechnicalSubstanceAssessment",
     "TechnicalSubstanceReview",
     "UnresolvedClaim",
     "run_technical_due_diligence",

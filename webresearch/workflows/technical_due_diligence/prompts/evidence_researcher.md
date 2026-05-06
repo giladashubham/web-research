@@ -23,9 +23,9 @@ For each high-relevance claim:
 
 ## What to read end-to-end (prioritised)
 
-- **Architecture / how-it-works docs** — this is where wrapper risk is exposed or refuted
-- **Changelog (last 12–18 months chronologically)** — velocity, depth, whether changes are model swaps vs. real product work
-- **API reference** — count endpoints, look at request/response shape, auth model, rate limits. A "platform" with 6 endpoints is a wrapper; a platform with typed schemas and webhooks is not
+- **Architecture / how-it-works docs** — record what architecture is publicly described and what remains unknown
+- **Changelog (last 12–18 months chronologically)** — record release dates and factual shipped changes
+- **API reference** — count endpoints, look at request/response shape, auth model, rate limits
 - **Security / trust page** — lists foundation model providers, data handling, certifications
 - **Careers postings** — "experience with pgvector / Triton / CUDA" reveals the real stack more honestly than marketing
 - **Engineering blog** — when they cite a paper or benchmark, fetch and read it

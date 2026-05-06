@@ -36,11 +36,15 @@ Edit `.env` with the credentials you want to use:
 OPENAI_API_KEY=...
 TAVILY_API_KEY=...
 OPENAI_MODEL=
+WEBRESEARCH_URL_SELECTOR_MODEL=gpt-4.1-mini
 LIVE_LLM=0
 ```
 
 Environment variables are loaded from `.env` automatically. Values already set in your
 shell take precedence over `.env`.
+
+`WEBRESEARCH_URL_SELECTOR_MODEL` controls the lightweight URL-selection stage in technical
+due diligence, so it can use a cheaper model than the main research and memo agents.
 
 ## CLI
 

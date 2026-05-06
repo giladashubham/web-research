@@ -16,7 +16,8 @@ def test_report_model_validates_example_output() -> None:
     report = TechnicalDueDiligenceReport.model_validate(example)
 
     assert report.target.company_name == "Example Robotics"
-    assert report.executive_judgment.technical_substance == "mixed"
+    assert report.release_activity is not None
+    assert report.release_activity.releases_last_12_months == 24
     assert report.code_review_follow_ups[0].priority == "high"
 
 
