@@ -26,22 +26,21 @@ class ChangelogObservations(WebResearchModel):
     cadence_description: str | None = None
 
 
+class CategorizedGap(WebResearchModel):
+    claim_id: str = Field(min_length=1)
+    gap_type: Literal["documentation_gap", "depth_gap", "private_diligence_needed"]
+    description: str = Field(min_length=1)
+
+
 class ClaimAssessment(WebResearchModel):
+    claim_id: str | None = None
     claim: str = Field(min_length=1)
     claim_source_urls: list[UrlString] = Field(default_factory=list)
     public_evidence: str = Field(min_length=1)
     evidence_source_urls: list[UrlString] = Field(default_factory=list)
-    assessment: Literal["supported", "partially_supported", "unsupported", "unclear"]
+    assessment: Literal["supported", "partially_supported", "unsupported", "unclear", "contradicted"]
     confidence: Literal["low", "medium", "high"]
     code_review_follow_up_ids: list[str] = Field(default_factory=list)
-
-
-class CompetitorAssessment(WebResearchModel):
-    competitor_name: str = Field(min_length=1)
-    competitor_url: UrlString | None = None
-    similar_capabilities: list[str] = Field(default_factory=list)
-    differentiation_notes: str = Field(min_length=1)
-    source_urls: list[UrlString] = Field(default_factory=list)
 
 
 class CodeReviewFollowUp(WebResearchModel):
@@ -56,7 +55,6 @@ class TechnicalDueDiligenceReport(WebResearchModel):
     target: DiligenceTarget
     claims: list[ClaimAssessment] = Field(default_factory=list)
     release_activity: ChangelogObservations | None = None
-    competitors: list[CompetitorAssessment] = Field(default_factory=list)
     code_review_follow_ups: list[CodeReviewFollowUp] = Field(default_factory=list)
     evidence_gaps: list[str] = Field(default_factory=list)
     source_urls: list[UrlString] = Field(default_factory=list)
@@ -66,12 +64,12 @@ class IntakePlan(WebResearchModel):
     target: DiligenceTarget
     research_questions: list[str] = Field(default_factory=list)
     likely_claim_areas: list[str] = Field(default_factory=list)
-    competitor_names: list[str] = Field(default_factory=list)
-    priority_urls_by_category: UrlsByCategory = Field(default_factory=UrlsByCategory)
+    claim_source_urls: list[UrlString] = Field(default_factory=list)
+    evidence_urls_by_category: UrlsByCategory = Field(default_factory=UrlsByCategory)
 
 
 class SelectedPriorityUrls(WebResearchModel):
-    priority_urls_by_category: UrlsByCategory = Field(default_factory=UrlsByCategory)
+    evidence_urls_by_category: UrlsByCategory = Field(default_factory=UrlsByCategory)
     selection_rationale: list[str] = Field(default_factory=list)
     rejected_patterns: list[str] = Field(default_factory=list)
 
@@ -87,18 +85,13 @@ class ExtractedClaim(WebResearchModel):
 class ClaimExtraction(WebResearchModel):
     claims: list[ExtractedClaim] = Field(default_factory=list)
     unknowns: list[str] = Field(default_factory=list)
-    release_activity: ChangelogObservations | None = None
 
 
 class EvidenceResearch(WebResearchModel):
     claim_assessments: list[ClaimAssessment] = Field(default_factory=list)
-    evidence_gaps: list[str] = Field(default_factory=list)
+    evidence_gaps: list[CategorizedGap] = Field(default_factory=list)
     source_urls: list[UrlString] = Field(default_factory=list)
-
-
-class CompetitorMapping(WebResearchModel):
-    competitors: list[CompetitorAssessment] = Field(default_factory=list)
-    comparison_summary: str = Field(min_length=1)
+    release_activity: ChangelogObservations | None = None
 
 
 class UnresolvedClaim(WebResearchModel):
@@ -119,7 +112,7 @@ class TechnicalSubstanceReview(WebResearchModel):
 class DiligenceGapResearch(WebResearchModel):
     summary: str = Field(min_length=1)
     additional_claim_assessments: list[ClaimAssessment] = Field(default_factory=list)
-    additional_evidence_gaps: list[str] = Field(default_factory=list)
+    additional_evidence_gaps: list[CategorizedGap] = Field(default_factory=list)
     source_urls: list[UrlString] = Field(default_factory=list)
 
 

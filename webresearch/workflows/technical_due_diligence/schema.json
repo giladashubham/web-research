@@ -3,13 +3,17 @@
     "ChangelogObservations": {
       "additionalProperties": false,
       "properties": {
-        "source_urls": {
-          "items": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "title": "Source Urls",
-          "type": "array"
+        "cadence_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cadence Description"
         },
         "last_release_date": {
           "anyOf": [
@@ -23,6 +27,13 @@
           "default": null,
           "title": "Last Release Date"
         },
+        "notable_releases": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notable Releases",
+          "type": "array"
+        },
         "releases_last_12_months": {
           "anyOf": [
             {
@@ -35,14 +46,38 @@
           "default": null,
           "title": "Releases Last 12 Months"
         },
-        "notable_releases": {
+        "source_urls": {
           "items": {
+            "minLength": 1,
             "type": "string"
           },
-          "title": "Notable Releases",
+          "title": "Source Urls",
           "type": "array"
+        }
+      },
+      "title": "ChangelogObservations",
+      "type": "object"
+    },
+    "ClaimAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "assessment": {
+          "enum": [
+            "supported",
+            "partially_supported",
+            "unsupported",
+            "unclear",
+            "contradicted"
+          ],
+          "title": "Assessment",
+          "type": "string"
         },
-        "cadence_description": {
+        "claim": {
+          "minLength": 1,
+          "title": "Claim",
+          "type": "string"
+        },
+        "claim_id": {
           "anyOf": [
             {
               "type": "string"
@@ -52,19 +87,7 @@
             }
           ],
           "default": null,
-          "title": "Cadence Description"
-        }
-      },
-      "title": "ChangelogObservations",
-      "type": "object"
-    },
-    "ClaimAssessment": {
-      "additionalProperties": false,
-      "properties": {
-        "claim": {
-          "minLength": 1,
-          "title": "Claim",
-          "type": "string"
+          "title": "Claim Id"
         },
         "claim_source_urls": {
           "items": {
@@ -74,28 +97,12 @@
           "title": "Claim Source Urls",
           "type": "array"
         },
-        "public_evidence": {
-          "minLength": 1,
-          "title": "Public Evidence",
-          "type": "string"
-        },
-        "evidence_source_urls": {
+        "code_review_follow_up_ids": {
           "items": {
-            "minLength": 1,
             "type": "string"
           },
-          "title": "Evidence Source Urls",
+          "title": "Code Review Follow Up Ids",
           "type": "array"
-        },
-        "assessment": {
-          "enum": [
-            "supported",
-            "partially_supported",
-            "unsupported",
-            "unclear"
-          ],
-          "title": "Assessment",
-          "type": "string"
         },
         "confidence": {
           "enum": [
@@ -106,12 +113,18 @@
           "title": "Confidence",
           "type": "string"
         },
-        "code_review_follow_up_ids": {
+        "evidence_source_urls": {
           "items": {
+            "minLength": 1,
             "type": "string"
           },
-          "title": "Code Review Follow Up Ids",
+          "title": "Evidence Source Urls",
           "type": "array"
+        },
+        "public_evidence": {
+          "minLength": 1,
+          "title": "Public Evidence",
+          "type": "string"
         }
       },
       "required": [
@@ -126,19 +139,9 @@
     "CodeReviewFollowUp": {
       "additionalProperties": false,
       "properties": {
-        "id": {
-          "minLength": 1,
-          "title": "Id",
-          "type": "string"
-        },
         "area": {
           "minLength": 1,
           "title": "Area",
-          "type": "string"
-        },
-        "question": {
-          "minLength": 1,
-          "title": "Question",
           "type": "string"
         },
         "expected_evidence": {
@@ -148,6 +151,11 @@
           "title": "Expected Evidence",
           "type": "array"
         },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
         "priority": {
           "enum": [
             "low",
@@ -155,6 +163,11 @@
             "high"
           ],
           "title": "Priority",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
           "type": "string"
         }
       },
@@ -167,55 +180,6 @@
       "title": "CodeReviewFollowUp",
       "type": "object"
     },
-    "CompetitorAssessment": {
-      "additionalProperties": false,
-      "properties": {
-        "competitor_name": {
-          "minLength": 1,
-          "title": "Competitor Name",
-          "type": "string"
-        },
-        "competitor_url": {
-          "anyOf": [
-            {
-              "minLength": 1,
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Competitor Url"
-        },
-        "similar_capabilities": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Similar Capabilities",
-          "type": "array"
-        },
-        "differentiation_notes": {
-          "minLength": 1,
-          "title": "Differentiation Notes",
-          "type": "string"
-        },
-        "source_urls": {
-          "items": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "title": "Source Urls",
-          "type": "array"
-        }
-      },
-      "required": [
-        "competitor_name",
-        "differentiation_notes"
-      ],
-      "title": "CompetitorAssessment",
-      "type": "object"
-    },
     "DiligenceTarget": {
       "additionalProperties": false,
       "properties": {
@@ -223,6 +187,26 @@
           "minLength": 1,
           "title": "Company Name",
           "type": "string"
+        },
+        "evaluation_prompt": {
+          "minLength": 1,
+          "title": "Evaluation Prompt",
+          "type": "string"
+        },
+        "known_competitors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Known Competitors",
+          "type": "array"
+        },
+        "known_urls": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Known Urls",
+          "type": "array"
         },
         "product_name": {
           "anyOf": [
@@ -248,26 +232,6 @@
           ],
           "default": null,
           "title": "Product Url"
-        },
-        "known_urls": {
-          "items": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "title": "Known Urls",
-          "type": "array"
-        },
-        "known_competitors": {
-          "items": {
-            "type": "string"
-          },
-          "title": "Known Competitors",
-          "type": "array"
-        },
-        "evaluation_prompt": {
-          "minLength": 1,
-          "title": "Evaluation Prompt",
-          "type": "string"
         }
       },
       "required": [
@@ -280,32 +244,11 @@
   },
   "additionalProperties": false,
   "properties": {
-    "target": {
-      "$ref": "#/$defs/DiligenceTarget"
-    },
     "claims": {
       "items": {
         "$ref": "#/$defs/ClaimAssessment"
       },
       "title": "Claims",
-      "type": "array"
-    },
-    "release_activity": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/ChangelogObservations"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null
-    },
-    "competitors": {
-      "items": {
-        "$ref": "#/$defs/CompetitorAssessment"
-      },
-      "title": "Competitors",
       "type": "array"
     },
     "code_review_follow_ups": {
@@ -322,6 +265,17 @@
       "title": "Evidence Gaps",
       "type": "array"
     },
+    "release_activity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ChangelogObservations"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
     "source_urls": {
       "items": {
         "minLength": 1,
@@ -329,6 +283,9 @@
       },
       "title": "Source Urls",
       "type": "array"
+    },
+    "target": {
+      "$ref": "#/$defs/DiligenceTarget"
     }
   },
   "required": [

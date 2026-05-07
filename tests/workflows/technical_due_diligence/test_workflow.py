@@ -11,7 +11,6 @@ from webresearch.types import Depth, UrlsByCategory, WorkflowInput
 from webresearch.workflows.registry import WORKFLOWS
 from webresearch.workflows.technical_due_diligence import (
     ClaimExtraction,
-    CompetitorMapping,
     DiligenceGapResearch,
     EvidenceResearch,
     FinalMemoOutput,
@@ -24,7 +23,6 @@ from webresearch.workflows.technical_due_diligence import (
 from webresearch.workflows.technical_due_diligence.workflow import (
     _validated_priority_urls,
     claim_extractor_agent,
-    competitor_mapper_agent,
     evidence_researcher_agent,
     final_memo_agent,
     gap_researcher_agent,
@@ -55,7 +53,6 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
     final_report["release_activity"] = None
     target = report["target"]
     claim = report["claims"][0]
-    competitor = report["competitors"][0]
 
     monkeypatch.setattr(
         f"{WORKFLOW_MODULE}.intake_planner_agent",
@@ -66,8 +63,8 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                 "target": target,
                 "research_questions": ["What is public evidence vs inference?"],
                 "likely_claim_areas": ["technical substance"],
-                "competitor_names": ["Competitor One"],
-                "priority_urls_by_category": {
+                "claim_source_urls": [],
+                "evidence_urls_by_category": {
                     "docs": [
                         "https://example.com/docs",
                         "https://example.com/docs/deep-installation",
@@ -77,7 +74,6 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                         "https://example.com/changelog",
                         "https://example.com/changelog/v1",
                     ],
-                    "pricing": [],
                     "security": [],
                     "customers": [],
                     "blog": [],
@@ -93,11 +89,10 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             "url_selector",
             SelectedPriorityUrls,
             {
-                "priority_urls_by_category": {
+                "evidence_urls_by_category": {
                     "docs": ["https://example.com/docs"],
                     "api": [],
                     "changelog": ["https://example.com/changelog"],
-                    "pricing": [],
                     "security": [],
                     "customers": [],
                     "blog": [],
@@ -125,13 +120,6 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
                     }
                 ],
                 "unknowns": ["Implementation details are not public."],
-                "release_activity": {
-                    "source_urls": ["https://example.com/changelog"],
-                    "last_release_date": "2025-03-28",
-                    "releases_last_12_months": 24,
-                    "notable_releases": ["v2.1: added webhook support"],
-                    "cadence_description": "approximately bi-weekly",
-                },
             },
         ),
     )
@@ -142,19 +130,15 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             EvidenceResearch,
             {
                 "claim_assessments": [claim],
-                "evidence_gaps": ["No benchmark evidence."],
+                "evidence_gaps": [
+                    {
+                        "claim_id": "claim_1",
+                        "gap_type": "documentation_gap",
+                        "description": "No benchmark evidence.",
+                    }
+                ],
                 "source_urls": report["source_urls"],
-            },
-        ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.competitor_mapper_agent",
-        lambda: _agent(
-            "competitors",
-            CompetitorMapping,
-            {
-                "competitors": [competitor],
-                "comparison_summary": "Public competitor capabilities overlap.",
+                "release_activity": None,
             },
         ),
     )
@@ -194,7 +178,13 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
             {
                 "summary": "Public gap research found no proprietary architecture proof.",
                 "additional_claim_assessments": [],
-                "additional_evidence_gaps": ["Architecture remains private."],
+                "additional_evidence_gaps": [
+                    {
+                        "claim_id": "claim_1",
+                        "gap_type": "documentation_gap",
+                        "description": "Architecture remains private.",
+                    }
+                ],
                 "source_urls": ["https://example.com/docs"],
             },
         ),
@@ -296,7 +286,7 @@ async def test_url_selection_guardrails_reject_unknown_urls_and_fill_minimum_cov
         security=["https://example.com/security"],
     )
     selected = SelectedPriorityUrls(
-        priority_urls_by_category=UrlsByCategory(
+        evidence_urls_by_category=UrlsByCategory(
             docs=[
                 "https://example.com/docs/architecture",
                 "https://attacker.example/docs",
@@ -318,7 +308,7 @@ async def test_url_selection_guardrails_enforce_category_budgets() -> None:
         docs=[f"https://example.com/docs/page-{index}" for index in range(12)],
         changelog=[f"https://example.com/release-notes/v{index}" for index in range(8)],
     )
-    selected = SelectedPriorityUrls(priority_urls_by_category=candidates)
+    selected = SelectedPriorityUrls(evidence_urls_by_category=candidates)
 
     guarded = _validated_priority_urls(candidates, selected)
 
@@ -332,7 +322,6 @@ def test_diligence_agents_disable_openai_response_storage() -> None:
         url_selector_agent(),
         claim_extractor_agent(),
         evidence_researcher_agent(),
-        competitor_mapper_agent(),
         technical_substance_reviewer_agent(),
         gap_researcher_agent(),
         final_memo_agent(),

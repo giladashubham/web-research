@@ -42,20 +42,7 @@
     ],
     "cadence_description": "approximately bi-weekly releases over the past 12 months"
   },
-  "competitors": [
-    {
-      "competitor_name": "Competitor One",
-      "competitor_url": "https://competitor.example/",
-      "similar_capabilities": [
-        "Workflow planning",
-        "API integrations"
-      ],
-      "differentiation_notes": "The public capability set overlaps materially; differentiation depends on implementation quality.",
-      "source_urls": [
-        "https://competitor.example/"
-      ]
-    }
-  ],
+
   "code_review_follow_ups": [
     {
       "id": "cr-1",

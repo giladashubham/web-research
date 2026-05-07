@@ -31,7 +31,6 @@ from webresearch.types import (
 from webresearch.workflows.shared.prompt_loader import load_workflow_prompt
 from webresearch.workflows.technical_due_diligence.models import (
     ClaimExtraction,
-    CompetitorMapping,
     DiligenceGapResearch,
     EvidenceResearch,
     FinalMemoOutput,
@@ -55,7 +54,6 @@ _URL_CATEGORIES = (
     "docs",
     "api",
     "changelog",
-    "pricing",
     "security",
     "customers",
     "blog",
@@ -66,7 +64,6 @@ _URL_SELECTION_BUDGETS = {
     "docs": 8,
     "api": 5,
     "changelog": 5,
-    "pricing": 3,
     "security": 4,
     "customers": 3,
     "blog": 3,
@@ -111,15 +108,6 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
         )
         evidence = cast("EvidenceResearch", evidence_result.final_output)
 
-    async with step("competitor_mapper"):
-        competitor_result = await Runner.run(
-            competitor_mapper_agent(),
-            _stage_prompt(input, plan=plan, claims=claims, evidence=evidence),
-            context=ctx,
-            max_turns=_RESEARCH_MAX_TURNS,
-        )
-        competitors = cast("CompetitorMapping", competitor_result.final_output)
-
     async with step("technical_substance_reviewer"):
         review_result = await Runner.run(
             technical_substance_reviewer_agent(),
@@ -128,7 +116,6 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                 plan=plan,
                 claims=claims,
                 evidence=evidence,
-                competitors=competitors,
                 pages_read_by_domain=_pages_by_domain(ctx),
             ),
             context=ctx,
@@ -149,7 +136,6 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                     plan=plan,
                     claims=claims,
                     evidence=evidence,
-                    competitors=competitors,
                     review=review,
                     gaps=gap_results,
                     unread_high_value_urls=unread_high_value,
@@ -158,9 +144,6 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                 max_turns=_RESEARCH_MAX_TURNS,
             )
             gap_results.append(cast("DiligenceGapResearch", gap_result.final_output))
-            # Re-evaluate which claims are still unresolved. If the gap researcher
-            # produced no new assessments at all, stop early — further rounds won't
-            # help and we've hit a public-evidence ceiling.
             previous_unresolved_count = len(review.unresolved_claims)
             review = _merge_gap_into_review(review, gap_results[-1])
             if (
@@ -177,18 +160,17 @@ async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:
                 plan=plan,
                 claims=claims,
                 evidence=evidence,
-                competitors=competitors,
                 review=review,
                 gaps=gap_results,
             ),
             context=ctx,
         )
         final = cast("FinalMemoOutput", final_result.final_output)
-        if claims.release_activity is not None and final.report.release_activity is None:
+        if evidence.release_activity is not None and final.report.release_activity is None:
             final = final.model_copy(
                 update={
                     "report": final.report.model_copy(
-                        update={"release_activity": claims.release_activity}
+                        update={"release_activity": evidence.release_activity}
                     )
                 }
             )
@@ -260,16 +242,6 @@ def evidence_researcher_agent() -> Agent:
         model_settings=no_store_model_settings(),
         tools=list(RESEARCH_TOOLS),
         output_type=EvidenceResearch,
-    )
-
-
-def competitor_mapper_agent() -> Agent:
-    return Agent(
-        name="Technical Diligence Competitor Mapper",
-        instructions=load_workflow_prompt(WORKFLOW_ID, "competitor_mapper.md"),
-        model_settings=no_store_model_settings(),
-        tools=list(RESEARCH_TOOLS),
-        output_type=CompetitorMapping,
     )
 
 
@@ -348,7 +320,6 @@ def _all_priority_urls(cat: UrlsByCategory) -> list[str]:
         cat.docs
         + cat.api
         + cat.changelog
-        + cat.pricing
         + cat.security
         + cat.customers
         + cat.blog
@@ -362,7 +333,7 @@ async def _run_url_selector(
     ctx: WorkflowContext,
     plan: IntakePlan,
 ) -> IntakePlan:
-    candidate_urls = plan.priority_urls_by_category
+    candidate_urls = plan.evidence_urls_by_category
     if not _all_priority_urls(candidate_urls):
         return plan
 
@@ -374,7 +345,7 @@ async def _run_url_selector(
                     input,
                     target=plan.target,
                     research_questions=plan.research_questions,
-                    candidate_urls_by_category=candidate_urls,
+                    evidence_urls_by_category=candidate_urls,
                     budgets=_URL_SELECTION_BUDGETS,
                 ),
                 context=ctx,
@@ -384,7 +355,7 @@ async def _run_url_selector(
         except Exception as exc:
             ctx.warnings.append(f"url_selector failed; using deterministic URL selection: {exc}")
             priority_urls = _fallback_priority_urls(candidate_urls)
-    return plan.model_copy(update={"priority_urls_by_category": priority_urls})
+    return plan.model_copy(update={"evidence_urls_by_category": priority_urls})
 
 
 def _urls_for_category(cat: UrlsByCategory, category: str) -> list[str]:
@@ -419,7 +390,7 @@ def _validated_priority_urls(
 ) -> UrlsByCategory:
     fallback = _fallback_priority_urls(candidate_urls)
     candidates_by_category = _urls_by_category(candidate_urls)
-    selected_by_category = _urls_by_category(selected.priority_urls_by_category)
+    selected_by_category = _urls_by_category(selected.evidence_urls_by_category)
     updates: dict[str, list[str]] = {}
 
     for category in _URL_CATEGORIES:
@@ -454,10 +425,10 @@ def _validated_priority_urls(
 def _unread_high_value_urls(plan: IntakePlan, ctx: WorkflowContext) -> list[str]:
     fetched = set(ctx.pages.keys())
     high_value = (
-        plan.priority_urls_by_category.docs
-        + plan.priority_urls_by_category.api
-        + plan.priority_urls_by_category.changelog
-        + plan.priority_urls_by_category.security
+        plan.evidence_urls_by_category.docs
+        + plan.evidence_urls_by_category.api
+        + plan.evidence_urls_by_category.changelog
+        + plan.evidence_urls_by_category.security
     )
     return [u for u in high_value if u not in fetched]
 
@@ -466,10 +437,18 @@ def _merge_gap_into_review(
     review: TechnicalSubstanceReview,
     gap: DiligenceGapResearch,
 ) -> TechnicalSubstanceReview:
-    resolved_claim_ids = {
-        a.claim for a in gap.additional_claim_assessments if a.assessment != "unclear"
-    }
-    remaining = [c for c in review.unresolved_claims if c.claim_text not in resolved_claim_ids]
+    resolved_by_id: set[str] = set()
+    resolved_by_text: set[str] = set()
+    for a in gap.additional_claim_assessments:
+        if a.assessment in ("supported", "partially_supported", "unsupported", "contradicted"):
+            if a.claim_id is not None:
+                resolved_by_id.add(a.claim_id)
+            else:
+                resolved_by_text.add(a.claim)
+    remaining = [
+        c for c in review.unresolved_claims
+        if c.claim_id not in resolved_by_id and c.claim_text not in resolved_by_text
+    ]
     return review.model_copy(update={"unresolved_claims": remaining})
 
 

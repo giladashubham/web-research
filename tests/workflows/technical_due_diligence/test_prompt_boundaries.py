@@ -10,7 +10,6 @@ def test_diligence_prompts_label_evidence_inference_and_unknowns() -> None:
         "url_selector.md",
         "claim_extractor.md",
         "evidence_researcher.md",
-        "competitor_mapper.md",
         "technical_substance_reviewer.md",
         "gap_researcher.md",
         "final_memo.md",

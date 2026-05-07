@@ -1,10 +1,9 @@
 from webresearch.workflows.technical_due_diligence.models import (
+    CategorizedGap,
     ChangelogObservations,
     ClaimAssessment,
     ClaimExtraction,
     CodeReviewFollowUp,
-    CompetitorAssessment,
-    CompetitorMapping,
     DiligenceFinding,
     DiligenceGapResearch,
     DiligenceTarget,
@@ -20,12 +19,11 @@ from webresearch.workflows.technical_due_diligence.models import (
 from webresearch.workflows.technical_due_diligence.workflow import run_technical_due_diligence
 
 __all__ = [
+    "CategorizedGap",
     "ChangelogObservations",
     "ClaimAssessment",
     "ClaimExtraction",
     "CodeReviewFollowUp",
-    "CompetitorAssessment",
-    "CompetitorMapping",
     "DiligenceFinding",
     "DiligenceGapResearch",
     "DiligenceTarget",
