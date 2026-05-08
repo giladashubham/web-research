@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from webresearch.sources.registry import SourceRegistry
-from webresearch.tools.providers.mock import MockSearchProvider
-from webresearch.tools.providers.tavily import TavilySearchProvider
 
 if TYPE_CHECKING:
-    from webresearch.tools.providers.search_provider import SearchProvider
-    from webresearch.tools.search_web import SearchResults
     from webresearch.types import Artifact, EvidenceNote
 
 
@@ -22,18 +17,13 @@ class FetchedPage:
     truncated: bool = False
 
 
-def default_search_provider() -> SearchProvider:
-    if os.getenv("TAVILY_API_KEY"):
-        return TavilySearchProvider()
-    return MockSearchProvider()
-
-
 @dataclass
 class WorkflowContext:
-    search_provider: SearchProvider = field(default_factory=default_search_provider)
     sources: SourceRegistry = field(default_factory=SourceRegistry)
     pages: dict[str, FetchedPage] = field(default_factory=dict)
     evidence: list[EvidenceNote] = field(default_factory=list)
     artifacts: list[Artifact] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
-    search_query_cache: dict[str, SearchResults] = field(default_factory=dict)
+    cost_usd: float = 0.0
+    input_tokens: int = 0
+    output_tokens: int = 0

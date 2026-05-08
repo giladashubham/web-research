@@ -10,14 +10,14 @@ from webresearch.cli.progress import ProgressRenderer
 from webresearch.events.stream import stream_workflow
 from webresearch.events.types import WorkflowFailed
 from webresearch.types import Depth, WorkflowInput, WorkflowResult
-from webresearch.workflows.registry import WORKFLOWS
+from webresearch.workflows import load_workflows
 
 OutputFormat = Literal["json", "md"]
 
 
 def run_command(  # noqa: PLR0913
     query: Annotated[str, typer.Argument(help="Research query.")],
-    workflow: Annotated[str, typer.Argument(help="Workflow id.")] = "standard",
+    workflow: Annotated[str, typer.Argument(help="Workflow id.")] = "deep",
     depth: Annotated[str, typer.Option("--depth", help="Depth preset.")] = "standard",
     instructions: Annotated[str | None, typer.Option("--instructions")] = None,
     max_sources: Annotated[int | None, typer.Option("--max-sources")] = None,
@@ -61,7 +61,7 @@ async def _run(  # noqa: PLR0913
     max_sources: int | None,
     quiet: bool,
 ) -> WorkflowResult:
-    workflow_fn = WORKFLOWS[workflow]
+    workflow_fn = load_workflows()[workflow]
     workflow_input = WorkflowInput(
         query=query,
         depth=Depth.for_preset(depth),

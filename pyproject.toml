@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "defusedxml>=0.7.1",
     "httpx>=0.28.1",
+    "jinja2>=3.1.0",
     "jsonschema>=4.26.0",
     "openai-agents==0.6.1",
     "pydantic>=2.12.5",
@@ -17,6 +18,10 @@ dependencies = [
 
 [project.scripts]
 webresearch = "webresearch.cli:app"
+
+[project.entry-points."webresearch.workflows"]
+deep = "webresearch.workflows.deep.workflow:run_deep"
+technical_due_diligence = "webresearch.workflows.technical_due_diligence.workflow:run_technical_due_diligence"
 
 [dependency-groups]
 dev = [
@@ -84,74 +89,40 @@ disallow_any_explicit = true
 
 [[tool.mypy.overrides]]
 module = "webresearch.types"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.providers.search_provider"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.search_web"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.fetch_url"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.fetch_and_extract"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.discover_urls"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.extract_content"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.tools.rank_sources"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.agents.models"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
 module = "webresearch.events.types"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
 module = "webresearch.workflows.technical_due_diligence.models"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.workflows.registry"
-# Pydantic BaseModel internals currently trip explicit-any on every model subclass.
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
 module = [
-    "webresearch.agents.gap",
-    "webresearch.agents.output",
-    "webresearch.agents.planner",
-    "webresearch.agents.researchers",
-    "webresearch.agents.reviewer",
+    "webresearch.pipeline",
+    "webresearch.pipeline.state",
+    "webresearch.pipeline.step",
+    "webresearch.pipeline.runtime",
+    "webresearch.pipeline.runner",
+    "webresearch.providers.search",
+    "webresearch.providers.fetch",
+    "webresearch.providers.extract",
+    "webresearch.providers.discover",
+    "webresearch.providers.services",
+    "webresearch.workflows",
+    "webresearch.workflows.deep.models",
+    "webresearch.workflows.deep.tools",
+    "webresearch.workflows.deep.agents",
+    "webresearch.workflows.deep.pipeline",
+    "webresearch.workflows.deep.workflow",
+    "webresearch.workflows.technical_due_diligence.agents",
+    "webresearch.workflows.technical_due_diligence.pipeline",
+    "webresearch.workflows.technical_due_diligence.tools",
     "webresearch.workflows.technical_due_diligence.workflow",
+    "webresearch.cli.run_cmd",
 ]
-# The Agents SDK exposes Agent with Any-bearing generic defaults.
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]

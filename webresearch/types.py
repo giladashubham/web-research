@@ -168,18 +168,6 @@ WorkflowArtifact = Annotated[
 ]
 
 
-class UrlsByCategory(WebResearchModel):
-    docs: list[str] = Field(default_factory=list)
-    api: list[str] = Field(default_factory=list)
-    changelog: list[str] = Field(default_factory=list)
-    pricing: list[str] = Field(default_factory=list)
-    security: list[str] = Field(default_factory=list)
-    customers: list[str] = Field(default_factory=list)
-    blog: list[str] = Field(default_factory=list)
-    careers: list[str] = Field(default_factory=list)
-    other: list[str] = Field(default_factory=list)
-
-
 class WorkflowResult(WebResearchModel):
     answer_markdown: str
     structured_data: dict[str, object] | None = None

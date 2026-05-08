@@ -41,8 +41,6 @@ async def step(name: str) -> AsyncIterator[None]:
     except Exception as exc:
         await emit_event(StepFailed(run_id=current_run_id(), step=name, error=str(exc)))
         raise
-    else:
-        await emit_event(StepCompleted(run_id=current_run_id(), step=name))
     finally:
         _active_step.reset(token)
 
@@ -72,3 +70,20 @@ async def emit_step_skipped(name: str, reason: str) -> None:
 async def emit_output_text_delta(delta: str) -> None:
     if current_step() == "output" and delta:
         await emit_event(OutputTextDelta(run_id=current_run_id(), delta=delta))
+
+
+async def emit_step_completed(
+    name: str,
+    cost_usd: float | None = None,
+    input_tokens: int | None = None,
+    output_tokens: int | None = None,
+) -> None:
+    await emit_event(
+        StepCompleted(
+            run_id=current_run_id(),
+            step=name,
+            cost_usd=cost_usd,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+        )
+    )

@@ -4,7 +4,8 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from webresearch.types import UrlsByCategory, WebResearchModel
+from webresearch.providers.discover import UrlsByCategory
+from webresearch.types import WebResearchModel
 
 UrlString = Annotated[str, Field(min_length=1)]
 

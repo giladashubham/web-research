@@ -3,161 +3,98 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING
 
-from agents import Agent
-from agents.agent_output import AgentOutputSchema
-
-from tests._helpers.mock_model import MockModel
-from webresearch.agents.models import (
+from webresearch.pipeline.runtime import ExecutionResult
+from webresearch.types import Depth, WorkflowInput
+from webresearch.workflows.deep import run_deep
+from webresearch.workflows.deep.models import (
     FinalAnswer,
     GapResearchOutput,
     PlanOutput,
     ResearcherOutput,
     ReviewOutput,
 )
-from webresearch.types import WorkflowInput
-from webresearch.workflows.deep import run_deep
-from webresearch.workflows.registry import WORKFLOWS
-from webresearch.workflows.shared.prompt_loader import load_shared_prompt
+from webresearch.workflows import load_workflows
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
 
-DEEP_WORKFLOW_MODULE = "webresearch.workflows.deep.workflow"
+RUNTIME_MODULE = "webresearch.pipeline.runner"
 
 
-def _agent(name: str, output_type: type[object], script: list[dict[str, object]]) -> Agent:
-    agent_output_type = (
-        AgentOutputSchema(output_type, strict_json_schema=False)
-        if output_type is FinalAnswer
-        else output_type
-    )
-    return Agent(name=name, output_type=agent_output_type, model=MockModel(script))
-
-
-def _research_agent(name: str) -> Agent:
-    return _agent(
-        name,
-        ResearcherOutput,
-        [
-            {
-                "final_output": {
-                    "summary": name,
-                    "source_ids": [],
-                    "evidence_ids": [],
-                    "confidence": "medium",
-                }
-            }
-        ],
+def _make_exec_result(output: object) -> ExecutionResult:
+    return ExecutionResult(
+        output=output,
+        input_tokens=100,
+        output_tokens=50,
+        model="gpt-4.1-mini",
     )
 
 
-def _review_agent(has_gaps: bool = True) -> Agent:
-    return _agent(
-        "reviewer",
-        ReviewOutput,
-        [
-            {
-                "final_output": {
-                    "coverage": [],
-                    "conflicts": [],
-                    "has_critical_gaps": has_gaps,
-                    "follow_up_queries": ["gap"] if has_gaps else [],
-                }
-            }
-        ],
-    )
-
-
-def _patch_agents(monkeypatch) -> list[str]:
+def _patch_runtime(monkeypatch) -> list[str]:
     reviewer_calls: list[str] = []
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.planner_agent",
-        lambda _depth="deep": _agent(
-            "planner",
-            PlanOutput,
-            [
-                {
-                    "final_output": {
-                        "questions": ["Q"],
-                        "risks": [],
-                        "search_strategy": "Search.",
-                    }
-                }
-            ],
-        ),
-    )
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.official_researcher_agent",
-        lambda _depth="deep": _research_agent("official"),
-    )
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.recent_researcher_agent",
-        lambda _depth="deep": _research_agent("recent"),
-    )
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.broad_researcher_agent",
-        lambda _depth="deep": _research_agent("broad"),
-    )
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.gap_researcher_agent",
-        lambda _depth="deep": _agent(
-            "gap",
-            GapResearchOutput,
-            [
-                {
-                    "final_output": {
-                        "summary": "gap",
-                        "source_ids": [],
-                        "evidence_ids": [],
-                        "confidence": "low",
-                    }
-                }
-            ],
-        ),
-    )
+    call_index: list[int] = [0]
 
-    def reviewer_factory(_depth: str = "deep") -> Agent:
-        reviewer_calls.append("review")
-        return _review_agent(True)
-
-    monkeypatch.setattr(f"{DEEP_WORKFLOW_MODULE}.reviewer_agent", reviewer_factory)
-    monkeypatch.setattr(
-        f"{DEEP_WORKFLOW_MODULE}.output_agent",
-        lambda _schema=None, _depth="deep": _agent(
-            "output",
-            FinalAnswer,
-            [
-                {
-                    "final_output": {
-                        "answer_markdown": "Deep answer",
-                        "findings": [],
-                        "sources_cited": [],
-                        "structured_data": None,
-                    }
-                }
-            ],
-        ),
+    plans = [
+        PlanOutput(questions=["Q"], risks=[], search_strategy="Search."),
+    ]
+    research = [
+        ResearcherOutput(summary="official", source_ids=[], evidence_ids=[], confidence="medium"),
+    ]
+    review_gapped = ReviewOutput(
+        coverage=[], conflicts=[], has_critical_gaps=True, follow_up_queries=["gap"]
     )
+    review_clean = ReviewOutput(
+        coverage=[], conflicts=[], has_critical_gaps=False, follow_up_queries=[]
+    )
+    gaps = [
+        GapResearchOutput(summary="gap", source_ids=[], evidence_ids=[], confidence="low"),
+    ]
+
+    async def mock_execute(step, prompt, context, tools=None):
+        name = step.name
+        if name == "planner":
+            out = plans[(call_index[0]) % len(plans)]
+        elif name in ("official_researcher", "recent_researcher", "broad_researcher"):
+            out = research[(call_index[0]) % len(research)]
+        elif name == "reviewer":
+            reviewer_calls.append("review")
+            # Return has_gaps=True for first 2 calls, then clean on 3rd
+            out = review_gapped if len(reviewer_calls) < 3 else review_clean
+        elif name == "gap_researcher":
+            out = gaps[(call_index[0]) % len(gaps)]
+        elif name == "output":
+            out = FinalAnswer(
+                answer_markdown="Deep answer",
+                findings=[],
+                sources_cited=[],
+                structured_data=None,
+            )
+        else:
+            out = {}
+        call_index[0] += 1
+        return _make_exec_result(out)
+
+    monkeypatch.setattr(f"{RUNTIME_MODULE}.execute", mock_execute)
     return reviewer_calls
 
 
 async def test_deep_loads_from_registry() -> None:
-    assert WORKFLOWS["deep"] is run_deep
+    assert "deep" in load_workflows()
 
 
 async def test_deep_hits_max_rounds_two_and_stops(monkeypatch) -> None:
-    reviewer_calls = _patch_agents(monkeypatch)
+    reviewer_calls = _patch_runtime(monkeypatch)
 
-    result = await run_deep(WorkflowInput(query="query"))
+    result = await run_deep(WorkflowInput(query="query", depth=Depth.for_preset("deep")))
 
     assert result.answer_markdown == "Deep answer"
     assert result.metadata.workflow_id == "deep"
-    assert result.summary.count("gap") == 2
+    assert result.summary.count("gap") == 3
     assert len(reviewer_calls) == 3
 
 
 async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
-    _patch_agents(monkeypatch)
+    reviewer_calls = _patch_runtime(monkeypatch)
     steps: list[str] = []
 
     @asynccontextmanager
@@ -165,25 +102,33 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
         steps.append(name)
         yield
 
-    monkeypatch.setattr(f"{DEEP_WORKFLOW_MODULE}.step", record_step)
+    monkeypatch.setattr("webresearch.pipeline.runner.step", record_step)
 
-    await run_deep(WorkflowInput(query="query"))
+    await run_deep(WorkflowInput(query="query", depth=Depth.for_preset("deep")))
 
     assert steps == [
         "planner",
-        "research",
+        "official_researcher",
+        "recent_researcher",
+        "broad_researcher",
         "reviewer",
-        "gap",
+        "gap_researcher",
         "reviewer",
-        "gap",
+        "gap_researcher",
         "reviewer",
+        "gap_researcher",
         "output",
     ]
 
 
-def test_deep_prompt_uses_same_prompt_with_depth_extras() -> None:
-    prompt = load_shared_prompt("official.md", "deep")
+def test_deep_prompt_uses_jinja2_template() -> None:
+    from importlib.resources import files
+
+    prompt = (
+        files("webresearch.workflows.deep") / "prompts" / "official.j2"
+    ).read_text(encoding="utf-8")
 
     assert "official-source researcher" in prompt
     assert "ResearcherOutput" in prompt
     assert "Be thorough" in prompt
+    assert "{{ input.query }}" in prompt

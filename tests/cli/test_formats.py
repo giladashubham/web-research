@@ -2,32 +2,45 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from webresearch.agents.models import FinalAnswer
 from webresearch.cli.formats import format_result, write_output
 from webresearch.context import WorkflowContext
-from webresearch.types import SourceInput, WorkflowInput, WorkflowResult
-from webresearch.workflows.shared.result import build_result
-from webresearch.workflows.shared.state import WorkflowState
+from webresearch.types import (
+    ResearchFinding,
+    SourceInput,
+    SourceRecord,
+    TokenUsage,
+    WorkflowInput,
+    WorkflowMetadata,
+    WorkflowResult,
+)
 
 
 def _result() -> WorkflowResult:
     ctx = WorkflowContext()
     ctx.sources.add(SourceInput(url="https://example.com", title="Example"))
-    state = WorkflowState(
-        input=WorkflowInput(query="query"),
-        depth=WorkflowInput(query="query").depth,
-        run_id="run_1",
-        started_at=datetime(2026, 5, 4, tzinfo=UTC),
-        final=FinalAnswer(
-            answer_markdown="Answer",
-            findings=[],
-            sources_cited=["src_1"],
-            structured_data=None,
+    return WorkflowResult(
+        answer_markdown="Answer",
+        structured_data=None,
+        summary="Summary",
+        findings=[],
+        sources=[
+            SourceRecord(
+                id="src_1",
+                url="https://example.com",
+                title="Example",
+            ),
+        ],
+        evidence=[],
+        artifacts=[],
+        warnings=["warning"],
+        metadata=WorkflowMetadata(
+            run_id="run_1",
+            workflow_id="test",
+            started_at=datetime(2026, 5, 4, tzinfo=UTC),
+            finished_at=datetime.now(UTC),
+            tokens=TokenUsage(),
         ),
     )
-    result = build_result(state, ctx)
-    result.warnings.append("warning")
-    return result
 
 
 def test_json_output_round_trips() -> None:

@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 
 import typer
 
-from webresearch.workflows.registry import WorkflowEntry, workflow_entries
+from webresearch.workflows import WorkflowEntry, load_workflow_entries
 
 OutputFormat = Literal["table", "json"]
 
@@ -16,7 +16,7 @@ def list_workflows(
         typer.Option("--format", help="Output format."),
     ] = "table",
 ) -> None:
-    entries = workflow_entries()
+    entries = load_workflow_entries()
     if output_format == "json":
         typer.echo(json.dumps([entry.model_dump() for entry in entries], indent=2))
         return

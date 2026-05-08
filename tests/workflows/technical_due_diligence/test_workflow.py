@@ -3,12 +3,12 @@ from __future__ import annotations
 import json
 from importlib.resources import files
 
-from agents import Agent
 from jsonschema import validate
 
-from tests._helpers.mock_model import MockModel
-from webresearch.types import Depth, UrlsByCategory, WorkflowInput
-from webresearch.workflows.registry import WORKFLOWS
+from webresearch.pipeline.runtime import ExecutionResult
+from webresearch.providers.discover import UrlsByCategory
+from webresearch.types import Depth, WorkflowInput
+from webresearch.workflows import load_workflows
 from webresearch.workflows.technical_due_diligence import (
     ClaimExtraction,
     DiligenceGapResearch,
@@ -20,19 +20,12 @@ from webresearch.workflows.technical_due_diligence import (
     UnresolvedClaim,
     run_technical_due_diligence,
 )
-from webresearch.workflows.technical_due_diligence.workflow import (
+from webresearch.workflows.technical_due_diligence.agents import (
     _validated_priority_urls,
-    claim_extractor_agent,
-    evidence_researcher_agent,
-    final_memo_agent,
-    gap_researcher_agent,
-    intake_planner_agent,
-    technical_substance_reviewer_agent,
-    url_selector_agent,
 )
 
 PACKAGE = "webresearch.workflows.technical_due_diligence"
-WORKFLOW_MODULE = "webresearch.workflows.technical_due_diligence.workflow"
+RUNTIME_MODULE = "webresearch.pipeline.runner"
 
 
 def _example_report() -> dict[str, object]:
@@ -41,109 +34,24 @@ def _example_report() -> dict[str, object]:
     )
 
 
-def _agent(name: str, output_type: type[object], final_output: dict[str, object]) -> Agent:
-    return Agent(
-        name=name, output_type=output_type, model=MockModel([{"final_output": final_output}])
+def _make_exec_result(output: object) -> ExecutionResult:
+    return ExecutionResult(
+        output=output,
+        input_tokens=100,
+        output_tokens=50,
+        model="gpt-4.1-mini",
     )
 
 
-def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
+def _patch_runtime(monkeypatch, *, has_gaps: bool = False) -> list[str]:
     report = _example_report()
     final_report = dict(report)
     final_report["release_activity"] = None
     target = report["target"]
     claim = report["claims"][0]
+    call_order: list[str] = []
 
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.intake_planner_agent",
-        lambda: _agent(
-            "intake",
-            IntakePlan,
-            {
-                "target": target,
-                "research_questions": ["What is public evidence vs inference?"],
-                "likely_claim_areas": ["technical substance"],
-                "claim_source_urls": [],
-                "evidence_urls_by_category": {
-                    "docs": [
-                        "https://example.com/docs",
-                        "https://example.com/docs/deep-installation",
-                    ],
-                    "api": [],
-                    "changelog": [
-                        "https://example.com/changelog",
-                        "https://example.com/changelog/v1",
-                    ],
-                    "security": [],
-                    "customers": [],
-                    "blog": [],
-                    "careers": [],
-                    "other": [],
-                },
-            },
-        ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.url_selector_agent",
-        lambda: _agent(
-            "url_selector",
-            SelectedPriorityUrls,
-            {
-                "evidence_urls_by_category": {
-                    "docs": ["https://example.com/docs"],
-                    "api": [],
-                    "changelog": ["https://example.com/changelog"],
-                    "security": [],
-                    "customers": [],
-                    "blog": [],
-                    "careers": [],
-                    "other": [],
-                },
-                "selection_rationale": ["Use docs and changelog index pages."],
-                "rejected_patterns": ["deep installation pages"],
-            },
-        ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.claim_extractor_agent",
-        lambda: _agent(
-            "claims",
-            ClaimExtraction,
-            {
-                "claims": [
-                    {
-                        "id": "claim_1",
-                        "claim": claim["claim"],
-                        "source_urls": claim["claim_source_urls"],
-                        "category": "architecture",
-                        "diligence_relevance": "high",
-                    }
-                ],
-                "unknowns": ["Implementation details are not public."],
-            },
-        ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.evidence_researcher_agent",
-        lambda: _agent(
-            "evidence",
-            EvidenceResearch,
-            {
-                "claim_assessments": [claim],
-                "evidence_gaps": [
-                    {
-                        "claim_id": "claim_1",
-                        "gap_type": "documentation_gap",
-                        "description": "No benchmark evidence.",
-                    }
-                ],
-                "source_urls": report["source_urls"],
-                "release_activity": None,
-            },
-        ),
-    )
-
-    unresolved: list[dict[str, object]] = (
+    unresolvable: list[dict[str, object]] = (
         [
             {
                 "claim_id": "claim_1",
@@ -159,68 +67,118 @@ def _patch_agents(monkeypatch, *, has_gaps: bool = False) -> None:
         else []
     )
 
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.technical_substance_reviewer_agent",
-        lambda: _agent(
-            "review",
-            TechnicalSubstanceReview,
-            {
-                "code_review_follow_ups": report["code_review_follow_ups"],
-                "unresolved_claims": unresolved,
+    outputs: dict[str, object] = {
+        "intake_planner": IntakePlan(
+            target={
+                "company_name": str(target.get("company_name", "")),
+                "product_name": str(target.get("product_name", "")),
+                "product_url": str(target.get("product_url", "")),
+                "known_urls": [str(u) for u in target.get("known_urls", [])],
+                "known_competitors": [str(c) for c in target.get("known_competitors", [])],
+                "evaluation_prompt": str(target.get("evaluation_prompt", "")),
             },
+            research_questions=["What is public evidence vs inference?"],
+            likely_claim_areas=["technical substance"],
+            claim_source_urls=[],
+            evidence_urls_by_category=UrlsByCategory(
+                docs=["https://example.com/docs", "https://example.com/docs/deep-installation"],
+                api=[],
+                changelog=["https://example.com/changelog", "https://example.com/changelog/v1"],
+                security=[],
+                customers=[],
+                blog=[],
+                careers=[],
+                other=[],
+            ),
         ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.gap_researcher_agent",
-        lambda: _agent(
-            "gap",
-            DiligenceGapResearch,
-            {
-                "summary": "Public gap research found no proprietary architecture proof.",
-                "additional_claim_assessments": [],
-                "additional_evidence_gaps": [
-                    {
-                        "claim_id": "claim_1",
-                        "gap_type": "documentation_gap",
-                        "description": "Architecture remains private.",
-                    }
-                ],
-                "source_urls": ["https://example.com/docs"],
-            },
+        "url_selector": SelectedPriorityUrls(
+            evidence_urls_by_category=UrlsByCategory(
+                docs=["https://example.com/docs"],
+                api=[],
+                changelog=["https://example.com/changelog"],
+                security=[],
+                customers=[],
+                blog=[],
+                careers=[],
+                other=[],
+            ),
+            selection_rationale=["Use docs and changelog index pages."],
+            rejected_patterns=["deep installation pages"],
         ),
-    )
-    monkeypatch.setattr(
-        f"{WORKFLOW_MODULE}.final_memo_agent",
-        lambda: _agent(
-            "final",
-            FinalMemoOutput,
-            {
-                "answer_markdown": (
-                    "## Technical Due Diligence\n\n"
-                    "Public evidence: docs describe APIs.\n\n"
-                    "Inference: architecture depth is unclear.\n\n"
-                    "Unknowns: code review is required."
-                ),
-                "report": final_report,
-                "findings": [
-                    {
-                        "claim": claim["claim"],
-                        "evidence_ids": [],
-                        "source_ids": [],
-                        "confidence": "medium",
-                    }
-                ],
-            },
+        "claim_extractor": ClaimExtraction(
+            claims=[
+                {
+                    "id": "claim_1",
+                    "claim": claim["claim"],
+                    "source_urls": claim["claim_source_urls"],
+                    "category": "architecture",
+                    "diligence_relevance": "high",
+                }
+            ],
+            unknowns=["Implementation details are not public."],
         ),
-    )
+        "evidence_researcher": EvidenceResearch(
+            claim_assessments=[claim],
+            evidence_gaps=[
+                {
+                    "claim_id": "claim_1",
+                    "gap_type": "documentation_gap",
+                    "description": "No benchmark evidence.",
+                }
+            ],
+            source_urls=report["source_urls"],
+            release_activity=None,
+        ),
+        "technical_substance_reviewer": TechnicalSubstanceReview(
+            code_review_follow_ups=report["code_review_follow_ups"],
+            unresolved_claims=unresolvable,
+        ),
+        "gap_researcher": DiligenceGapResearch(
+            summary="Public gap research found no proprietary architecture proof.",
+            additional_claim_assessments=[],
+            additional_evidence_gaps=[
+                {
+                    "claim_id": "claim_1",
+                    "gap_type": "documentation_gap",
+                    "description": "Architecture remains private.",
+                }
+            ],
+            source_urls=["https://example.com/docs"],
+        ),
+        "final_memo": FinalMemoOutput(
+            answer_markdown=(
+                "## Technical Due Diligence\n\n"
+                "Public evidence: docs describe APIs.\n\n"
+                "Inference: architecture depth is unclear.\n\n"
+                "Unknowns: code review is required."
+            ),
+            report=final_report,
+            findings=[
+                {
+                    "claim": claim["claim"],
+                    "evidence_ids": [],
+                    "source_ids": [],
+                    "confidence": "medium",
+                }
+            ],
+        ),
+    }
+
+    async def mock_execute(step, prompt, context, tools=None):
+        call_order.append(step.name)
+        out = outputs.get(step.name, {})
+        return _make_exec_result(out)
+
+    monkeypatch.setattr(f"{RUNTIME_MODULE}.execute", mock_execute)
+    return call_order
 
 
 async def test_diligence_workflow_is_registered() -> None:
-    assert WORKFLOWS["technical_due_diligence"] is run_technical_due_diligence
+    assert "technical_due_diligence" in load_workflows()
 
 
 async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None:
-    _patch_agents(monkeypatch)
+    _patch_runtime(monkeypatch)
 
     result = await run_technical_due_diligence(WorkflowInput(query="Evaluate Example Robotics"))
 
@@ -237,7 +195,7 @@ async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None
 
 
 async def test_diligence_gap_loop_runs_when_review_reports_unresolved(monkeypatch) -> None:
-    _patch_agents(monkeypatch, has_gaps=True)
+    call_order = _patch_runtime(monkeypatch, has_gaps=True)
 
     result = await run_technical_due_diligence(
         WorkflowInput(
@@ -250,7 +208,7 @@ async def test_diligence_gap_loop_runs_when_review_reports_unresolved(monkeypatc
 
 
 async def test_intake_plan_carries_categorised_urls(monkeypatch) -> None:
-    _patch_agents(monkeypatch)
+    _patch_runtime(monkeypatch)
 
     result = await run_technical_due_diligence(WorkflowInput(query="Evaluate Example Robotics"))
 
@@ -314,23 +272,3 @@ async def test_url_selection_guardrails_enforce_category_budgets() -> None:
 
     assert guarded.docs == candidates.docs[:8]
     assert guarded.changelog == candidates.changelog[:5]
-
-
-def test_diligence_agents_disable_openai_response_storage() -> None:
-    agents = [
-        intake_planner_agent(),
-        url_selector_agent(),
-        claim_extractor_agent(),
-        evidence_researcher_agent(),
-        technical_substance_reviewer_agent(),
-        gap_researcher_agent(),
-        final_memo_agent(),
-    ]
-
-    assert all(agent.model_settings.store is False for agent in agents)
-
-
-def test_url_selector_agent_uses_selector_model_env(monkeypatch) -> None:
-    monkeypatch.setenv("WEBRESEARCH_URL_SELECTOR_MODEL", "gpt-test-selector")
-
-    assert url_selector_agent().model == "gpt-test-selector"

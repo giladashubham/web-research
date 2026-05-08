@@ -41,6 +41,9 @@ class StepStarted(EventModel):
 class StepCompleted(EventModel):
     kind: Literal["step_completed"] = "step_completed"
     step: str
+    cost_usd: float | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
 
 
 class StepSkipped(EventModel):

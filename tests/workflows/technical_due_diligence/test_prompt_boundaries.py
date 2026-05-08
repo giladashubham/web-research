@@ -1,21 +1,24 @@
 from __future__ import annotations
 
-from webresearch.workflows.shared.prompt_loader import load_workflow_prompt
-from webresearch.workflows.technical_due_diligence.workflow import WORKFLOW_ID
+from importlib.resources import files
 
 
 def test_diligence_prompts_label_evidence_inference_and_unknowns() -> None:
     prompt_names = [
-        "intake_planner.md",
-        "url_selector.md",
-        "claim_extractor.md",
-        "evidence_researcher.md",
-        "technical_substance_reviewer.md",
-        "gap_researcher.md",
-        "final_memo.md",
+        "intake_planner.j2",
+        "url_selector.j2",
+        "claim_extractor.j2",
+        "evidence_researcher.j2",
+        "technical_substance_reviewer.j2",
+        "gap_researcher.j2",
+        "final_memo.j2",
     ]
 
-    combined = "\n".join(load_workflow_prompt(WORKFLOW_ID, name) for name in prompt_names).lower()
+    pkg = "webresearch.workflows.technical_due_diligence"
+    combined = "\n".join(
+        (files(pkg) / "prompts" / name).read_text(encoding="utf-8")
+        for name in prompt_names
+    ).lower()
 
     assert "public evidence" in combined
     assert "inference" in combined

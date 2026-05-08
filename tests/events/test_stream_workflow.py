@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-from webresearch.events.step import emit_output_text_delta, step
+from webresearch.events.step import emit_output_text_delta, emit_step_completed, step
 from webresearch.events.stream import stream_workflow
 from webresearch.events.types import OutputTextDelta, WorkflowCompleted
 from webresearch.types import WorkflowInput
@@ -11,9 +11,11 @@ from webresearch.types import WorkflowInput
 async def _ordered_workflow(_: WorkflowInput) -> object:
     async with step("planner"):
         pass
+    await emit_step_completed("planner")
     async with step("output"):
         await emit_output_text_delta("hello")
         await emit_output_text_delta(" world")
+    await emit_step_completed("output")
     return object()
 
 

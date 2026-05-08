@@ -6,12 +6,14 @@ from typing import TYPE_CHECKING
 
 from typer.testing import CliRunner
 
-from webresearch.agents.models import FinalAnswer
 from webresearch.cli import app, run_cmd
-from webresearch.context import WorkflowContext
 from webresearch.events.step import step
-from webresearch.workflows.shared.result import build_result
-from webresearch.workflows.shared.state import WorkflowState
+from webresearch.types import (
+    TokenUsage,
+    WorkflowInput,
+    WorkflowMetadata,
+    WorkflowResult,
+)
 
 if TYPE_CHECKING:
     from webresearch.types import WorkflowInput, WorkflowResult
@@ -22,23 +24,32 @@ async def fake_workflow(input_: WorkflowInput) -> WorkflowResult:
         pass
     async with step("output"):
         pass
-    state = WorkflowState(
-        input=input_,
-        depth=input_.depth,
-        run_id="run_test",
-        started_at=datetime(2026, 5, 4, tzinfo=UTC),
-        final=FinalAnswer(
-            answer_markdown="Answer",
-            findings=[],
-            sources_cited=[],
-            structured_data=None,
+    return WorkflowResult(
+        answer_markdown="Answer",
+        structured_data=None,
+        summary="Summary",
+        findings=[],
+        sources=[],
+        evidence=[],
+        artifacts=[],
+        warnings=[],
+        metadata=WorkflowMetadata(
+            run_id="run_test",
+            workflow_id="fake",
+            started_at=datetime(2026, 5, 4, tzinfo=UTC),
+            finished_at=datetime.now(UTC),
+            tokens=TokenUsage(),
         ),
     )
-    return build_result(state, WorkflowContext())
 
 
 def test_run_outputs_json_to_stdout_and_progress_to_stderr(monkeypatch) -> None:
-    monkeypatch.setitem(run_cmd.WORKFLOWS, "fake", fake_workflow)
+    from webresearch.workflows import load_workflows as orig_load
+
+    def mock_load():
+        return {"fake": fake_workflow}
+
+    monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
 
     result = CliRunner().invoke(app, ["run", "query", "fake"])
 
@@ -48,7 +59,10 @@ def test_run_outputs_json_to_stdout_and_progress_to_stderr(monkeypatch) -> None:
 
 
 def test_run_quiet_silences_stderr(monkeypatch) -> None:
-    monkeypatch.setitem(run_cmd.WORKFLOWS, "fake", fake_workflow)
+    def mock_load():
+        return {"fake": fake_workflow}
+
+    monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
 
     result = CliRunner().invoke(app, ["run", "query", "fake", "--quiet"])
 
@@ -70,19 +84,29 @@ def test_usage_error_exits_two() -> None:
 
 
 def test_output_write_error_exits_three(monkeypatch, tmp_path) -> None:
-    monkeypatch.setitem(run_cmd.WORKFLOWS, "fake", fake_workflow)
+    def mock_load():
+        return {"fake": fake_workflow}
 
-    result = CliRunner().invoke(app, ["run", "query", "fake", "--quiet", "--out", str(tmp_path)])
+    monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
+
+    result = CliRunner().invoke(
+        app, ["run", "query", "fake", "--quiet", "--out", str(tmp_path)]
+    )
 
     assert result.exit_code == 3
     assert "IO error" in result.output
 
 
 def test_out_writes_file(monkeypatch, tmp_path) -> None:
-    monkeypatch.setitem(run_cmd.WORKFLOWS, "fake", fake_workflow)
+    def mock_load():
+        return {"fake": fake_workflow}
+
+    monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
     path = tmp_path / "result.json"
 
-    result = CliRunner().invoke(app, ["run", "query", "fake", "--quiet", "--out", str(path)])
+    result = CliRunner().invoke(
+        app, ["run", "query", "fake", "--quiet", "--out", str(path)]
+    )
 
     assert result.exit_code == 0
     assert result.output == ""
