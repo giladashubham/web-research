@@ -84,11 +84,24 @@ def test_default_search_provider_missing_creds(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setenv("WEBRESEARCH_SEARCH_PROVIDER", "brightdata")
     monkeypatch.delenv("BRIGHTDATA_API_KEY", raising=False)
 
-    with pytest.raises(ValueError, match="BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required"):
+    with pytest.raises(
+        ValueError, match="BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required"
+    ):
         default_search_provider()
 
 
+def test_default_search_provider_fallback_to_mock(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("WEBRESEARCH_SEARCH_PROVIDER", raising=False)
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+
+    provider = default_search_provider()
+    assert provider.id == "mock"
+
+
 def test_default_search_provider_unknown(monkeypatch: pytest.MonkeyPatch) -> None:
+
     monkeypatch.setenv("WEBRESEARCH_SEARCH_PROVIDER", "unsupported")
 
     with pytest.raises(ValueError, match="Unknown search provider: unsupported"):

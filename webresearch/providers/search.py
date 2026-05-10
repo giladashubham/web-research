@@ -103,21 +103,26 @@ class MockSearchProvider:
 
 
 def default_search_provider() -> SearchProvider:
-    provider_id = os.getenv("WEBRESEARCH_SEARCH_PROVIDER", "tavily").lower()
+    raw_provider_id = os.getenv("WEBRESEARCH_SEARCH_PROVIDER")
+    provider_id = (raw_provider_id or "tavily").lower()
 
     if provider_id == "tavily":
         api_key = os.getenv("TAVILY_API_KEY")
         if not api_key:
-            raise ValueError("TAVILY_API_KEY is required for Tavily provider")
+            if raw_provider_id:
+                raise ValueError("TAVILY_API_KEY is required for Tavily provider")
+            return MockSearchProvider()
         return TavilySearchProvider(api_key=api_key)
 
     if provider_id == "brightdata":
         api_key = os.getenv("BRIGHTDATA_API_KEY")
         zone = os.getenv("BRIGHTDATA_ZONE")
         if not api_key or not zone:
-            raise ValueError(
-                "BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required for BrightData provider"
-            )
+            if raw_provider_id:
+                raise ValueError(
+                    "BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required for BrightData provider"
+                )
+            return MockSearchProvider()
         return BrightDataSearchProvider(api_key=api_key, zone=zone)
 
     if provider_id == "mock":
