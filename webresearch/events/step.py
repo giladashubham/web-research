@@ -5,8 +5,10 @@ from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
 from webresearch.events.types import (
+    ArtifactAdded,
     LoopIteration,
     OutputTextDelta,
+    SourceAdded,
     StepCompleted,
     StepFailed,
     StepSkipped,
@@ -89,5 +91,25 @@ async def emit_step_completed(
             cost_usd=cost_usd,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+        )
+    )
+
+
+async def emit_artifact_added(artifact_id: str, artifact_kind: str) -> None:
+    await emit_event(
+        ArtifactAdded(
+            run_id=current_run_id(),
+            artifact_id=artifact_id,
+            artifact_kind=artifact_kind,
+        )
+    )
+
+
+async def emit_source_added(source_id: str, url: str) -> None:
+    await emit_event(
+        SourceAdded(
+            run_id=current_run_id(),
+            source_id=source_id,
+            url=url,
         )
     )

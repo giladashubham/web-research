@@ -6,6 +6,7 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict
 
+from webresearch.events.step import emit_source_added
 from webresearch.providers.errors import SearchProviderError
 from webresearch.providers.search import default_search_provider
 from webresearch.types import SourceInput
@@ -98,6 +99,7 @@ class SearchService:
                     published_at=provider_result.published_at,
                 )
             )
+            await emit_source_added(source.id, source.url)
             results.append(
                 SearchWebResult(
                     source_id=source.id,
