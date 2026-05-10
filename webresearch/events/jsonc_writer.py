@@ -3,16 +3,19 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, TextIO
 
 if TYPE_CHECKING:
     from webresearch.events.types import WorkflowEvent
+
+MAX_STR_LEN = 1000
+MAX_LIST_LEN = 20
 
 
 class JSONCWriter:
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
-        self._f = None
+        self._f: TextIO | None = None
         self._first_event = True
 
     def open(self, run_id: str, workflow_id: str, query: str) -> None:
@@ -50,7 +53,7 @@ class JSONCWriter:
         self._f.close()
         self._f = None
 
-    def _prepare_event(self, data: dict[str, Any]) -> dict[str, Any]:
+    def _prepare_event(self, data: dict[str, object]) -> dict[str, object]:
         # Basic redaction and truncation
         if "arguments" in data and isinstance(data["arguments"], dict):
             data["arguments"] = self._redact_dict(data["arguments"])
@@ -58,18 +61,18 @@ class JSONCWriter:
             data["result"] = self._truncate_value(data["result"])
         return data
 
-    def _redact_dict(self, d: dict[str, Any]) -> dict[str, Any]:
+    def _redact_dict(self, d: dict[str, object]) -> dict[str, object]:
         secrets = {"api_key", "token", "password", "authorization", "secret"}
         return {
             k: "[REDACTED]" if any(s in k.lower() for s in secrets) else self._truncate_value(v)
             for k, v in d.items()
         }
 
-    def _truncate_value(self, v: Any) -> Any:
-        if isinstance(v, str) and len(v) > 1000:
-            return v[:1000] + "... [TRUNCATED]"
-        if isinstance(v, list) and len(v) > 20:
-            return v[:20] + ["... [TRUNCATED]"]
+    def _truncate_value(self, v: object) -> object:
+        if isinstance(v, str) and len(v) > MAX_STR_LEN:
+            return v[:MAX_STR_LEN] + "... [TRUNCATED]"
+        if isinstance(v, list) and len(v) > MAX_LIST_LEN:
+            return [*v[:MAX_LIST_LEN], "... [TRUNCATED]"]
         if isinstance(v, dict):
             return {k: self._truncate_value(val) for k, val in v.items()}
         return v
