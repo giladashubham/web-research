@@ -8,7 +8,7 @@ Add an automatic run log that captures every observable workflow event into a se
 The log should make debugging and diligence review easier by showing:
 
 - workflow and step lifecycle events
-- agent/model calls
+- agent/model calls (distinct from pipeline steps)
 - tool calls with arguments
 - tool responses or summarized outputs
 - output text deltas when available
@@ -83,11 +83,23 @@ Use one JSONC document per run:
       "workflow_id": "technical_due_diligence"
     },
     {
+      "kind": "step_started",
+      "timestamp": 123.50,
+      "run_id": "run_abc123",
+      "step": "evidence_researcher"
+    },
+    {
+      "kind": "agent_started",
+      "timestamp": 124.00,
+      "run_id": "run_abc123",
+      "step": "evidence_researcher",
+      "agent_name": "Technical Diligence Evidence Researcher"
+    },
+    {
       "kind": "tool_call",
       "timestamp": 124.12,
       "run_id": "run_abc123",
       "step": "evidence_researcher",
-      "agent_name": "Technical Diligence Evidence Researcher",
       "tool_name": "search_web_tool",
       "call_id": "call_1",
       "arguments": {
@@ -106,6 +118,18 @@ Use one JSONC document per run:
         "provider_id": "tavily",
         "result_count": 10
       }
+    },
+    {
+      "kind": "agent_completed",
+      "timestamp": 126.00,
+      "run_id": "run_abc123",
+      "step": "evidence_researcher"
+    },
+    {
+      "kind": "step_completed",
+      "timestamp": 126.10,
+      "run_id": "run_abc123",
+      "step": "evidence_researcher"
     }
   ],
   "completed_at": "2026-05-05T..."
@@ -116,160 +140,54 @@ Keep final workflow output in the normal `--out` file. The event log may include
 text deltas, but should not duplicate the full final result object unless explicitly
 enabled later.
 
-## Implementation Tasks
+## Implementation Tasks (Sequenced)
 
 ### EV-01 - Event Model Expansion
+Update `webresearch/events/types.py` with richer observable event types.
+- Distinguish between **Pipeline Steps** (structural) and **Agent Calls** (model interactions).
+- New types: `AgentStarted`, `AgentCompleted`, `AgentFailed`, `ToolCall`, `ToolResult`, `ToolFailed`.
+- Replace existing thin `ToolStarted`/`ToolCompleted` shapes.
+- Update `ProgressRenderer` in `webresearch/cli/progress.py` to handle new events (e.g., map `ToolCall` to the dimmed dot UI).
 
-Update `webresearch/events/types.py` with richer observable event types:
+### EV-02 - Run ID Synchronization
+Ensure the `run_id` is consistent across the entire system.
+- Update `webresearch/events/step.py` to provide a `current_run_id()` that is reliable.
+- Modify `Pipeline.run` in `webresearch/pipeline/runner.py` to check for an existing `run_id` in the `event_context` before generating a new one. This ensures the final result metadata matches the event log.
 
-- `AgentStarted`
-- `AgentCompleted`
-- `AgentFailed`
-- `ModelOutputItem`
-- `ToolCall`
-- `ToolResult`
-- `ToolFailed`
+### EV-03 - SDK Event Translation & Relocation
+Move and extend the SDK translation logic.
+- Move `_translate_sdk_event` from `webresearch/pipeline/runtime.py` to `webresearch/events/stream.py` (or a dedicated translation module).
+- Extend it to capture: agent lifecycle, tool arguments, tool outputs, and tool errors.
+- Ensure only one event is emitted per SDK event (no duplicates).
 
-Replace the existing thin `ToolStarted` / `ToolCompleted` shape if the richer tool events
-make those names obsolete. Do not keep old aliases or re-export compatibility event
-classes. Update the progress renderer and tests to the final event names directly.
+### EV-04 - JSONC Run Log Writer
+Add `webresearch/events/jsonc_writer.py`.
+- Responsibilities:
+  - create `.web-research/logs/` automatically.
+  - write JSONC header comments.
+  - write events incrementally (stream/flush).
+  - handle cancellation/failures gracefully to ensure a valid JSONC structure.
 
-Include common fields:
-
-- `run_id`
-- `timestamp`
-- `workflow_id` when known
-- `step`
-- `agent_name`
-- `call_id`
-- `sequence`
-
-Do not add a field called `thought` unless it contains public/visible model text. Hidden
-chain-of-thought must not be requested, inferred, or logged.
-
-### EV-02 - SDK Event Translation
-
-Extend `webresearch/events/stream.py` so `_translate_sdk_event(...)` captures more of the
-Agents SDK stream:
-
-- agent lifecycle events if exposed by the SDK
-- raw model response output items
-- tool call names
-- tool call arguments
-- tool outputs
-- tool errors
-- output text deltas
-
-Current code only translates basic tool started/completed events. This task should preserve
-the existing progress renderer user experience while replacing the old thin translation
-with the final richer translation. Do not emit both legacy and new tool events for the
-same SDK event.
-
-### EV-03 - JSONC Run Log Writer
-
-Add a writer module, for example:
-
-```text
-webresearch/events/jsonc_writer.py
-```
-
-Responsibilities:
-
-- create `.web-research/` and `.web-research/logs/` when needed
-- default to `.web-research/logs/run_<run_id>.jsonc`
-- derive `run_<run_id>.jsonc` when `--events-out` is a directory
-- write JSONC header comments
-- write a single JSON object with an `events` array
-- append events incrementally and flush after each event
-- close the JSON array/object in `finally`
-- tolerate cancellation and workflow failure
-
-Implementation detail: use comma-aware appends so the file remains valid JSONC after a
-normal run. If a process is killed mid-run, a partial file is acceptable.
-
-This should be the only event-log writer. Do not add a temporary NDJSON writer, debug
-writer, or compatibility output mode unless a future task explicitly requires it.
-
-### EV-04 - CLI Option
-
-Add a CLI option in `webresearch/cli/run_cmd.py`:
-
-```text
---events-out PATH
-```
-
-Behavior:
-
-- omitted: write `.web-research/logs/run_<run_id>.jsonc`
-- directory path: write `PATH/run_<run_id>.jsonc`
-- file path ending in `.jsonc`: write exactly that file
-- fail with exit code `3` on IO errors, matching existing output write behavior
-
-The option should work with all workflows, including `technical_due_diligence`.
-
-Add the option directly to the main `run` command surface as an override for the default
-`.web-research/logs/` location. Do not add hidden legacy flags, environment-variable-only
-switches, or deprecated aliases.
-
-### EV-05 - Stream Multiplexing
-
-Update the run command event loop so each streamed event is sent to both:
-
-- `ProgressRenderer`
-- JSONC writer
-
-The normal result output path should remain unchanged.
-
-Keep stream dispatch centralized. Avoid adding per-workflow event capture hooks or
-workflow-specific logging branches.
+### EV-05 - CLI Integration & Multiplexing
+Update `webresearch/cli/run_cmd.py`.
+- Add `--events-out PATH` option.
+- Default to `.web-research/logs/run_<run_id>.jsonc`.
+- Update the `async for event in stream_workflow(...)` loop to send events to both the `ProgressRenderer` and the `JSONCWriter`.
 
 ### EV-06 - Redaction and Size Limits
-
-Add conservative safeguards before logging tool arguments/results:
-
-- redact likely secrets by key name, such as `api_key`, `authorization`, `token`, `password`
-- cap large string fields
-- cap large lists of search results
-- mark truncated values with metadata such as `"truncated": true`
-
-Default behavior should be useful for debugging without dumping megabytes of fetched page
-content into the event log.
-
-Apply redaction and truncation inside the shared event serialization path so all event
-logs follow the same rules.
+Add safeguards to the serialization path.
+- Redact secrets (`api_key`, `token`, etc.).
+- Cap large string fields and long lists.
+- Apply these rules inside the shared serialization logic.
 
 ### EV-07 - Tests
-
 Add focused tests:
-
-```text
-tests/events/test_jsonc_writer.py
-tests/cli/test_event_log.py
-tests/events/test_stream_workflow.py
-```
-
-Coverage:
-
-- writer creates a valid JSONC file for a successful run
-- writer finalizes on workflow failure
-- CLI without `--events-out` creates `.web-research/logs/run_<run_id>.jsonc`
-- CLI `--events-out logs` creates `logs/run_<run_id>.jsonc`
-- CLI `--events-out file.jsonc` writes the explicit file
-- final result output still goes to `--out`
-- tool call arguments and tool result summaries are present
-- secrets are redacted
-- large values are truncated
-- no deleted or legacy event names remain in runtime code unless they are still part of
-  the final vocabulary
+- `tests/events/test_jsonc_writer.py`: File creation and valid JSONC structure.
+- `tests/cli/test_event_log.py`: CLI flag behavior and default path creation.
+- `tests/events/test_stream_workflow.py`: End-to-end event sequence verification.
 
 ### EV-08 - Documentation
-
-Update README with:
-
-- `--events-out` usage
-- default `.web-research/logs/run_<run_id>.jsonc` event log path
-- what is captured
-- explicit note that hidden chain-of-thought is not captured
+Update README with usage instructions for `--events-out` and information on what is captured in the logs.
 
 ## Acceptance Criteria
 
@@ -279,6 +197,7 @@ Update README with:
   under the explicit directory.
 - The log includes `run_id`, workflow id, step events, agent events, tool calls, arguments,
   tool results, warnings, errors, and timestamps.
+- The `run_id` in the final result metadata matches the `run_id` in the event log.
 - The normal `--out` result file is still separate.
 - No hidden model chain-of-thought is requested or logged.
 - JSONC output is valid after successful and failed workflow runs.
@@ -295,3 +214,4 @@ uv run ruff format --check
 uv run mypy webresearch
 uv run pre-commit run -a
 ```
+
