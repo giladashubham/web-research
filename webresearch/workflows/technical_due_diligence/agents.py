@@ -28,7 +28,9 @@ _URL_CATEGORIES = tuple(CONFIG.url_budgets.keys())
 
 def _prompt(name: str) -> str:
     return (
-        files("webresearch.workflows.technical_due_diligence") / "prompts" / f"{name}.j2"
+        files("webresearch.workflows.technical_due_diligence")
+        / "prompts"
+        / f"{name}.j2"
     ).read_text(encoding="utf-8")
 
 
@@ -60,7 +62,9 @@ def _normalize_or_none(url: str) -> str | None:
 def _fallback_priority_urls(candidate_urls: UrlsByCategory) -> UrlsByCategory:
     return UrlsByCategory(
         **{
-            category: _urls_for_category(candidate_urls, category)[: CONFIG.url_budgets[category]]
+            category: _urls_for_category(candidate_urls, category)[
+                : CONFIG.url_budgets[category]
+            ]
             for category in _URL_CATEGORIES
         }
     )
@@ -85,7 +89,11 @@ def _validated_priority_urls(
         valid: list[str] = []
         for url in selected_by_category[category]:
             normalized = _normalize_or_none(url)
-            if normalized is None or normalized not in candidate_lookup or normalized in seen:
+            if (
+                normalized is None
+                or normalized not in candidate_lookup
+                or normalized in seen
+            ):
                 continue
             seen.add(normalized)
             valid.append(candidate_lookup[normalized])
@@ -153,7 +161,9 @@ async def _gap_post_hook(state: PipelineState) -> HookSignal:
     review = state.outputs.get("technical_substance_reviewer")
     gap = state.outputs.get("gap_researcher")
     if review is not None and gap is not None:
-        state.outputs["technical_substance_reviewer"] = _merge_gap_into_review(review, gap)
+        state.outputs["technical_substance_reviewer"] = _merge_gap_into_review(
+            review, gap
+        )
     return HookSignal.CONTINUE
 
 

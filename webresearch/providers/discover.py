@@ -160,7 +160,11 @@ def _registrable_domain(host: str) -> str:
     labels = [label for label in host.lower().split(".") if label]
     if len(labels) <= 2:
         return ".".join(labels)
-    if len(labels[-1]) == 2 and labels[-2] in COMMON_SECOND_LEVEL_DOMAINS and len(labels) >= 3:
+    if (
+        len(labels[-1]) == 2
+        and labels[-2] in COMMON_SECOND_LEVEL_DOMAINS
+        and len(labels) >= 3
+    ):
         return ".".join(labels[-3:])
     return ".".join(labels[-2:])
 
@@ -214,7 +218,9 @@ def _sort_key(category: str, url: str) -> tuple[int, int, str]:
 
 
 def _limited_sorted(category: str, urls: set[str]) -> list[str]:
-    return sorted(urls, key=lambda url: _sort_key(category, url))[: CATEGORY_LIMITS[category]]
+    return sorted(urls, key=lambda url: _sort_key(category, url))[
+        : CATEGORY_LIMITS[category]
+    ]
 
 
 class UrlDiscoverProvider:
@@ -227,7 +233,9 @@ class UrlDiscoverProvider:
             return DiscoveredUrls(seed_url=seed_url, by_category=UrlsByCategory())
 
         base = _base(normalized_seed)
-        found: dict[str, set[str]] = {cat: set() for cat in [*CATEGORY_PATTERNS, "other"]}
+        found: dict[str, set[str]] = {
+            cat: set() for cat in [*CATEGORY_PATTERNS, "other"]
+        }
 
         if gh := _github_releases_url(normalized_seed):
             found["changelog"].add(gh)
@@ -260,7 +268,9 @@ class UrlDiscoverProvider:
         result = await self._fetch.fetch(ctx, sitemap_url)
         if result.status != "fetched":
             return
-        page = ctx.pages.get(sitemap_url) or ctx.pages.get(_try_normalize(sitemap_url) or "")
+        page = ctx.pages.get(sitemap_url) or ctx.pages.get(
+            _try_normalize(sitemap_url) or ""
+        )
         if not page:
             return
         try:
@@ -309,7 +319,8 @@ class UrlDiscoverProvider:
                 url
                 for category in ("docs", "api", "changelog", "security")
                 for url in found[category]
-                if urllib.parse.urlparse(url).netloc != seed_host and _same_site(seed, url)
+                if urllib.parse.urlparse(url).netloc != seed_host
+                and _same_site(seed, url)
             }
         )
         for candidate in candidates[:8]:

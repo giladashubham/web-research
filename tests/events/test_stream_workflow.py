@@ -20,7 +20,10 @@ async def _ordered_workflow(_: WorkflowInput) -> object:
 
 
 async def test_events_arrive_in_emitted_order() -> None:
-    events = [event async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))]
+    events = [
+        event
+        async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))
+    ]
 
     assert [event.kind for event in events] == [
         "workflow_started",
@@ -35,7 +38,10 @@ async def test_events_arrive_in_emitted_order() -> None:
 
 
 async def test_iterator_ends_cleanly_on_workflow_completion() -> None:
-    events = [event async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))]
+    events = [
+        event
+        async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))
+    ]
 
     assert isinstance(events[-1], WorkflowCompleted)
 
@@ -61,8 +67,13 @@ async def test_cancelling_iterator_cancels_workflow_task_within_one_second() -> 
     await asyncio.wait_for(cancelled.wait(), timeout=1)
 
 
-async def test_output_text_deltas_only_arrive_during_output_step_and_reproduce_answer() -> None:
-    events = [event async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))]
+async def test_output_text_deltas_only_arrive_during_output_step_and_reproduce_answer() -> (
+    None
+):
+    events = [
+        event
+        async for event in stream_workflow(_ordered_workflow, WorkflowInput(query="q"))
+    ]
 
     active_step: str | None = None
     deltas: list[str] = []
@@ -84,6 +95,9 @@ async def test_failed_workflow_emits_failed_event() -> None:
             msg = "boom"
             raise RuntimeError(msg)
 
-    events = [event async for event in stream_workflow(failing_workflow, WorkflowInput(query="q"))]
+    events = [
+        event
+        async for event in stream_workflow(failing_workflow, WorkflowInput(query="q"))
+    ]
 
     assert events[-1].kind == "workflow_failed"

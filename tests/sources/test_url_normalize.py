@@ -29,11 +29,17 @@ def test_default_ports_are_stripped():
 
 
 def test_different_schemes_and_hosts_do_not_collapse():
-    assert normalize_url("http://example.com/path") != normalize_url("https://example.com/path")
-    assert normalize_url("https://example.com/path") != normalize_url("https://example.org/path")
+    assert normalize_url("http://example.com/path") != normalize_url(
+        "https://example.com/path"
+    )
+    assert normalize_url("https://example.com/path") != normalize_url(
+        "https://example.org/path"
+    )
 
 
-@pytest.mark.parametrize("raw", ["mailto:test@example.com", "javascript:alert(1)", "file:///tmp/a"])
+@pytest.mark.parametrize(
+    "raw", ["mailto:test@example.com", "javascript:alert(1)", "file:///tmp/a"]
+)
 def test_non_http_schemes_raise(raw):
     with pytest.raises(ValueError):
         normalize_url(raw)

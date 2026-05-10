@@ -81,7 +81,9 @@ class ExtractedClaim(WebResearchModel):
     id: str = Field(min_length=1)
     claim: str = Field(min_length=1)
     source_urls: list[UrlString] = Field(default_factory=list)
-    category: Literal["product", "architecture", "ai_ml", "integration", "customer", "other"]
+    category: Literal[
+        "product", "architecture", "ai_ml", "integration", "customer", "other"
+    ]
     diligence_relevance: Literal["low", "medium", "high"]
 
 
@@ -102,7 +104,16 @@ class UnresolvedClaim(WebResearchModel):
     claim_text: str = Field(min_length=1)
     reason_unresolved: str = Field(min_length=1)
     artefact_types_to_chase: list[
-        Literal["docs", "changelog", "api", "pricing", "security", "customers", "blog", "careers"]
+        Literal[
+            "docs",
+            "changelog",
+            "api",
+            "pricing",
+            "security",
+            "customers",
+            "blog",
+            "careers",
+        ]
     ] = Field(default_factory=list)
     follow_up_queries: list[str] = Field(default_factory=list)
 

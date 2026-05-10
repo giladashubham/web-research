@@ -84,7 +84,9 @@ class Pipeline:
             exec_result = await execute(step_def, prompt, state.context)
 
         state.outputs[step_def.name] = exec_result.output
-        state.iteration_count[step_def.name] = state.iteration_count.get(step_def.name, 0) + 1
+        state.iteration_count[step_def.name] = (
+            state.iteration_count.get(step_def.name, 0) + 1
+        )
         step_cost = calculate_cost(
             exec_result.input_tokens, exec_result.output_tokens, exec_result.model
         )
@@ -135,7 +137,9 @@ class Pipeline:
                 state.context.output_tokens += exec_result.output_tokens
                 state.context.cost_usd += step_cost
 
-            state.iteration_count[fan.step.name] = state.iteration_count.get(fan.step.name, 0) + 1
+            state.iteration_count[fan.step.name] = (
+                state.iteration_count.get(fan.step.name, 0) + 1
+            )
 
             await emit_step_completed(
                 fan.step.name,

@@ -65,17 +65,25 @@ async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
 
     pipeline = Pipeline(
         steps=[
-            AgentStep(name="planner", prompt="plan {{ input.query }}", output_type=FakeOutput),
             AgentStep(
-                name="researcher", prompt="research {{ input.query }}", output_type=FakeOutput
+                name="planner", prompt="plan {{ input.query }}", output_type=FakeOutput
             ),
-            AgentStep(name="writer", prompt="write {{ input.query }}", output_type=FakeFinal),
+            AgentStep(
+                name="researcher",
+                prompt="research {{ input.query }}",
+                output_type=FakeOutput,
+            ),
+            AgentStep(
+                name="writer", prompt="write {{ input.query }}", output_type=FakeFinal
+            ),
         ],
         final_output_key="writer",
         workflow_id="test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="hello", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="hello", depth=Depth.for_preset("quick"))
+    )
 
     assert result.answer_markdown == "final answer"
     assert result.metadata.workflow_id == "test"
@@ -113,7 +121,9 @@ async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
         workflow_id="parallel_test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     assert result.metadata.workflow_id == "parallel_test"
     # All three parallel lanes ran
@@ -144,7 +154,9 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
         steps=[
             FanOut(
                 step=AgentStep(
-                    name="research_item", prompt="item {{ item }}", output_type=FakeOutput
+                    name="research_item",
+                    prompt="item {{ item }}",
+                    output_type=FakeOutput,
                 ),
                 over=lambda state: ["url1", "url2", "url3"],
             ),
@@ -154,7 +166,9 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
         workflow_id="fanout_test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     assert result.metadata.workflow_id == "fanout_test"
     # FanOut processed each item
@@ -182,7 +196,9 @@ async def test_fanout_collects_results(monkeypatch) -> None:
     pipeline = Pipeline(
         steps=[
             FanOut(
-                step=AgentStep(name="fan_step", prompt="item {{ item }}", output_type=FakeOutput),
+                step=AgentStep(
+                    name="fan_step", prompt="item {{ item }}", output_type=FakeOutput
+                ),
                 over=lambda state: ["a", "b", "c"],
             ),
         ],
@@ -190,7 +206,9 @@ async def test_fanout_collects_results(monkeypatch) -> None:
         workflow_id="fanout_collect",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     # The structured_data isn't set by FakeOutput, but the summary should contain results
     assert result.metadata.workflow_id == "fanout_collect"
@@ -229,7 +247,9 @@ async def test_fanout_with_pre_hook_skip(monkeypatch) -> None:
         workflow_id="fanout_skip",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     assert not executed, "FanOut items should not execute when pre_hook returns SKIP"
     assert result.metadata.workflow_id == "fanout_skip"
@@ -252,7 +272,9 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
         if step.name == "reviewer":
             iteration_count.append(len(iteration_count) + 1)
             done = len(iteration_count) >= 3
-            return _make_result(FakeReview(done=done, summary=f"iter_{len(iteration_count)}"))
+            return _make_result(
+                FakeReview(done=done, summary=f"iter_{len(iteration_count)}")
+            )
         if step.name == "writer":
             return _make_result(FakeFinal(answer_markdown="final"))
         return _make_result(FakeOutput(result="ok"))
@@ -265,7 +287,9 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
             Loop(
                 steps=[
                     AgentStep(name="reviewer", prompt="review", output_type=FakeReview),
-                    AgentStep(name="researcher", prompt="research", output_type=FakeOutput),
+                    AgentStep(
+                        name="researcher", prompt="research", output_type=FakeOutput
+                    ),
                 ],
                 until=lambda state: bool(
                     state.outputs.get("reviewer")
@@ -279,7 +303,9 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
         workflow_id="loop_test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("deep")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("deep"))
+    )
 
     assert result.metadata.workflow_id == "loop_test"
     assert len(iteration_count) == 3, "Loop should run 3 iterations"
@@ -323,7 +349,9 @@ async def test_agent_pre_hook_skip(monkeypatch) -> None:
         workflow_id="skip_test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     assert not skipped_step_executed, "Skipped step should not execute"
     assert result.metadata.workflow_id == "skip_test"
@@ -405,7 +433,9 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
         workflow_id="cost_test",
     )
 
-    result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
+    result = await pipeline.run(
+        WorkflowInput(query="test", depth=Depth.for_preset("quick"))
+    )
 
     # 3 steps (step1, step2, writer) x 200 input each = 600
     assert result.metadata.tokens.input_tokens == 600

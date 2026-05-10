@@ -47,7 +47,9 @@ def test_json_output_round_trips() -> None:
     assert WorkflowResult.model_validate_json(content).answer_markdown == "Answer"
 
 
-def test_markdown_output_starts_with_answer_and_ends_with_sources_and_warnings() -> None:
+def test_markdown_output_starts_with_answer_and_ends_with_sources_and_warnings() -> (
+    None
+):
     content = format_result(_result(), "md")
 
     assert content.startswith("Answer\n")

@@ -7,11 +7,15 @@ from webresearch.pipeline.step import Loop
 from webresearch.workflows.technical_due_diligence import agents
 
 if TYPE_CHECKING:
-    from webresearch.workflows.technical_due_diligence.models import TechnicalSubstanceReview
+    from webresearch.workflows.technical_due_diligence.models import (
+        TechnicalSubstanceReview,
+    )
 
 
 def _all_resolved(state: Any) -> bool:
-    review: TechnicalSubstanceReview | None = state.outputs.get("technical_substance_reviewer")
+    review: TechnicalSubstanceReview | None = state.outputs.get(
+        "technical_substance_reviewer"
+    )
     if review is None:
         return False
     return not review.unresolved_claims

@@ -46,7 +46,9 @@ class TavilySearchProvider:
             response = await client.post(TAVILY_SEARCH_URL, json=payload)
 
         if response.is_error:
-            raise SearchProviderError(response.status_code, response.text[:BODY_EXCERPT_LENGTH])
+            raise SearchProviderError(
+                response.status_code, response.text[:BODY_EXCERPT_LENGTH]
+            )
 
         data = response.json()
         results = data.get("results", [])

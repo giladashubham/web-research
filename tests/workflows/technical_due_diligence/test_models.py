@@ -10,7 +10,9 @@ PACKAGE = "webresearch.workflows.technical_due_diligence"
 
 def test_report_model_validates_example_output() -> None:
     example = json.loads(
-        files(PACKAGE).joinpath("examples", "output.example.json").read_text(encoding="utf-8")
+        files(PACKAGE)
+        .joinpath("examples", "output.example.json")
+        .read_text(encoding="utf-8")
     )
 
     report = TechnicalDueDiligenceReport.model_validate(example)
@@ -23,7 +25,9 @@ def test_report_model_validates_example_output() -> None:
 
 def test_example_input_is_valid_json() -> None:
     example_input = json.loads(
-        files(PACKAGE).joinpath("examples", "input.example.json").read_text(encoding="utf-8")
+        files(PACKAGE)
+        .joinpath("examples", "input.example.json")
+        .read_text(encoding="utf-8")
     )
 
     assert example_input["company_name"] == "Example Robotics"

@@ -45,9 +45,13 @@ class ExtractProvider:
                 reason="No fetched page body found",
             )
 
-        extracted = trafilatura.extract(page.body, url=normalized_url, favor_recall=True)
+        extracted = trafilatura.extract(
+            page.body, url=normalized_url, favor_recall=True
+        )
         if extracted is None or not extracted.strip():
-            return ExtractResult(url=normalized_url, status="failed", reason="No content extracted")
+            return ExtractResult(
+                url=normalized_url, status="failed", reason="No content extracted"
+            )
 
         text = extracted.strip()
         truncated = len(text) > self._max_chars

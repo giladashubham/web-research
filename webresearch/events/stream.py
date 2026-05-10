@@ -38,7 +38,9 @@ async def stream_workflow(
         except asyncio.CancelledError:
             raise
         except Exception as exc:
-            await emit(WorkflowFailed(run_id=run_id, workflow_id=workflow_id, error=str(exc)))
+            await emit(
+                WorkflowFailed(run_id=run_id, workflow_id=workflow_id, error=str(exc))
+            )
         else:
             await emit(WorkflowCompleted(run_id=run_id, workflow_id=workflow_id))
         finally:
