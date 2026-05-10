@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
+
+from pydantic import BaseModel, ConfigDict
 
 from webresearch.providers.errors import SearchProviderError
 from webresearch.providers.search import default_search_provider
@@ -17,8 +20,6 @@ EVIDENCE_BONUS = 0.1
 
 
 def domain_reliability_score(url: str) -> float:
-    from urllib.parse import urlsplit
-
     MAJOR_NEWS_DOMAINS = {
         "apnews.com",
         "bbc.com",
@@ -60,8 +61,6 @@ class SearchService:
     async def search_web(
         self, ctx: WorkflowContext, query: str, limit: int = 10
     ) -> object:
-        from pydantic import BaseModel, ConfigDict
-
         class SearchWebResult(BaseModel):
             model_config = ConfigDict(extra="forbid")
             source_id: str
@@ -125,8 +124,6 @@ class SearchService:
         source_ids: list[str] | None = None,
         top_k: int = 10,
     ) -> object:
-        from pydantic import BaseModel, ConfigDict
-
         class RankedSource(BaseModel):
             model_config = ConfigDict(extra="forbid")
             source_id: str

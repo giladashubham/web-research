@@ -47,7 +47,7 @@ def test_parallel_holds_steps() -> None:
 
 def test_fanout_holds_step_and_over() -> None:
     inner = AgentStep(name="fan", prompt="item {{ item }}", output_type=FakeOutput)
-    fan = FanOut(step=inner, over=lambda s: [1, 2, 3])
+    fan = FanOut(step=inner, over=lambda _s: [1, 2, 3])
     assert fan.step.name == "fan"
     assert fan.over(None) == [1, 2, 3]
 
@@ -55,7 +55,7 @@ def test_fanout_holds_step_and_over() -> None:
 def test_loop_holds_steps_and_condition() -> None:
     s1 = AgentStep(name="step1", prompt="step1", output_type=FakeOutput)
     s2 = AgentStep(name="step2", prompt="step2", output_type=FakeOutput)
-    loop = Loop(steps=[s1, s2], until=lambda s: True, max_iterations=5)
+    loop = Loop(steps=[s1, s2], until=lambda _s: True, max_iterations=5)
     assert len(loop.steps) == 2
     assert loop.max_iterations == 5
     assert loop.until(None) is True

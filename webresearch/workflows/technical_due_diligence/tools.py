@@ -13,12 +13,15 @@ _search_service = SearchService()
 
 
 @function_tool
-async def search_web_tool(
+async def search_technical_tool(
     ctx: ToolContext,
     query: str,
     limit: int = 10,
 ) -> object:
-    """Search the web for technical evidence. Prefer official docs, changelogs, security advisories."""
+    """Search the web for technical evidence.
+
+    Prefer official docs, changelogs, security advisories.
+    """
     return await _search_service.search_web(ctx.context, query, limit)
 
 
@@ -66,4 +69,4 @@ async def discover_urls_tool(
     return await _discover_provider.discover(ctx.context, seed_url)
 
 
-RESEARCH_TOOLS = [discover_urls_tool, search_web_tool, fetch_and_extract_tool]
+RESEARCH_TOOLS = [discover_urls_tool, search_technical_tool, fetch_and_extract_tool]

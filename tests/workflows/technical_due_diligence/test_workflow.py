@@ -174,7 +174,7 @@ def _patch_runtime(monkeypatch, *, has_gaps: bool = False) -> list[str]:
         ),
     }
 
-    async def mock_execute(step, prompt, context, tools=None):
+    async def mock_execute(step, _prompt, _context, _tools=None):
         call_order.append(step.name)
         out = outputs.get(step.name, {})
         return _make_exec_result(out)

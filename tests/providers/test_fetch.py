@@ -26,7 +26,7 @@ async def test_fetch_returns_cached_page() -> None:
 async def test_fetch_creates_source_for_new_url(monkeypatch) -> None:
     ctx = WorkflowContext()
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 200
         mock_response.headers = {"content-type": "text/html"}
@@ -47,7 +47,7 @@ async def test_fetch_creates_source_for_new_url(monkeypatch) -> None:
 async def test_fetch_blocks_disallowed_content_type(monkeypatch) -> None:
     ctx = WorkflowContext()
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 200
         mock_response.headers = {"content-type": "application/octet-stream"}
@@ -68,7 +68,7 @@ async def test_fetch_blocks_disallowed_content_type(monkeypatch) -> None:
 async def test_fetch_fails_on_http_error(monkeypatch) -> None:
     ctx = WorkflowContext()
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 404
         mock_response.headers = {"content-type": "text/html"}
@@ -89,7 +89,7 @@ async def test_fetch_fails_on_http_error(monkeypatch) -> None:
 async def test_fetch_truncates_large_body(monkeypatch) -> None:
     ctx = WorkflowContext()
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 200
         mock_response.headers = {"content-type": "text/html"}
@@ -110,7 +110,7 @@ async def test_fetch_truncates_large_body(monkeypatch) -> None:
 async def test_fetch_normalizes_url(monkeypatch) -> None:
     ctx = WorkflowContext()
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 200
         mock_response.headers = {"content-type": "text/html"}
@@ -135,7 +135,7 @@ async def test_fetch_marks_source_status(monkeypatch) -> None:
     ctx = WorkflowContext()
     ctx.sources.add(SourceInput(url="https://example.com/status-test"))
 
-    async def mock_get(self, url: str, **kwargs: object) -> object:
+    async def mock_get(_self, _url: str, **_kwargs: object) -> object:
         mock_response = AsyncMock()
         mock_response.status_code = 200
         mock_response.headers = {"content-type": "text/html"}

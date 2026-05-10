@@ -18,7 +18,10 @@ async def search_news_tool(
     query: str,
     limit: int = 15,
 ) -> object:
-    """Search the web for company news. Use site: operators for social media, e.g. site:twitter.com or site:linkedin.com."""
+    """Search the web for company news.
+
+    Use site: operators for social media, e.g. site:twitter.com or site:linkedin.com.
+    """
     return await _search_service.search_web(ctx.context, query, limit)
 
 
@@ -28,7 +31,10 @@ async def fetch_and_extract_tool(
     url: str,
     query: str | None = None,
 ) -> object:
-    """Fetch a URL and return extracted text. Pass the topic being researched as query to focus extraction."""
+    """Fetch a URL and return extracted text.
+
+    Pass the topic being researched as query to focus extraction.
+    """
     fetch_result = await _fetch_provider.fetch(ctx.context, url)
     if fetch_result.status != "fetched":
         return {

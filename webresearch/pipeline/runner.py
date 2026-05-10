@@ -7,7 +7,9 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from jinja2 import BaseLoader, Environment, Undefined
+from pydantic import BaseModel
 
+from webresearch.context import WorkflowContext
 from webresearch.events.step import (
     emit_loop_iteration,
     emit_step_completed,
@@ -48,8 +50,6 @@ class Pipeline:
         self._workflow_id = workflow_id
 
     async def run(self, input: WorkflowInput) -> WorkflowResult:
-        from webresearch.context import WorkflowContext
-
         state = PipelineState(
             input=input,
             run_id=f"run_{uuid4().hex}",
@@ -182,8 +182,6 @@ def _build_prompt(step: AgentStep, state: PipelineState, item: object = None) ->
 
 
 def _jsonable(value: object) -> object:
-    from pydantic import BaseModel
-
     if isinstance(value, BaseModel):
         return value.model_dump(mode="json")
     if isinstance(value, list):

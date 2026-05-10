@@ -15,7 +15,7 @@ from webresearch.workflows import load_workflows
 OutputFormat = Literal["json", "md"]
 
 
-def run_command(
+def run_command(  # noqa: PLR0913
     query: Annotated[str, typer.Argument(help="Research query.")],
     workflow: Annotated[str, typer.Argument(help="Workflow id.")] = "deep",
     depth: Annotated[str, typer.Option("--depth", help="Depth preset.")] = "standard",
@@ -52,7 +52,7 @@ def run_command(
         raise typer.Exit(3) from None
 
 
-async def _run(
+async def _run(  # noqa: PLR0913
     *,
     workflow: str,
     query: str,

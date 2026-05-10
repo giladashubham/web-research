@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from webresearch.providers.search import MockSearchProvider, SearchResult
 
 
@@ -30,8 +32,6 @@ def test_search_result_model() -> None:
 
 
 def test_search_result_extra_forbidden() -> None:
-    import pytest
-
     with pytest.raises(ValueError):
         SearchResult(  # type: ignore[call-arg]
             url="https://example.com",

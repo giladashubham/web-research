@@ -158,12 +158,12 @@ def _same_origin(base: str, url: str) -> bool:
 
 def _registrable_domain(host: str) -> str:
     labels = [label for label in host.lower().split(".") if label]
-    if len(labels) <= 2:
+    if len(labels) <= 2:  # noqa: PLR2004
         return ".".join(labels)
     if (
-        len(labels[-1]) == 2
+        len(labels[-1]) == 2  # noqa: PLR2004
         and labels[-2] in COMMON_SECOND_LEVEL_DOMAINS
-        and len(labels) >= 3
+        and len(labels) >= 3  # noqa: PLR2004
     ):
         return ".".join(labels[-3:])
     return ".".join(labels[-2:])
@@ -196,7 +196,7 @@ def _github_releases_url(url: str) -> str | None:
     if p.netloc not in ("github.com", "www.github.com"):
         return None
     segments = [s for s in p.path.split("/") if s]
-    if len(segments) < 2:
+    if len(segments) < 2:  # noqa: PLR2004
         return None
     org, repo = segments[0], segments[1]
     return f"https://github.com/{org}/{repo}/releases"

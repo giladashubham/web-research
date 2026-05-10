@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from importlib.resources import files
 from typing import TYPE_CHECKING
 
 from webresearch.pipeline.runtime import ExecutionResult
@@ -54,7 +55,7 @@ def _patch_runtime(monkeypatch) -> list[str]:
         ),
     ]
 
-    async def mock_execute(step, prompt, context, tools=None):
+    async def mock_execute(step, _prompt, _context, _tools=None):
         name = step.name
         if name == "planner":
             out = plans[(call_index[0]) % len(plans)]
@@ -128,11 +129,9 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
 
 
 def test_deep_prompt_uses_jinja2_template() -> None:
-    from importlib.resources import files
-
-    prompt = (
-        files("webresearch.workflows.deep") / "prompts" / "official.j2"
-    ).read_text(encoding="utf-8")
+    prompt = (files("webresearch.workflows.deep") / "prompts" / "official.j2").read_text(
+        encoding="utf-8"
+    )
 
     assert "official-source researcher" in prompt
     assert "ResearcherOutput" in prompt

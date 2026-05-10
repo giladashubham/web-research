@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from webresearch.pipeline.runner import Pipeline
 from webresearch.pipeline.step import Loop, Parallel
@@ -8,10 +8,11 @@ from webresearch.workflows.deep import agents
 from webresearch.workflows.deep.config import CONFIG
 
 if TYPE_CHECKING:
+    from webresearch.pipeline.state import PipelineState
     from webresearch.workflows.deep.models import ReviewOutput
 
 
-def _has_gaps(state: Any) -> bool:
+def _has_gaps(state: PipelineState) -> bool:
     review: ReviewOutput | None = state.outputs.get("reviewer")
     if review is None:
         return True

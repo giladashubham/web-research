@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from webresearch.types import WorkflowInput
 
 
-async def fake_workflow(input_: WorkflowInput) -> WorkflowResult:
+async def fake_workflow(_input: WorkflowInput) -> WorkflowResult:
     async with step("planner"):
         pass
     async with step("output"):

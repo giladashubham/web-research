@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from importlib.resources import files
 from typing import TYPE_CHECKING, cast
+from urllib.parse import urlsplit
 
 from webresearch.pipeline.hooks import HookSignal
 from webresearch.pipeline.step import AgentStep
@@ -177,14 +178,12 @@ async def _reviewer_pre_hook(state: PipelineState) -> HookSignal:
     on every iteration so both reviewer and gap_researcher prompts have
     fresh data.
     """
-    from urllib.parse import urlsplit
-
     # 1. Pages-by-domain count for the reviewer depth-floor check.
-    domain_counts: dict[str, int] = {}
+    pages_by_domain: dict[str, int] = {}
     for url in state.context.pages:
         domain = urlsplit(url).hostname or "unknown"
-        domain_counts[domain] = domain_counts.get(domain, 0) + 1
-    state.outputs["_pages_by_domain"] = domain_counts
+        pages_by_domain[domain] = pages_by_domain.get(domain, 0) + 1
+    state.outputs["_pages_by_domain"] = pages_by_domain
 
     # 2. Unread high-value URLs for the gap researcher.
     candidate = state.outputs.get("url_selector")

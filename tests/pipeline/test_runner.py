@@ -56,7 +56,7 @@ async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
     }
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         call_order.append(step.name)
         return _make_result(outputs[step.name])
@@ -99,7 +99,7 @@ async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
     call_order: list[str] = []
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         call_order.append(step.name)
         return _make_result(FakeOutput(result=step.name))
@@ -143,7 +143,7 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
     items_processed: list[str] = []
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         items_processed.append(step.name)
         return _make_result(FakeOutput(result=f"done_{step.name}"))
@@ -158,7 +158,7 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
                     prompt="item {{ item }}",
                     output_type=FakeOutput,
                 ),
-                over=lambda state: ["url1", "url2", "url3"],
+                over=lambda _state: ["url1", "url2", "url3"],
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
@@ -187,7 +187,7 @@ async def test_fanout_collects_results(monkeypatch) -> None:
     )
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        _step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         return next(outputs_iter)
 
@@ -199,7 +199,7 @@ async def test_fanout_collects_results(monkeypatch) -> None:
                 step=AgentStep(
                     name="fan_step", prompt="item {{ item }}", output_type=FakeOutput
                 ),
-                over=lambda state: ["a", "b", "c"],
+                over=lambda _state: ["a", "b", "c"],
             ),
         ],
         final_output_key="fan_step",
@@ -217,13 +217,13 @@ async def test_fanout_collects_results(monkeypatch) -> None:
 async def test_fanout_with_pre_hook_skip(monkeypatch) -> None:
     """FanOut step with a pre_hook that returns SKIP should skip execution."""
 
-    async def skip_hook(state: PipelineState) -> HookSignal:
+    async def skip_hook(_state: PipelineState) -> HookSignal:
         return HookSignal.SKIP
 
     executed = False
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        _step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         nonlocal executed
         executed = True
@@ -240,7 +240,7 @@ async def test_fanout_with_pre_hook_skip(monkeypatch) -> None:
                     output_type=FakeOutput,
                     pre_hook=skip_hook,
                 ),
-                over=lambda state: ["x", "y"],
+                over=lambda _state: ["x", "y"],
             ),
         ],
         final_output_key="skipped_fan",
@@ -267,7 +267,7 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
         pass
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         if step.name == "reviewer":
             iteration_count.append(len(iteration_count) + 1)
@@ -322,11 +322,11 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
 async def test_agent_pre_hook_skip(monkeypatch) -> None:
     skipped_step_executed = False
 
-    async def skip_hook(state: PipelineState) -> HookSignal:
+    async def skip_hook(_state: PipelineState) -> HookSignal:
         return HookSignal.SKIP
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         if step.name == "skip_me":
             nonlocal skipped_step_executed
@@ -371,7 +371,7 @@ async def test_agent_post_hook_repeat(monkeypatch) -> None:
         return HookSignal.CONTINUE
 
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         call_count[0] += 1
         if step.name == "repeater":
@@ -412,7 +412,7 @@ async def test_agent_post_hook_repeat(monkeypatch) -> None:
 
 async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        _step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         return ExecutionResult(
             output=FakeOutput(result="ok"),
@@ -454,7 +454,7 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
 
 async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
     async def mock_execute(
-        step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
+        _step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
         return _make_result(FakeOutput(result="ok"))
 
@@ -467,8 +467,6 @@ async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
         final_output_key="missing_key",
         workflow_id="missing_test",
     )
-
-    import pytest
 
     with pytest.raises(ValueError, match="not found in state outputs"):
         await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
