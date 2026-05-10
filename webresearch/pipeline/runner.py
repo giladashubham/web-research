@@ -32,7 +32,11 @@ if TYPE_CHECKING:
 
 PipelineStep = AgentStep | Parallel | FanOut | Loop
 
-_jinja = Environment(loader=BaseLoader(), undefined=Undefined)
+_jinja = Environment(
+    loader=BaseLoader(),
+    undefined=Undefined,
+    autoescape=False,  # noqa: S701 (Prompts are plain text, not HTML)
+)
 _jinja.filters["tojson"] = lambda v, indent=None: json.dumps(
     _jsonable(v) if not isinstance(v, Undefined) else None, indent=indent
 )
