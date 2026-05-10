@@ -42,9 +42,7 @@ async def fetch_and_extract_tool(
             "status": fetch_result.status,
             "reason": fetch_result.reason,
         }
-    extract_result = await _extract_provider.extract(
-        ctx.context, fetch_result.url, query
-    )
+    extract_result = await _extract_provider.extract(ctx.context, fetch_result.url, query)
     return {
         "url": fetch_result.url,
         "status": extract_result.status,

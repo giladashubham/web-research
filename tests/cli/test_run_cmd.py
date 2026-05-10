@@ -88,9 +88,7 @@ def test_output_write_error_exits_three(monkeypatch, tmp_path) -> None:
 
     monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
 
-    result = CliRunner().invoke(
-        app, ["run", "query", "fake", "--quiet", "--out", str(tmp_path)]
-    )
+    result = CliRunner().invoke(app, ["run", "query", "fake", "--quiet", "--out", str(tmp_path)])
 
     assert result.exit_code == 3
     assert "IO error" in result.output
@@ -103,9 +101,7 @@ def test_out_writes_file(monkeypatch, tmp_path) -> None:
     monkeypatch.setattr("webresearch.cli.run_cmd.load_workflows", mock_load)
     path = tmp_path / "result.json"
 
-    result = CliRunner().invoke(
-        app, ["run", "query", "fake", "--quiet", "--out", str(path)]
-    )
+    result = CliRunner().invoke(app, ["run", "query", "fake", "--quiet", "--out", str(path)])
 
     assert result.exit_code == 0
     assert result.output == ""

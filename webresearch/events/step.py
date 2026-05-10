@@ -60,9 +60,7 @@ async def emit_event(event: WorkflowEvent) -> None:
 
 
 async def emit_loop_iteration(loop: str, iteration: int) -> None:
-    await emit_event(
-        LoopIteration(run_id=current_run_id(), loop=loop, iteration=iteration)
-    )
+    await emit_event(LoopIteration(run_id=current_run_id(), loop=loop, iteration=iteration))
 
 
 async def emit_step_skipped(name: str, reason: str) -> None:

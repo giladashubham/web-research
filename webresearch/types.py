@@ -39,25 +39,19 @@ class Depth(WebResearchModel):
                 preset=DepthPreset.QUICK,
                 max_rounds=0,
                 max_sources=5,
-                tool_budgets=ToolBudgets(
-                    search_queries=2, fetch_urls=5, extract_pages=5
-                ),
+                tool_budgets=ToolBudgets(search_queries=2, fetch_urls=5, extract_pages=5),
             ),
             DepthPreset.STANDARD: cls(
                 preset=DepthPreset.STANDARD,
                 max_rounds=1,
                 max_sources=10,
-                tool_budgets=ToolBudgets(
-                    search_queries=5, fetch_urls=10, extract_pages=10
-                ),
+                tool_budgets=ToolBudgets(search_queries=5, fetch_urls=10, extract_pages=10),
             ),
             DepthPreset.DEEP: cls(
                 preset=DepthPreset.DEEP,
                 max_rounds=3,
                 max_sources=20,
-                tool_budgets=ToolBudgets(
-                    search_queries=10, fetch_urls=25, extract_pages=25
-                ),
+                tool_budgets=ToolBudgets(search_queries=10, fetch_urls=25, extract_pages=25),
             ),
         }
         return presets[DepthPreset(name)]

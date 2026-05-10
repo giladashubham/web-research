@@ -5,9 +5,7 @@ from webresearch.types import FetchStatus, SourceInput
 def test_same_normalized_url_returns_same_record():
     registry = SourceRegistry()
 
-    first = registry.add(
-        SourceInput(url="https://example.com/report/?utm_source=newsletter#top")
-    )
+    first = registry.add(SourceInput(url="https://example.com/report/?utm_source=newsletter#top"))
     second = registry.add(SourceInput(url="https://EXAMPLE.com/report"))
 
     assert second == first
@@ -18,14 +16,10 @@ def test_first_writer_wins_for_title_and_publisher():
     registry = SourceRegistry()
 
     first = registry.add(
-        SourceInput(
-            url="https://example.com/report", title="Original", publisher="Example"
-        )
+        SourceInput(url="https://example.com/report", title="Original", publisher="Example")
     )
     second = registry.add(
-        SourceInput(
-            url="https://example.com/report/", title="Updated", publisher="Other"
-        )
+        SourceInput(url="https://example.com/report/", title="Updated", publisher="Other")
     )
 
     assert second is first
@@ -52,9 +46,7 @@ def test_source_ids_are_stable_and_sequential_per_registry():
 def test_mark_fetch_status_updates_status_without_losing_fields():
     registry = SourceRegistry()
     record = registry.add(
-        SourceInput(
-            url="https://example.com/report", title="Report", publisher="Example"
-        )
+        SourceInput(url="https://example.com/report", title="Report", publisher="Example")
     )
 
     registry.mark_fetch_status(record.id, FetchStatus.FETCHED)

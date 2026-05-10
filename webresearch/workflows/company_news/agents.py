@@ -19,9 +19,9 @@ if TYPE_CHECKING:
 
 
 def _prompt(name: str) -> str:
-    return (
-        files("webresearch.workflows.company_news") / "prompts" / f"{name}.j2"
-    ).read_text(encoding="utf-8")
+    return (files("webresearch.workflows.company_news") / "prompts" / f"{name}.j2").read_text(
+        encoding="utf-8"
+    )
 
 
 async def _intake_planner_pre_hook(state: PipelineState) -> HookSignal:

@@ -163,9 +163,7 @@ def _output_items(step: ScriptStep, call_index: int) -> list[TResponseOutputItem
 
     if "final_output" in step:
         final_output = step["final_output"]
-        text = (
-            final_output if isinstance(final_output, str) else json.dumps(final_output)
-        )
+        text = final_output if isinstance(final_output, str) else json.dumps(final_output)
         items.append(_message(text, call_index))
     elif "text" in step:
         items.append(_message(str(step["text"]), call_index))

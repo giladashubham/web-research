@@ -37,9 +37,7 @@ class FetchResult(BaseModel):
 
 
 class FetchProvider:
-    def __init__(
-        self, timeout: float = 30, body_limit_bytes: int = BODY_SIZE_LIMIT_BYTES
-    ) -> None:
+    def __init__(self, timeout: float = 30, body_limit_bytes: int = BODY_SIZE_LIMIT_BYTES) -> None:
         self._timeout = timeout
         self._body_limit = body_limit_bytes
 
@@ -71,9 +69,7 @@ class FetchProvider:
             ) as client:
                 response = await client.get(normalized_url)
         except httpx.HTTPError as exc:
-            return _failure(
-                ctx, normalized_url, source.id, f"HTTP request failed: {exc}"
-            )
+            return _failure(ctx, normalized_url, source.id, f"HTTP request failed: {exc}")
 
         content_type = _content_type(response.headers.get("content-type"))
         if response.is_error:

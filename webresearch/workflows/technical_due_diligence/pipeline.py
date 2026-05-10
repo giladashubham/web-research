@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 
 
 def _all_resolved(state: PipelineState) -> bool:
-    review: TechnicalSubstanceReview | None = state.outputs.get(
-        "technical_substance_reviewer"
-    )
+    review: TechnicalSubstanceReview | None = state.outputs.get("technical_substance_reviewer")
     if review is None:
         return False
     return not review.unresolved_claims

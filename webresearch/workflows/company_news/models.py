@@ -34,9 +34,7 @@ class ResearcherOutput(WebResearchModel):
 class NewsItem(WebResearchModel):
     title: str = Field(min_length=1)
     date: str | None = None
-    category: Literal[
-        "leadership", "funding", "product_pricing", "partnerships_ma", "other"
-    ]
+    category: Literal["leadership", "funding", "product_pricing", "partnerships_ma", "other"]
     summary: str = Field(min_length=1)
     url: str = Field(min_length=1)
     source_id: str | None = None

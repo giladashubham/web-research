@@ -39,9 +39,7 @@ def _patch_runtime(monkeypatch) -> list[str]:
         PlanOutput(questions=["Q"], risks=[], search_strategy="Search."),
     ]
     research = [
-        ResearcherOutput(
-            summary="official", source_ids=[], evidence_ids=[], confidence="medium"
-        ),
+        ResearcherOutput(summary="official", source_ids=[], evidence_ids=[], confidence="medium"),
     ]
     review_gapped = ReviewOutput(
         coverage=[], conflicts=[], has_critical_gaps=True, follow_up_queries=["gap"]
@@ -50,9 +48,7 @@ def _patch_runtime(monkeypatch) -> list[str]:
         coverage=[], conflicts=[], has_critical_gaps=False, follow_up_queries=[]
     )
     gaps = [
-        GapResearchOutput(
-            summary="gap", source_ids=[], evidence_ids=[], confidence="low"
-        ),
+        GapResearchOutput(summary="gap", source_ids=[], evidence_ids=[], confidence="low"),
     ]
 
     async def mock_execute(step, _prompt, _context, _tools=None):
@@ -90,9 +86,7 @@ async def test_deep_loads_from_registry() -> None:
 async def test_deep_hits_max_rounds_two_and_stops(monkeypatch) -> None:
     reviewer_calls = _patch_runtime(monkeypatch)
 
-    result = await run_deep(
-        WorkflowInput(query="query", depth=Depth.for_preset("deep"))
-    )
+    result = await run_deep(WorkflowInput(query="query", depth=Depth.for_preset("deep")))
 
     assert result.answer_markdown == "Deep answer"
     assert result.metadata.workflow_id == "deep"

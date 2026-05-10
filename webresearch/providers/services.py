@@ -48,9 +48,7 @@ def _is_vendor_official(host: str, blog_hints: tuple[str, ...]) -> bool:
 
 
 def _is_major_news(host: str, major_domains: set[str]) -> bool:
-    return any(
-        host == domain or host.endswith(f".{domain}") for domain in major_domains
-    )
+    return any(host == domain or host.endswith(f".{domain}") for domain in major_domains)
 
 
 class SearchService:
@@ -58,9 +56,7 @@ class SearchService:
         self._provider = provider or default_search_provider()
         self._query_cache: dict[str, object] = {}
 
-    async def search_web(
-        self, ctx: WorkflowContext, query: str, limit: int = 10
-    ) -> object:
+    async def search_web(self, ctx: WorkflowContext, query: str, limit: int = 10) -> object:
         class SearchWebResult(BaseModel):
             model_config = ConfigDict(extra="forbid")
             source_id: str
@@ -112,9 +108,7 @@ class SearchService:
                 )
             )
 
-        result = SearchResults(
-            query=query, results=results, provider_id=self._provider.id
-        )
+        result = SearchResults(query=query, results=results, provider_id=self._provider.id)
         self._query_cache[cache_key] = result
         return result
 
@@ -136,19 +130,14 @@ class SearchService:
 
         sources = _selected_sources(ctx, source_ids)
         ranked = sorted(
-            (
-                RankedSource(source_id=s.id, url=s.url, score=_score_source(ctx, s))
-                for s in sources
-            ),
+            (RankedSource(source_id=s.id, url=s.url, score=_score_source(ctx, s)) for s in sources),
             key=lambda rs: rs.score,
             reverse=True,
         )
         return RankedSources(sources=ranked[:top_k])
 
 
-def _selected_sources(
-    ctx: WorkflowContext, source_ids: list[str] | None
-) -> list[SourceRecord]:
+def _selected_sources(ctx: WorkflowContext, source_ids: list[str] | None) -> list[SourceRecord]:
     if source_ids is None:
         return list(ctx.sources.list())
     selected: list[SourceRecord] = []

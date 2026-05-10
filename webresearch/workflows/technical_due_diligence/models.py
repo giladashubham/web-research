@@ -81,9 +81,7 @@ class ExtractedClaim(WebResearchModel):
     id: str = Field(min_length=1)
     claim: str = Field(min_length=1)
     source_urls: list[UrlString] = Field(default_factory=list)
-    category: Literal[
-        "product", "architecture", "ai_ml", "integration", "customer", "other"
-    ]
+    category: Literal["product", "architecture", "ai_ml", "integration", "customer", "other"]
     diligence_relevance: Literal["low", "medium", "high"]
 
 

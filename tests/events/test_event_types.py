@@ -32,15 +32,9 @@ from webresearch.events.types import (
         StepSkipped(run_id="run_1", step="gap", reason="No critical gaps"),
         StepFailed(run_id="run_1", step="planner", error="failed"),
         LoopIteration(run_id="run_1", loop="gap", iteration=1),
-        ToolStarted(
-            run_id="run_1", step="research", tool_name="search_web", call_id="call_1"
-        ),
-        ToolCompleted(
-            run_id="run_1", step="research", tool_name="search_web", call_id="call_1"
-        ),
-        ArtifactAdded(
-            run_id="run_1", artifact_id="artifact_1", artifact_kind="evidence"
-        ),
+        ToolStarted(run_id="run_1", step="research", tool_name="search_web", call_id="call_1"),
+        ToolCompleted(run_id="run_1", step="research", tool_name="search_web", call_id="call_1"),
+        ArtifactAdded(run_id="run_1", artifact_id="artifact_1", artifact_kind="evidence"),
         SourceAdded(run_id="run_1", source_id="src_1", url="https://example.com"),
         OutputTextDelta(run_id="run_1", delta="hello"),
         Warning(run_id="run_1", message="warning"),

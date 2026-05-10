@@ -59,9 +59,7 @@ async def test_extract_adds_evidence_and_artifact() -> None:
     )
 
     provider = ExtractProvider()
-    result = await provider.extract(
-        ctx, "https://example.com/evidence", query="test relevance"
-    )
+    result = await provider.extract(ctx, "https://example.com/evidence", query="test relevance")
 
     assert result.status == "extracted"
     assert len(ctx.evidence) == 1
