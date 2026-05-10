@@ -39,7 +39,9 @@ class ClaimAssessment(WebResearchModel):
     claim_source_urls: list[UrlString] = Field(default_factory=list)
     public_evidence: str = Field(min_length=1)
     evidence_source_urls: list[UrlString] = Field(default_factory=list)
-    assessment: Literal["supported", "partially_supported", "unsupported", "unclear", "contradicted"]
+    assessment: Literal[
+        "supported", "partially_supported", "unsupported", "unclear", "contradicted"
+    ]
     confidence: Literal["low", "medium", "high"]
     code_review_follow_up_ids: list[str] = Field(default_factory=list)
 
@@ -100,7 +102,16 @@ class UnresolvedClaim(WebResearchModel):
     claim_text: str = Field(min_length=1)
     reason_unresolved: str = Field(min_length=1)
     artefact_types_to_chase: list[
-        Literal["docs", "changelog", "api", "pricing", "security", "customers", "blog", "careers"]
+        Literal[
+            "docs",
+            "changelog",
+            "api",
+            "pricing",
+            "security",
+            "customers",
+            "blog",
+            "careers",
+        ]
     ] = Field(default_factory=list)
     follow_up_queries: list[str] = Field(default_factory=list)
 

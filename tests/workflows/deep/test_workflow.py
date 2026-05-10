@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from importlib.resources import files
 from typing import TYPE_CHECKING
 
 from webresearch.pipeline.runtime import ExecutionResult
 from webresearch.types import Depth, WorkflowInput
+from webresearch.workflows import load_workflows
 from webresearch.workflows.deep import run_deep
 from webresearch.workflows.deep.models import (
     FinalAnswer,
@@ -13,7 +15,6 @@ from webresearch.workflows.deep.models import (
     ResearcherOutput,
     ReviewOutput,
 )
-from webresearch.workflows import load_workflows
 
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
@@ -50,7 +51,7 @@ def _patch_runtime(monkeypatch) -> list[str]:
         GapResearchOutput(summary="gap", source_ids=[], evidence_ids=[], confidence="low"),
     ]
 
-    async def mock_execute(step, prompt, context, tools=None):
+    async def mock_execute(step, _prompt, _context, _tools=None):
         name = step.name
         if name == "planner":
             out = plans[(call_index[0]) % len(plans)]
@@ -94,7 +95,7 @@ async def test_deep_hits_max_rounds_two_and_stops(monkeypatch) -> None:
 
 
 async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
-    reviewer_calls = _patch_runtime(monkeypatch)
+    _patch_runtime(monkeypatch)
     steps: list[str] = []
 
     @asynccontextmanager
@@ -122,11 +123,9 @@ async def test_deep_uses_standard_step_shape(monkeypatch) -> None:
 
 
 def test_deep_prompt_uses_jinja2_template() -> None:
-    from importlib.resources import files
-
-    prompt = (
-        files("webresearch.workflows.deep") / "prompts" / "official.j2"
-    ).read_text(encoding="utf-8")
+    prompt = (files("webresearch.workflows.deep") / "prompts" / "official.j2").read_text(
+        encoding="utf-8"
+    )
 
     assert "official-source researcher" in prompt
     assert "ResearcherOutput" in prompt

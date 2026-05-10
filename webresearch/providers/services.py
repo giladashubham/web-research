@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
+from urllib.parse import urlsplit
+
+from pydantic import BaseModel, ConfigDict
 
 from webresearch.providers.errors import SearchProviderError
 from webresearch.providers.search import default_search_provider
@@ -17,10 +20,12 @@ EVIDENCE_BONUS = 0.1
 
 
 def domain_reliability_score(url: str) -> float:
-    from urllib.parse import urlsplit
-
     MAJOR_NEWS_DOMAINS = {
-        "apnews.com", "bbc.com", "nytimes.com", "reuters.com", "washingtonpost.com",
+        "apnews.com",
+        "bbc.com",
+        "nytimes.com",
+        "reuters.com",
+        "washingtonpost.com",
     }
     BLOG_HINTS = ("blog", "medium.com", "substack.com", "wordpress.com")
 
@@ -43,9 +48,7 @@ def _is_vendor_official(host: str, blog_hints: tuple[str, ...]) -> bool:
 
 
 def _is_major_news(host: str, major_domains: set[str]) -> bool:
-    return any(
-        host == domain or host.endswith(f".{domain}") for domain in major_domains
-    )
+    return any(host == domain or host.endswith(f".{domain}") for domain in major_domains)
 
 
 class SearchService:
@@ -53,11 +56,7 @@ class SearchService:
         self._provider = provider or default_search_provider()
         self._query_cache: dict[str, object] = {}
 
-    async def search_web(
-        self, ctx: WorkflowContext, query: str, limit: int = 10
-    ) -> object:
-        from pydantic import BaseModel, ConfigDict
-
+    async def search_web(self, ctx: WorkflowContext, query: str, limit: int = 10) -> object:
         class SearchWebResult(BaseModel):
             model_config = ConfigDict(extra="forbid")
             source_id: str
@@ -109,9 +108,7 @@ class SearchService:
                 )
             )
 
-        result = SearchResults(
-            query=query, results=results, provider_id=self._provider.id
-        )
+        result = SearchResults(query=query, results=results, provider_id=self._provider.id)
         self._query_cache[cache_key] = result
         return result
 
@@ -121,8 +118,6 @@ class SearchService:
         source_ids: list[str] | None = None,
         top_k: int = 10,
     ) -> object:
-        from pydantic import BaseModel, ConfigDict
-
         class RankedSource(BaseModel):
             model_config = ConfigDict(extra="forbid")
             source_id: str
@@ -135,19 +130,14 @@ class SearchService:
 
         sources = _selected_sources(ctx, source_ids)
         ranked = sorted(
-            (
-                RankedSource(source_id=s.id, url=s.url, score=_score_source(ctx, s))
-                for s in sources
-            ),
+            (RankedSource(source_id=s.id, url=s.url, score=_score_source(ctx, s)) for s in sources),
             key=lambda rs: rs.score,
             reverse=True,
         )
         return RankedSources(sources=ranked[:top_k])
 
 
-def _selected_sources(
-    ctx: WorkflowContext, source_ids: list[str] | None
-) -> list[SourceRecord]:
+def _selected_sources(ctx: WorkflowContext, source_ids: list[str] | None) -> list[SourceRecord]:
     if source_ids is None:
         return list(ctx.sources.list())
     selected: list[SourceRecord] = []

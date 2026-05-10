@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
-
-from webresearch.pipeline.hooks import PostHook, PreHook
-
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from pydantic import BaseModel
+
+    from webresearch.pipeline.hooks import PostHook, PreHook
     from webresearch.pipeline.state import PipelineState
 
 
@@ -32,11 +32,11 @@ class Parallel:
 @dataclass
 class FanOut:
     step: AgentStep
-    over: Callable[["PipelineState"], list[Any]]
+    over: Callable[[PipelineState], list[Any]]
 
 
 @dataclass
 class Loop:
     steps: list[AgentStep]
-    until: Callable[["PipelineState"], bool]
+    until: Callable[[PipelineState], bool]
     max_iterations: int | None = None

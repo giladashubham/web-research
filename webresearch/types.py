@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from enum import StrEnum
 from typing import Annotated, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+
+# Shared type alias for all workflow entry points.
+WorkflowFn = Callable[["WorkflowInput"], Awaitable["WorkflowResult"]]
 
 
 class WebResearchModel(BaseModel):

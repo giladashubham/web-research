@@ -16,7 +16,9 @@ from webresearch.workflows.technical_due_diligence.models import (
     TechnicalSubstanceReview,
     UnresolvedClaim,
 )
-from webresearch.workflows.technical_due_diligence.workflow import run_technical_due_diligence
+from webresearch.workflows.technical_due_diligence.workflow import (
+    run_technical_due_diligence,
+)
 
 __all__ = [
     "CategorizedGap",

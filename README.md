@@ -1,61 +1,60 @@
 # Web Research
 
-Web Research is a Python CLI and TUI for running OpenAI Agents SDK research workflows.
-It can search the web, fetch and extract pages, rank sources, review coverage gaps, and
-return sourced answers as JSON or Markdown. Workflows are packaged independently, with
-shared workflow infrastructure kept under `webresearch/workflows/shared/`.
+A Python CLI and library for running LLM-powered web research workflows. Built on the
+[OpenAI Agents SDK](https://github.com/openai/openai-agents-python) with a clean
+abstraction layer so the underlying runtime can be swapped without touching workflow code.
 
 ## Features
 
-- Package-based workflows:
-  - `standard`: planner, parallel research, reviewer, one gap pass, final answer.
-  - `quick`: planner, lean official and broad research, final answer.
-  - `deep`: standard workflow shape with a deeper source budget and two gap passes.
-  - `technical_due_diligence`: public technical substance, claims, competitors,
-    replicability, and code-review follow-up assessment.
-- Technical due-diligence output includes a markdown memo plus a structured
-  `TechnicalDueDiligenceReport` validated against the workflow-local JSON Schema.
-- Tavily search when `TAVILY_API_KEY` is configured; mock search provider otherwise.
-- Source registry with stable `src_*` IDs and fetched-page status.
-- Evidence extraction with stable `ev_*` IDs.
-- Event streaming for workflow progress, tool calls, output deltas, completion, and failure.
-- Typer CLI and Textual TUI.
-- Optional structured output validation for JSON results.
+- **Declarative pipeline** — Workflows are defined as sequences of `AgentStep`, `Parallel`,
+  `FanOut`, and `Loop` steps. The pipeline owns all execution mechanics (hooks, parallelism,
+  loop control, event emission, cost tracking).
+- **Entry-point workflow discovery** — Workflows are registered via Python entry points.
+  Adding a new workflow requires zero changes outside the workflow's own folder.
+- **Two built-in workflows:**
+  - **`deep`** — Planner → parallel research (official/recent/broad) → review → gap loop → answer.
+  - **`technical_due_diligence`** — Intake planning, URL selection, claim extraction, evidence
+    research, substance review with gap loop, final memo with structured report validated
+    against a JSON Schema.
+- **Provider layer** — Raw I/O adapters for web search (Tavily/mock), HTTP fetching, HTML
+  extraction (trafilatura), and URL discovery (sitemap + link parsing). No LLM concepts.
+- **Runtime isolation** — Only `pipeline/runtime.py` imports from the LLM framework.
+  Swapping to BAML, raw Anthropic API, etc. means rewriting that single file.
+- **Jinja2 prompt templates** — Prompts are `.j2` files rendered with the full pipeline state
+  (`{{ input }}`, `{{ outputs }}`, `{{ item }}`). No Python code builds prompt strings.
+- **Event streaming** — Real-time step/tool progress, output deltas, and cost tracking
+  available via async event stream.
+- **Cost tracking** — Per-step and cumulative token usage and cost, emitted via events and
+  captured in the final `WorkflowResult.metadata`.
 
 ## Setup
 
 ```sh
 uv sync
-uv run pre-commit install
 cp .env.example .env
 ```
 
-Edit `.env` with the credentials you want to use:
+Edit `.env` with your credentials:
 
 ```sh
-OPENAI_API_KEY=...
-TAVILY_API_KEY=...
-OPENAI_MODEL=
+OPENAI_API_KEY=sk-...
+TAVILY_API_KEY=tvly-...
+OPENAI_MODEL=gpt-4.1
 WEBRESEARCH_URL_SELECTOR_MODEL=gpt-4.1-mini
-LIVE_LLM=0
 ```
 
 Environment variables are loaded from `.env` automatically. Values already set in your
-shell take precedence over `.env`.
-
-`WEBRESEARCH_URL_SELECTOR_MODEL` controls the lightweight URL-selection stage in technical
-due diligence, so it can use a cheaper model than the main research and memo agents.
+shell take precedence.
 
 ## CLI
 
-List workflows:
+List available workflows:
 
 ```sh
 uv run webresearch list
-uv run webresearch list --format json
 ```
 
-Run a query:
+Run the deep workflow:
 
 ```sh
 uv run webresearch run "What is the current Node.js LTS version?"
@@ -68,17 +67,17 @@ uv run webresearch run "Compare Python 3.13 migration risks" deep --depth deep
 uv run webresearch run "Summarize the latest Django release" quick --depth quick
 ```
 
-Run technical due diligence from public URLs and competitor hints:
+Run technical due diligence:
 
 ```sh
 uv run webresearch run \
-  "Evaluate PRODUCT for technical diligence. URLs: https://example.com/docs. Competitors: ACME, Contoso." \
+  "Evaluate ProductX for technical diligence. URLs: https://productx.com/docs. Competitors: ACME, Contoso." \
   technical_due_diligence \
   --format json \
   --out diligence.json
 ```
 
-Write Markdown or JSON output:
+Output formats:
 
 ```sh
 uv run webresearch run "What changed in Python 3.13?" --format md --out answer.md
@@ -93,58 +92,20 @@ Useful options:
 --quiet
 ```
 
-## TUI
-
-Start the terminal UI:
-
-```sh
-uv run webresearch tui
-```
-
-The TUI lets you choose a workflow, enter a query, watch progress, inspect sources and
-artifacts, export results, cancel an active run, and view runtime settings.
-
-## Runtime Environment
-
-Live OpenAI runs require `OPENAI_API_KEY`.
-
-Tavily-backed search requires `TAVILY_API_KEY`. If it is not set, the app uses the mock
-search provider, which is suitable for tests and local smoke runs.
-
-The gated live integration test requires:
-
-```sh
-LIVE_LLM=1
-OPENAI_API_KEY=...
-TAVILY_API_KEY=...
-```
-
-Run it with:
-
-```sh
-uv run pytest -m live
-```
-
-The OpenAI Agents SDK tracing dashboard is enabled by the SDK when tracing is configured
-for live runs. Unit tests use mocks and do not require tracing credentials.
-
 ## Python API
 
 ```python
 import asyncio
-
 from webresearch import run_workflow
 from webresearch.types import WorkflowInput
-from webresearch.workflows.standard import run_standard
-
+from webresearch.workflows.deep import run_deep
 
 async def main() -> None:
     result = await run_workflow(
-        run_standard,
+        run_deep,
         WorkflowInput(query="What is the current Node.js LTS version?"),
     )
     print(result.answer_markdown)
-
 
 asyncio.run(main())
 ```
@@ -153,32 +114,123 @@ For streaming progress:
 
 ```python
 from webresearch import stream_workflow
+from webresearch.workflows.deep import run_deep
+from webresearch.types import WorkflowInput
 
-async for event in stream_workflow(run_standard, WorkflowInput(query="Research query")):
+async for event in stream_workflow(run_deep, WorkflowInput(query="Research query")):
     print(event.kind)
 ```
 
-Use the technical due-diligence workflow directly:
+## Project Structure
 
-```python
-import asyncio
-
-from webresearch import run_workflow
-from webresearch.types import WorkflowInput
-from webresearch.workflows.technical_due_diligence import run_technical_due_diligence
-
-
-async def main() -> None:
-    result = await run_workflow(
-        run_technical_due_diligence,
-        WorkflowInput(query="Evaluate Example Robotics. URLs: https://example.com/docs"),
-    )
-    print(result.answer_markdown)
-    print(result.structured_data)
-
-
-asyncio.run(main())
 ```
+webresearch/
+  pipeline/            ← Execution engine (no LLM imports outside runtime.py)
+    hooks.py           ← HookSignal, PreHook, PostHook
+    state.py           ← PipelineState
+    step.py            ← AgentStep, Parallel, FanOut, Loop
+    runner.py          ← Pipeline class (orchestration + Jinja rendering)
+    runtime.py         ← ONLY file importing from the LLM framework
+    __init__.py        ← Re-exports function_tool, ToolContext
+
+  providers/           ← Raw I/O adapters (no LLM concepts)
+    search.py          ← SearchProvider protocol, Tavily + Mock implementations
+    fetch.py           ← httpx-based HTTP fetcher
+    extract.py         ← trafilatura-based HTML content extractor
+    discover.py        ← URL discovery via sitemap + link parsing
+    services.py        ← Higher-level search service with caching + ranking
+    errors.py          ← SearchProviderError
+
+  events/              ← Event types, streaming, context management
+    types.py           ← All event models (StepStarted, ToolCompleted, etc.)
+    step.py            ← event_context, step(), emit_event()
+    stream.py          ← stream_workflow(), run_workflow()
+
+  sources/             ← Source registry and URL normalization
+    registry.py        ← SourceRegistry (stable src_* IDs, fetch status)
+    url_normalize.py   ← URL normalization (scheme, host, port, tracking params)
+
+  cli/                 ← Typer CLI
+    __init__.py        ← app, commands
+    run_cmd.py         ← run command
+    list_cmd.py        ← list command
+    progress.py        ← ProgressRenderer
+    formats.py         ← Output formatting (JSON, Markdown)
+
+  context.py           ← WorkflowContext (pages, sources, evidence, cost)
+  types.py             ← Core contracts (WorkflowInput, WorkflowResult, Depth, etc.)
+  env.py               ← Environment / .env loading
+
+  workflows/           ← Workflow packages, discovered via entry points
+    __init__.py        ← load_workflows(), load_workflow_entries()
+    deep/              ← Deep research workflow
+      agents.py        ← AgentStep definitions
+      tools.py         ← function_tool wrappers
+      pipeline.py      ← Pipeline declaration
+      models.py        ← Output models
+      config.py        ← Workflow config
+      workflow.py      ← run_deep() entry point
+      prompts/         ← .j2 Jinja2 templates
+    technical_due_diligence/
+      agents.py        ← AgentStep definitions + hooks
+      tools.py         ← function_tool wrappers
+      pipeline.py      ← Pipeline declaration
+      models.py        ← Output models + UrlsByCategory
+      config.py        ← Workflow config
+      workflow.py      ← run_technical_due_diligence() entry point
+      prompts/         ← .j2 Jinja2 templates
+      schema.json      ← JSON Schema for structured report output
+      examples/        ← Example input/output
+```
+
+## Architecture
+
+### Layered design
+
+| Layer | Owns | Never touches |
+|-------|------|---------------|
+| `providers/` | Raw HTTP calls, API responses, HTML extraction | LLM concepts, tools, prompts |
+| `pipeline/` | Step execution, hooks, loops, events, cost, result build | Workflow logic, prompt content |
+| `pipeline/runtime.py` | LLM framework imports, agent construction | Everything else |
+| `events/` | Event types, sink, streaming to CLI | Workflow logic |
+| `context.py` | Page cache, source registry, evidence list | Execution, providers, LLM |
+| `types.py` | `WorkflowInput` / `WorkflowResult` contract | Workflow-specific types |
+| `workflow/*/tools.py` | function_tool wrappers + workflow-tuned docstrings | Provider implementation |
+| `workflow/*/agents.py` | AgentStep definitions + hook logic | LLM framework, Runner |
+| `workflow/*/pipeline.py` | Step sequence declaration | Hook logic, execution |
+| `workflow/*/workflow.py` | `run()` entry point | Everything (delegates to Pipeline) |
+| `cli/` | Workflow discovery, input parsing, output formatting | Workflow internals |
+
+### Pipeline step types
+
+- **`AgentStep`** — A single agent with a Jinja2 prompt, output type, tools, and optional hooks.
+- **`Parallel`** — Run multiple `AgentStep` instances concurrently. All must complete before
+  the pipeline continues.
+- **`FanOut`** — Run one `AgentStep` once per item in a dynamic collection (e.g. one per URL).
+  All instances run concurrently. Results collected as a list.
+- **`Loop`** — Repeat a sequence of steps until a condition is met or `max_iterations` is reached.
+
+### Cost tracking
+
+Cost flows through two channels simultaneously:
+
+1. **State accumulation** — `pipeline/runtime.py` returns `ExecutionResult` with token
+   counts. `pipeline/runner.py` accumulates these into `state.context.cost_usd`,
+   `input_tokens`, `output_tokens`. Final `WorkflowResult.metadata` reads from here.
+2. **Event emission** — Each `StepCompleted` event carries `cost_usd`, `input_tokens`,
+   `output_tokens` for real-time CLI display.
+
+### Adding a new workflow
+
+1. Create `webresearch/workflows/my_workflow/` with `workflow.py`, `agents.py`,
+   `tools.py`, `pipeline.py`, `models.py`, `config.py`, and `prompts/`.
+2. In `workflow.py`, expose an async `run_my_workflow(input: WorkflowInput) -> WorkflowResult`.
+3. Add an entry point in `pyproject.toml`:
+   ```toml
+   [project.entry-points."webresearch.workflows"]
+   my_workflow = "webresearch.workflows.my_workflow.workflow:run_my_workflow"
+   ```
+No other changes needed. The CLI discovers it automatically.
 
 ## Development
 
@@ -187,44 +239,23 @@ uv run pytest
 uv run ruff check
 uv run ruff format
 uv run mypy webresearch
-uv run pre-commit run -a
 ```
 
-Live service tests are skipped unless the required environment variables are set.
+Live service tests (require credentials):
 
-## Workflow Layout
-
-Workflows are package-based. Shared workflow infrastructure and shared prompts live under
-`webresearch/workflows/shared/`. Each workflow owns its orchestration, config, README,
-and workflow-specific prompt assets:
-
-```text
-webresearch/workflows/
-  registry.py
-  shared/
-    state.py
-    result.py
-    prompt_loader.py
-    prompts/
-  quick/
-    workflow.py
-    config.py
-    prompts/depth_extras.md
-  standard/
-    workflow.py
-    config.py
-    prompts/depth_extras.md
-  deep/
-    workflow.py
-    config.py
-    prompts/depth_extras.md
-  technical_due_diligence/
-    workflow.py
-    models.py
-    schema.json
-    prompts/
-    examples/
+```sh
+LIVE_LLM=1 uv run pytest -m live
 ```
 
-There is no root-level prompts package and no flat workflow modules. Imports should use
-package exports such as `from webresearch.workflows.standard import run_standard`.
+## Dependencies
+
+Key runtime dependencies:
+
+- `openai-agents` — LLM agent framework
+- `httpx` — Async HTTP client
+- `trafilatura` — HTML content extraction
+- `jinja2` — Prompt template rendering
+- `pydantic` — Data validation and schema enforcement
+- `typer` — CLI framework
+- `python-dotenv` — Environment file loading
+- `defusedxml` — Safe XML parsing for sitemaps

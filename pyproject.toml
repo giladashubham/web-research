@@ -22,9 +22,11 @@ webresearch = "webresearch.cli:app"
 [project.entry-points."webresearch.workflows"]
 deep = "webresearch.workflows.deep.workflow:run_deep"
 technical_due_diligence = "webresearch.workflows.technical_due_diligence.workflow:run_technical_due_diligence"
+company_news = "webresearch.workflows.company_news.workflow:run_company_news"
 
 [dependency-groups]
 dev = [
+    "black>=26.3.1",
     "mypy>=1.18.2",
     "pre-commit>=4.3.0",
     "pytest>=9.0.1",
@@ -45,6 +47,10 @@ packages = ["webresearch"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
 
 [tool.ruff.lint]
 select = [
@@ -100,6 +106,10 @@ module = "webresearch.workflows.technical_due_diligence.models"
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
+module = "webresearch.workflows.company_news.models"
+disallow_any_explicit = false
+
+[[tool.mypy.overrides]]
 module = [
     "webresearch.pipeline",
     "webresearch.pipeline.state",
@@ -121,6 +131,10 @@ module = [
     "webresearch.workflows.technical_due_diligence.pipeline",
     "webresearch.workflows.technical_due_diligence.tools",
     "webresearch.workflows.technical_due_diligence.workflow",
+    "webresearch.workflows.company_news.agents",
+    "webresearch.workflows.company_news.pipeline",
+    "webresearch.workflows.company_news.tools",
+    "webresearch.workflows.company_news.workflow",
     "webresearch.cli.run_cmd",
 ]
 disallow_any_explicit = false

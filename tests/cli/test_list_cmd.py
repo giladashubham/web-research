@@ -28,5 +28,7 @@ def test_list_json_round_trips() -> None:
 
     assert result.exit_code == 0
     parsed = json.loads(result.output)
-    assert parsed[0]["id"] == "deep"
-    assert {entry["id"] for entry in parsed} >= {"technical_due_diligence"}
+    ids = {entry["id"] for entry in parsed}
+    assert "deep" in ids
+    assert "technical_due_diligence" in ids
+    assert "company_news" in ids

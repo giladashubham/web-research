@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from webresearch.context import WorkflowContext
-from webresearch.pipeline import RunContextWrapper, function_tool
-from webresearch.providers.fetch import FetchProvider
-from webresearch.providers.extract import ExtractProvider
+from webresearch.pipeline import ToolContext, function_tool
 from webresearch.providers.discover import UrlDiscoverProvider
+from webresearch.providers.extract import ExtractProvider
+from webresearch.providers.fetch import FetchProvider
 from webresearch.providers.services import SearchService
 
 _fetch_provider = FetchProvider()
@@ -15,7 +14,7 @@ _search_service = SearchService()
 
 @function_tool
 async def search_web_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     query: str,
     limit: int = 10,
 ) -> object:
@@ -25,7 +24,7 @@ async def search_web_tool(
 
 @function_tool
 async def fetch_and_extract_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     url: str,
     query: str | None = None,
 ) -> object:
@@ -37,9 +36,7 @@ async def fetch_and_extract_tool(
             "status": fetch_result.status,
             "reason": fetch_result.reason,
         }
-    extract_result = await _extract_provider.extract(
-        ctx.context, fetch_result.url, query
-    )
+    extract_result = await _extract_provider.extract(ctx.context, fetch_result.url, query)
     return {
         "url": fetch_result.url,
         "status": extract_result.status,
@@ -54,7 +51,7 @@ async def fetch_and_extract_tool(
 
 @function_tool
 async def discover_urls_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     seed_url: str,
 ) -> object:
     """Expand a seed URL into high-value pages. Use before searching."""
@@ -63,7 +60,7 @@ async def discover_urls_tool(
 
 @function_tool
 async def rank_sources_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     source_ids: list[str] | None = None,
     top_k: int = 10,
 ) -> object:

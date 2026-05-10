@@ -3,6 +3,7 @@ from __future__ import annotations
 from importlib.resources import files
 
 from webresearch.pipeline.step import AgentStep
+from webresearch.workflows.deep.config import CONFIG
 from webresearch.workflows.deep.models import (
     FinalAnswer,
     GapResearchOutput,
@@ -14,9 +15,9 @@ from webresearch.workflows.deep.tools import RESEARCH_TOOLS
 
 
 def _prompt(name: str) -> str:
-    return (
-        files("webresearch.workflows.deep") / "prompts" / f"{name}.j2"
-    ).read_text(encoding="utf-8")
+    return (files("webresearch.workflows.deep") / "prompts" / f"{name}.j2").read_text(
+        encoding="utf-8"
+    )
 
 
 planner = AgentStep(
@@ -30,6 +31,7 @@ official_researcher = AgentStep(
     prompt=_prompt("official"),
     tools=RESEARCH_TOOLS,
     output_type=ResearcherOutput,
+    max_turns=CONFIG.researcher_max_turns,
 )
 
 recent_researcher = AgentStep(
@@ -37,6 +39,7 @@ recent_researcher = AgentStep(
     prompt=_prompt("recent"),
     tools=RESEARCH_TOOLS,
     output_type=ResearcherOutput,
+    max_turns=CONFIG.researcher_max_turns,
 )
 
 broad_researcher = AgentStep(
@@ -44,6 +47,7 @@ broad_researcher = AgentStep(
     prompt=_prompt("broad"),
     tools=RESEARCH_TOOLS,
     output_type=ResearcherOutput,
+    max_turns=CONFIG.researcher_max_turns,
 )
 
 reviewer = AgentStep(
@@ -57,6 +61,7 @@ gap_researcher = AgentStep(
     prompt=_prompt("gap"),
     tools=RESEARCH_TOOLS,
     output_type=GapResearchOutput,
+    max_turns=CONFIG.researcher_max_turns,
 )
 
 output_writer = AgentStep(

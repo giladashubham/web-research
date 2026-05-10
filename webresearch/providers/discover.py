@@ -27,6 +27,7 @@ class UrlsByCategory(BaseModel):
     careers: list[str] = Field(default_factory=list)
     other: list[str] = Field(default_factory=list)
 
+
 _SITEMAP_NS = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 
 CATEGORY_PATTERNS: dict[str, list[str]] = {

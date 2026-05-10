@@ -1,17 +1,20 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
 
 from webresearch.pipeline.runner import Pipeline
 from webresearch.pipeline.step import Loop
 from webresearch.workflows.technical_due_diligence import agents
-from webresearch.workflows.technical_due_diligence.models import TechnicalSubstanceReview
 
-
-def _all_resolved(state: Any) -> bool:
-    review: TechnicalSubstanceReview | None = state.outputs.get(
-        "technical_substance_reviewer"
+if TYPE_CHECKING:
+    from webresearch.pipeline.state import PipelineState
+    from webresearch.workflows.technical_due_diligence.models import (
+        TechnicalSubstanceReview,
     )
+
+
+def _all_resolved(state: PipelineState) -> bool:
+    review: TechnicalSubstanceReview | None = state.outputs.get("technical_substance_reviewer")
     if review is None:
         return False
     return not review.unresolved_claims

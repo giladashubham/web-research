@@ -27,3 +27,8 @@ class WorkflowContext:
     cost_usd: float = 0.0
     input_tokens: int = 0
     output_tokens: int = 0
+    _max_sources: int | None = field(default=None, repr=False)
+
+    def __post_init__(self) -> None:
+        if self._max_sources is not None:
+            self.sources._max_sources = self._max_sources

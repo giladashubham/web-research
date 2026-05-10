@@ -81,9 +81,15 @@ def _patch_runtime(monkeypatch, *, has_gaps: bool = False) -> list[str]:
             likely_claim_areas=["technical substance"],
             claim_source_urls=[],
             evidence_urls_by_category=UrlsByCategory(
-                docs=["https://example.com/docs", "https://example.com/docs/deep-installation"],
+                docs=[
+                    "https://example.com/docs",
+                    "https://example.com/docs/deep-installation",
+                ],
                 api=[],
-                changelog=["https://example.com/changelog", "https://example.com/changelog/v1"],
+                changelog=[
+                    "https://example.com/changelog",
+                    "https://example.com/changelog/v1",
+                ],
                 security=[],
                 customers=[],
                 blog=[],
@@ -164,7 +170,7 @@ def _patch_runtime(monkeypatch, *, has_gaps: bool = False) -> list[str]:
         ),
     }
 
-    async def mock_execute(step, prompt, context, tools=None):
+    async def mock_execute(step, _prompt, _context, _tools=None):
         call_order.append(step.name)
         out = outputs.get(step.name, {})
         return _make_exec_result(out)
@@ -194,8 +200,10 @@ async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None
     validate(instance=result.structured_data, schema=schema)
 
 
-async def test_diligence_gap_loop_runs_when_review_reports_unresolved(monkeypatch) -> None:
-    call_order = _patch_runtime(monkeypatch, has_gaps=True)
+async def test_diligence_gap_loop_runs_when_review_reports_unresolved(
+    monkeypatch,
+) -> None:
+    _patch_runtime(monkeypatch, has_gaps=True)
 
     result = await run_technical_due_diligence(
         WorkflowInput(
@@ -240,7 +248,10 @@ async def test_url_selection_guardrails_reject_unknown_urls_and_fill_minimum_cov
     candidates = UrlsByCategory(
         docs=["https://example.com/docs", "https://example.com/docs/architecture"],
         api=["https://example.com/api/reference"],
-        changelog=["https://example.com/release-notes", "https://example.com/release-notes/v2"],
+        changelog=[
+            "https://example.com/release-notes",
+            "https://example.com/release-notes/v2",
+        ],
         security=["https://example.com/security"],
     )
     selected = SelectedPriorityUrls(
