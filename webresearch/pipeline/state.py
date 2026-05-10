@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from webresearch.context import WorkflowContext
-from webresearch.types import WorkflowInput
+if TYPE_CHECKING:
+    from datetime import datetime
+
+    from webresearch.context import WorkflowContext
+    from webresearch.types import WorkflowInput
 
 
 @dataclass

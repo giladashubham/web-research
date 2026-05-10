@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 from importlib.resources import files
-from typing import cast
-from urllib.parse import urlparse
+from typing import TYPE_CHECKING, cast
 
 from webresearch.pipeline.hooks import HookSignal
-from webresearch.pipeline.state import PipelineState
 from webresearch.pipeline.step import AgentStep
 from webresearch.providers.discover import UrlsByCategory
 from webresearch.sources.url_normalize import normalize_url
@@ -21,19 +19,21 @@ from webresearch.workflows.technical_due_diligence.models import (
 )
 from webresearch.workflows.technical_due_diligence.tools import RESEARCH_TOOLS
 
+if TYPE_CHECKING:
+    from webresearch.pipeline.state import PipelineState
+
 # Derive URL categories from config so url_budgets and categories stay in sync.
 _URL_CATEGORIES = tuple(CONFIG.url_budgets.keys())
 
 
 def _prompt(name: str) -> str:
     return (
-        files("webresearch.workflows.technical_due_diligence")
-        / "prompts"
-        / f"{name}.j2"
+        files("webresearch.workflows.technical_due_diligence") / "prompts" / f"{name}.j2"
     ).read_text(encoding="utf-8")
 
 
 # --- URL validation helpers ---
+
 
 def _all_priority_urls(cat: UrlsByCategory) -> list[str]:
     result: list[str] = []
@@ -60,9 +60,7 @@ def _normalize_or_none(url: str) -> str | None:
 def _fallback_priority_urls(candidate_urls: UrlsByCategory) -> UrlsByCategory:
     return UrlsByCategory(
         **{
-            category: _urls_for_category(candidate_urls, category)[
-                : CONFIG.url_budgets[category]
-            ]
+            category: _urls_for_category(candidate_urls, category)[: CONFIG.url_budgets[category]]
             for category in _URL_CATEGORIES
         }
     )
@@ -87,11 +85,7 @@ def _validated_priority_urls(
         valid: list[str] = []
         for url in selected_by_category[category]:
             normalized = _normalize_or_none(url)
-            if (
-                normalized is None
-                or normalized not in candidate_lookup
-                or normalized in seen
-            ):
+            if normalized is None or normalized not in candidate_lookup or normalized in seen:
                 continue
             seen.add(normalized)
             valid.append(candidate_lookup[normalized])
@@ -118,7 +112,10 @@ def _merge_gap_into_review(
     resolved_by_text: set[str] = set()
     for a in gap.additional_claim_assessments:
         if a.assessment in (
-            "supported", "partially_supported", "unsupported", "contradicted",
+            "supported",
+            "partially_supported",
+            "unsupported",
+            "contradicted",
         ):
             if a.claim_id is not None:
                 resolved_by_id.add(a.claim_id)
@@ -127,13 +124,13 @@ def _merge_gap_into_review(
     remaining = [
         c
         for c in review.unresolved_claims
-        if c.claim_id not in resolved_by_id
-        and c.claim_text not in resolved_by_text
+        if c.claim_id not in resolved_by_id and c.claim_text not in resolved_by_text
     ]
     return review.model_copy(update={"unresolved_claims": remaining})
 
 
 # --- Hooks ---
+
 
 async def _url_selector_pre_hook(state: PipelineState) -> HookSignal:
     plan: IntakePlan | None = state.outputs.get("intake_planner")
@@ -156,13 +153,12 @@ async def _gap_post_hook(state: PipelineState) -> HookSignal:
     review = state.outputs.get("technical_substance_reviewer")
     gap = state.outputs.get("gap_researcher")
     if review is not None and gap is not None:
-        state.outputs["technical_substance_reviewer"] = _merge_gap_into_review(
-            review, gap
-        )
+        state.outputs["technical_substance_reviewer"] = _merge_gap_into_review(review, gap)
     return HookSignal.CONTINUE
 
 
 # --- Pre-hook to populate context for reviewer and gap researcher templates ---
+
 
 async def _reviewer_pre_hook(state: PipelineState) -> HookSignal:
     """Compute _pages_by_domain and _unread_high_value for templates.

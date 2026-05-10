@@ -195,7 +195,7 @@ async def test_diligence_workflow_returns_structured_report(monkeypatch) -> None
 
 
 async def test_diligence_gap_loop_runs_when_review_reports_unresolved(monkeypatch) -> None:
-    call_order = _patch_runtime(monkeypatch, has_gaps=True)
+    _patch_runtime(monkeypatch, has_gaps=True)
 
     result = await run_technical_due_diligence(
         WorkflowInput(

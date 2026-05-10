@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from webresearch.pipeline.runner import Pipeline
 from webresearch.pipeline.step import Loop, Parallel
 from webresearch.workflows.deep import agents
 from webresearch.workflows.deep.config import CONFIG
-from webresearch.workflows.deep.models import ReviewOutput
+
+if TYPE_CHECKING:
+    from webresearch.workflows.deep.models import ReviewOutput
 
 
 def _has_gaps(state: Any) -> bool:

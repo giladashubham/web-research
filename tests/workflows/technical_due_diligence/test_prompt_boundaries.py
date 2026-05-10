@@ -16,8 +16,7 @@ def test_diligence_prompts_label_evidence_inference_and_unknowns() -> None:
 
     pkg = "webresearch.workflows.technical_due_diligence"
     combined = "\n".join(
-        (files(pkg) / "prompts" / name).read_text(encoding="utf-8")
-        for name in prompt_names
+        (files(pkg) / "prompts" / name).read_text(encoding="utf-8") for name in prompt_names
     ).lower()
 
     assert "public evidence" in combined

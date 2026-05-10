@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from importlib.metadata import entry_points
-from typing import Any
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
-from webresearch.types import WorkflowFn
+if TYPE_CHECKING:
+    from webresearch.types import WorkflowFn
 
 
 class WorkflowEntry(BaseModel):
@@ -25,8 +26,7 @@ _WORKFLOW_METADATA: dict[str, WorkflowEntry] = {
         id="technical_due_diligence",
         name="Technical Due Diligence",
         description=(
-            "Public technical claims, release activity, competitors, "
-            "and code-review follow-ups."
+            "Public technical claims, release activity, competitors, and code-review follow-ups."
         ),
     ),
     "company_news": WorkflowEntry(
@@ -57,4 +57,3 @@ def load_workflow_entries() -> list[WorkflowEntry]:
         if meta is not None:
             entries.append(meta)
     return entries
-

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
-from webresearch.types import WorkflowInput, WorkflowResult
+from typing import TYPE_CHECKING
+
 from webresearch.workflows.technical_due_diligence.pipeline import PIPELINE
+
+if TYPE_CHECKING:
+    from webresearch.types import WorkflowInput, WorkflowResult
 
 
 async def run_technical_due_diligence(input: WorkflowInput) -> WorkflowResult:

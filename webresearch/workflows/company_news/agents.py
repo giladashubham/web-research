@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 from importlib.resources import files
+from typing import TYPE_CHECKING
 
 from webresearch.pipeline.hooks import HookSignal
-from webresearch.pipeline.state import PipelineState
 from webresearch.pipeline.step import AgentStep
 from webresearch.workflows.company_news.config import CONFIG
 from webresearch.workflows.company_news.models import (
@@ -14,11 +14,14 @@ from webresearch.workflows.company_news.models import (
 )
 from webresearch.workflows.company_news.tools import COMPANY_TOOLS, NEWS_TOOLS
 
+if TYPE_CHECKING:
+    from webresearch.pipeline.state import PipelineState
+
 
 def _prompt(name: str) -> str:
-    return (
-        files("webresearch.workflows.company_news") / "prompts" / f"{name}.j2"
-    ).read_text(encoding="utf-8")
+    return (files("webresearch.workflows.company_news") / "prompts" / f"{name}.j2").read_text(
+        encoding="utf-8"
+    )
 
 
 async def _intake_planner_pre_hook(state: PipelineState) -> HookSignal:

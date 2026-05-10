@@ -15,9 +15,9 @@ from webresearch.workflows.deep.tools import RESEARCH_TOOLS
 
 
 def _prompt(name: str) -> str:
-    return (
-        files("webresearch.workflows.deep") / "prompts" / f"{name}.j2"
-    ).read_text(encoding="utf-8")
+    return (files("webresearch.workflows.deep") / "prompts" / f"{name}.j2").read_text(
+        encoding="utf-8"
+    )
 
 
 planner = AgentStep(

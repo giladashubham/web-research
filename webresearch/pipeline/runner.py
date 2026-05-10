@@ -3,10 +3,10 @@ from __future__ import annotations
 import asyncio
 import json
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
+from uuid import uuid4
 
 from jinja2 import BaseLoader, Environment, Undefined
-from uuid import uuid4
 
 from webresearch.events.step import (
     emit_loop_iteration,
@@ -15,7 +15,7 @@ from webresearch.events.step import (
     step,
 )
 from webresearch.pipeline.hooks import HookSignal
-from webresearch.pipeline.runtime import ExecutionResult, calculate_cost, execute
+from webresearch.pipeline.runtime import calculate_cost, execute
 from webresearch.pipeline.state import PipelineState
 from webresearch.pipeline.step import AgentStep, FanOut, Loop, Parallel
 from webresearch.types import (
@@ -84,9 +84,7 @@ class Pipeline:
             exec_result = await execute(step_def, prompt, state.context)
 
         state.outputs[step_def.name] = exec_result.output
-        state.iteration_count[step_def.name] = (
-            state.iteration_count.get(step_def.name, 0) + 1
-        )
+        state.iteration_count[step_def.name] = state.iteration_count.get(step_def.name, 0) + 1
         step_cost = calculate_cost(
             exec_result.input_tokens, exec_result.output_tokens, exec_result.model
         )
@@ -137,9 +135,7 @@ class Pipeline:
                 state.context.output_tokens += exec_result.output_tokens
                 state.context.cost_usd += step_cost
 
-            state.iteration_count[fan.step.name] = (
-                state.iteration_count.get(fan.step.name, 0) + 1
-            )
+            state.iteration_count[fan.step.name] = state.iteration_count.get(fan.step.name, 0) + 1
 
             await emit_step_completed(
                 fan.step.name,
@@ -205,7 +201,7 @@ def _build_result(
     structured = getattr(final, "structured_data", None)
     # For workflows like TDD that embed structured data in a "report" field
     if structured is None and hasattr(final, "report"):
-        report = getattr(final, "report")
+        report = final.report
         if hasattr(report, "model_dump"):
             structured = report.model_dump(mode="json")
 

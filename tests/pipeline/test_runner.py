@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from pydantic import BaseModel
@@ -8,9 +8,11 @@ from pydantic import BaseModel
 from webresearch.pipeline.hooks import HookSignal
 from webresearch.pipeline.runner import Pipeline
 from webresearch.pipeline.runtime import ExecutionResult
-from webresearch.pipeline.state import PipelineState
 from webresearch.pipeline.step import AgentStep, FanOut, Loop, Parallel
-from webresearch.types import Depth, WorkflowInput, WorkflowResult
+from webresearch.types import Depth, WorkflowInput
+
+if TYPE_CHECKING:
+    from webresearch.pipeline.state import PipelineState
 
 RUNTIME_MODULE = "webresearch.pipeline.runner"
 
@@ -44,6 +46,7 @@ def _make_result(output: object) -> ExecutionResult:
 # Sequential execution
 # ---------------------------------------------------------------------------
 
+
 async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
     call_order: list[str] = []
     outputs: dict[str, object] = {
@@ -63,7 +66,9 @@ async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
     pipeline = Pipeline(
         steps=[
             AgentStep(name="planner", prompt="plan {{ input.query }}", output_type=FakeOutput),
-            AgentStep(name="researcher", prompt="research {{ input.query }}", output_type=FakeOutput),
+            AgentStep(
+                name="researcher", prompt="research {{ input.query }}", output_type=FakeOutput
+            ),
             AgentStep(name="writer", prompt="write {{ input.query }}", output_type=FakeFinal),
         ],
         final_output_key="writer",
@@ -81,6 +86,7 @@ async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
 # Parallel execution
 # ---------------------------------------------------------------------------
 
+
 async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
     call_order: list[str] = []
 
@@ -94,11 +100,13 @@ async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
 
     pipeline = Pipeline(
         steps=[
-            Parallel([
-                AgentStep(name="lane_a", prompt="a", output_type=FakeOutput),
-                AgentStep(name="lane_b", prompt="b", output_type=FakeOutput),
-                AgentStep(name="lane_c", prompt="c", output_type=FakeOutput),
-            ]),
+            Parallel(
+                [
+                    AgentStep(name="lane_a", prompt="a", output_type=FakeOutput),
+                    AgentStep(name="lane_b", prompt="b", output_type=FakeOutput),
+                    AgentStep(name="lane_c", prompt="c", output_type=FakeOutput),
+                ]
+            ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
         final_output_key="writer",
@@ -120,6 +128,7 @@ async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
 # FanOut execution
 # ---------------------------------------------------------------------------
 
+
 async def test_pipeline_runs_fanout(monkeypatch) -> None:
     items_processed: list[str] = []
 
@@ -134,7 +143,9 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
     pipeline = Pipeline(
         steps=[
             FanOut(
-                step=AgentStep(name="research_item", prompt="item {{ item }}", output_type=FakeOutput),
+                step=AgentStep(
+                    name="research_item", prompt="item {{ item }}", output_type=FakeOutput
+                ),
                 over=lambda state: ["url1", "url2", "url3"],
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
@@ -153,11 +164,13 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
 
 
 async def test_fanout_collects_results(monkeypatch) -> None:
-    outputs_iter = iter([
-        _make_result(FakeOutput(result="result_a")),
-        _make_result(FakeOutput(result="result_b")),
-        _make_result(FakeOutput(result="result_c")),
-    ])
+    outputs_iter = iter(
+        [
+            _make_result(FakeOutput(result="result_a")),
+            _make_result(FakeOutput(result="result_b")),
+            _make_result(FakeOutput(result="result_c")),
+        ]
+    )
 
     async def mock_execute(
         step: AgentStep, prompt: str, context: object, tools: list[Any] | None = None
@@ -226,6 +239,7 @@ async def test_fanout_with_pre_hook_skip(monkeypatch) -> None:
 # Loop execution
 # ---------------------------------------------------------------------------
 
+
 async def test_pipeline_runs_loop(monkeypatch) -> None:
     iteration_count: list[int] = []
 
@@ -278,6 +292,7 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
 # Pre-hook SKIP signal
 # ---------------------------------------------------------------------------
 
+
 async def test_agent_pre_hook_skip(monkeypatch) -> None:
     skipped_step_executed = False
 
@@ -318,6 +333,7 @@ async def test_agent_pre_hook_skip(monkeypatch) -> None:
 # Post-hook REPEAT signal
 # ---------------------------------------------------------------------------
 
+
 async def test_agent_post_hook_repeat(monkeypatch) -> None:
     call_count: list[int] = [0]
 
@@ -350,10 +366,12 @@ async def test_agent_post_hook_repeat(monkeypatch) -> None:
         workflow_id="repeat_test",
     )
 
-    result = await pipeline.run(WorkflowInput(
-        query="test",
-        depth=Depth.for_preset("deep"),
-    ))
+    result = await pipeline.run(
+        WorkflowInput(
+            query="test",
+            depth=Depth.for_preset("deep"),
+        )
+    )
 
     assert call_count[0] >= 3, "Step should repeat due to post_hook REPEAT"
     assert result.metadata.workflow_id == "repeat_test"
@@ -362,6 +380,7 @@ async def test_agent_post_hook_repeat(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 # Cost and token tracking
 # ---------------------------------------------------------------------------
+
 
 async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
     async def mock_execute(
@@ -388,12 +407,12 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
 
-    # 3 steps (step1, step2, writer) × 200 input each = 600
+    # 3 steps (step1, step2, writer) x 200 input each = 600
     assert result.metadata.tokens.input_tokens == 600
-    # 3 steps × 100 output each = 300
+    # 3 steps x 100 output each = 300
     assert result.metadata.tokens.output_tokens == 300
     assert result.metadata.tokens.total_tokens == 900
-    # Cost: 200 input * $2/1M + 100 output * $8/1M = $0.0012 per step × 3 steps = $0.0036
+    # Cost: 200 input * $2/1M + 100 output * $8/1M = $0.0012 per step x 3 steps = $0.0036
     assert result.metadata.cost_usd is not None
     assert result.metadata.cost_usd == pytest.approx(0.0036)
 
@@ -401,6 +420,7 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 # _build_result raises on missing key
 # ---------------------------------------------------------------------------
+
 
 async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
     async def mock_execute(
@@ -419,5 +439,6 @@ async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
     )
 
     import pytest
+
     with pytest.raises(ValueError, match="not found in state outputs"):
         await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))

@@ -10,4 +10,4 @@ from webresearch.context import WorkflowContext
 
 ToolContext = RunContextWrapper[WorkflowContext]
 
-__all__ = ["function_tool", "RunContextWrapper", "ToolContext"]
+__all__ = ["RunContextWrapper", "ToolContext", "function_tool"]

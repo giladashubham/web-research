@@ -6,7 +6,6 @@ from typing import Annotated, Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
-
 # Shared type alias for all workflow entry points.
 WorkflowFn = Callable[["WorkflowInput"], Awaitable["WorkflowResult"]]
 

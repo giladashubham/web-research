@@ -39,7 +39,9 @@ class ClaimAssessment(WebResearchModel):
     claim_source_urls: list[UrlString] = Field(default_factory=list)
     public_evidence: str = Field(min_length=1)
     evidence_source_urls: list[UrlString] = Field(default_factory=list)
-    assessment: Literal["supported", "partially_supported", "unsupported", "unclear", "contradicted"]
+    assessment: Literal[
+        "supported", "partially_supported", "unsupported", "unclear", "contradicted"
+    ]
     confidence: Literal["low", "medium", "high"]
     code_review_follow_up_ids: list[str] = Field(default_factory=list)
 

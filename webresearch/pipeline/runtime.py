@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from collections.abc import AsyncIterator
 from typing import TYPE_CHECKING, Any
 
-from agents import Agent, Runner, ModelSettings
+from agents import Agent, ModelSettings, Runner
 from agents.agent_output import AgentOutputSchema
 
 from webresearch.events.step import current_run_id, current_step, emit_event
@@ -13,10 +12,12 @@ from webresearch.events.types import (
     ToolCompleted,
     ToolStarted,
 )
-from webresearch.pipeline.step import AgentStep
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
     from webresearch.context import WorkflowContext
+    from webresearch.pipeline.step import AgentStep
 
 _COST_PER_1M: dict[str, dict[str, float]] = {
     "gpt-4.1": {"input": 2.00, "output": 8.00},

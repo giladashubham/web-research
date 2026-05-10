@@ -5,11 +5,9 @@ from datetime import UTC, datetime
 from webresearch.cli.formats import format_result, write_output
 from webresearch.context import WorkflowContext
 from webresearch.types import (
-    ResearchFinding,
     SourceInput,
     SourceRecord,
     TokenUsage,
-    WorkflowInput,
     WorkflowMetadata,
     WorkflowResult,
 )

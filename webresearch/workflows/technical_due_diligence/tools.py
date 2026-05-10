@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from webresearch.pipeline import ToolContext, function_tool
-from webresearch.providers.fetch import FetchProvider
-from webresearch.providers.extract import ExtractProvider
 from webresearch.providers.discover import UrlDiscoverProvider
+from webresearch.providers.extract import ExtractProvider
+from webresearch.providers.fetch import FetchProvider
 from webresearch.providers.services import SearchService
 
 _fetch_provider = FetchProvider()
@@ -39,9 +39,7 @@ async def fetch_and_extract_tool(
             "status": fetch_result.status,
             "reason": fetch_result.reason,
         }
-    extract_result = await _extract_provider.extract(
-        ctx.context, fetch_result.url, query
-    )
+    extract_result = await _extract_provider.extract(ctx.context, fetch_result.url, query)
     return {
         "url": fetch_result.url,
         "status": extract_result.status,

@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
-import pytest
-
 from webresearch.context import FetchedPage, WorkflowContext
 from webresearch.providers.fetch import FetchProvider
-from webresearch.sources.registry import SourceRegistry
 from webresearch.types import FetchStatus, SourceInput
 
 
@@ -126,9 +123,7 @@ async def test_fetch_normalizes_url(monkeypatch) -> None:
 
     provider = FetchProvider()
     # URL with trailing slash and tracking params
-    result = await provider.fetch(
-        ctx, "https://Example.COM/Page/?utm_source=test&fbclid=abc"
-    )
+    result = await provider.fetch(ctx, "https://Example.COM/Page/?utm_source=test&fbclid=abc")
 
     assert result.status == "fetched"
     assert result.url == "https://example.com/Page"
