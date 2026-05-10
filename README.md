@@ -90,7 +90,18 @@ Useful options:
 --instructions "Prefer official release notes"
 --max-sources 8
 --quiet
+--events-out logs/my-run.jsonc
 ```
+
+### Event Logs
+
+Every run automatically captures observable events (agent calls, tool interactions, warnings, etc.)
+into a `.jsonc` file. This is useful for debugging and diligence review without cluttering
+the final result output.
+
+- **Default location:** `.web-research/logs/run_<id>.jsonc`
+- **What is captured:** Workflow/Step/Agent lifecycle, Tool calls (redacted), Tool results (truncated), output deltas.
+- **Privacy:** Hidden model chain-of-thought is **not** captured.
 
 ## Python API
 

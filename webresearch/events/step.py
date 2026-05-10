@@ -49,6 +49,10 @@ def current_run_id() -> str:
     return _run_id.get() or "run_uninstrumented"
 
 
+def get_active_run_id() -> str | None:
+    return _run_id.get()
+
+
 def current_step() -> str | None:
     return _active_step.get()
 

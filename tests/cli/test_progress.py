@@ -8,7 +8,7 @@ from webresearch.events.types import (
     StepCompleted,
     StepSkipped,
     StepStarted,
-    ToolStarted,
+    ToolCall,
     Warning,
 )
 
@@ -18,7 +18,15 @@ def test_progress_renders_expected_glyph_sequence() -> None:
     renderer = ProgressRenderer(stream)
 
     renderer.render(StepStarted(run_id="run_1", step="planner"))
-    renderer.render(ToolStarted(run_id="run_1", step="planner", tool_name="search"))
+    renderer.render(
+        ToolCall(
+            run_id="run_1",
+            step="planner",
+            tool_name="search",
+            call_id="c1",
+            arguments={},
+        )
+    )
     renderer.render(StepCompleted(run_id="run_1", step="planner"))
     renderer.render(StepSkipped(run_id="run_1", step="gap", reason="none"))
     renderer.render(Warning(run_id="run_1", message="warn"))

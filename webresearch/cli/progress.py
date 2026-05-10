@@ -9,8 +9,9 @@ from webresearch.events.types import (
     StepCompleted,
     StepSkipped,
     StepStarted,
-    ToolCompleted,
-    ToolStarted,
+    ToolCall,
+    ToolFailed,
+    ToolResult,
     Warning,
     WorkflowEvent,
     WorkflowFailed,
@@ -36,7 +37,7 @@ class ProgressRenderer:
             self._line(f"✓  {event.step}  ({elapsed:.0f}s)")
         elif isinstance(event, StepSkipped):
             self._line(f"-  {event.step}  (skipped)")
-        elif isinstance(event, ToolStarted | ToolCompleted):
+        elif isinstance(event, ToolCall | ToolResult | ToolFailed):
             self._line(self._dim(f"   · {event.tool_name}"))
         elif isinstance(event, Warning):
             self._line(self._yellow(f"! {event.message}"))
