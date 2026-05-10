@@ -7,10 +7,12 @@ from agents import Agent, ModelSettings, Runner
 from agents.agent_output import AgentOutputSchema
 
 from webresearch.events.step import current_run_id, current_step, emit_event
+from webresearch.events.translation import translate_sdk_event
 from webresearch.events.types import (
+    AgentCompleted,
+    AgentFailed,
+    AgentStarted,
     OutputTextDelta,
-    ToolCompleted,
-    ToolStarted,
 )
 
 if TYPE_CHECKING:
@@ -58,7 +60,17 @@ async def execute(
         output_type=output_type,
         model_settings=ModelSettings(store=False),
     )
-    result = await Runner.run(agent, prompt, context=context, max_turns=step.max_turns)
+
+    await emit_event(
+        AgentStarted(run_id=current_run_id(), step=step.name, agent_name=step.name)
+    )
+    try:
+        result = await Runner.run(agent, prompt, context=context, max_turns=step.max_turns)
+    except Exception as exc:
+        await emit_event(AgentFailed(run_id=current_run_id(), step=step.name, error=str(exc)))
+        raise
+
+    await emit_event(AgentCompleted(run_id=current_run_id(), step=step.name))
 
     usage = result.raw_responses[-1].usage if result.raw_responses else None
     input_tokens = usage.input_tokens if usage else 0
@@ -85,7 +97,7 @@ async def patch_runner_for_streaming() -> AsyncIterator[None]:
     async def run_streamed_wrapper(*args: object, **kwargs: object) -> object:
         result = original_run_streamed(*args, **kwargs)  # type: ignore[arg-type]
         async for sdk_event in result.stream_events():
-            await _translate_sdk_event(sdk_event)
+            await translate_sdk_event(sdk_event)
         return result
 
     Runner.run = run_streamed_wrapper  # type: ignore[method-assign, assignment]
@@ -94,40 +106,6 @@ async def patch_runner_for_streaming() -> AsyncIterator[None]:
     finally:
         Runner.run = original_run  # type: ignore[method-assign]
         Runner.run_streamed = original_run_streamed  # type: ignore[method-assign]
-
-
-async def _translate_sdk_event(sdk_event: object) -> None:
-    step = current_step()
-    if step is None:
-        return
-
-    event_name = getattr(sdk_event, "name", None)
-    item = getattr(sdk_event, "item", None)
-    if event_name == "tool_called":
-        raw_item = getattr(item, "raw_item", None)
-        await emit_event(
-            ToolStarted(
-                run_id=current_run_id(),
-                step=step,
-                tool_name=str(getattr(raw_item, "name", "tool")),
-                call_id=_optional_str(getattr(raw_item, "call_id", None)),
-            )
-        )
-    elif event_name == "tool_output":
-        raw_item = getattr(item, "raw_item", None)
-        await emit_event(
-            ToolCompleted(
-                run_id=current_run_id(),
-                step=step,
-                tool_name="tool",
-                call_id=_optional_str(_dict_get(raw_item, "call_id")),
-            )
-        )
-
-    data = getattr(sdk_event, "data", None)
-    delta = _attr(data, "delta")
-    if step == "output" and _attr(data, "type") == "response.output_text.delta" and delta:
-        await emit_event(OutputTextDelta(run_id=current_run_id(), delta=str(delta)))
 
 
 def _dict_get(value: object, key: str) -> object | None:

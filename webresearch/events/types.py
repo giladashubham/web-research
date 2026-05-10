@@ -64,18 +64,45 @@ class LoopIteration(EventModel):
     iteration: int = Field(ge=1)
 
 
-class ToolStarted(EventModel):
-    kind: Literal["tool_started"] = "tool_started"
+class AgentStarted(EventModel):
+    kind: Literal["agent_started"] = "agent_started"
     step: str
-    tool_name: str
-    call_id: str | None = None
+    agent_name: str
 
 
-class ToolCompleted(EventModel):
-    kind: Literal["tool_completed"] = "tool_completed"
+class AgentCompleted(EventModel):
+    kind: Literal["agent_completed"] = "agent_completed"
+    step: str
+
+
+class AgentFailed(EventModel):
+    kind: Literal["agent_failed"] = "agent_failed"
+    step: str
+    error: str
+
+
+class ToolCall(EventModel):
+    kind: Literal["tool_call"] = "tool_call"
     step: str
     tool_name: str
-    call_id: str | None = None
+    call_id: str
+    arguments: dict[str, object]
+
+
+class ToolResult(EventModel):
+    kind: Literal["tool_result"] = "tool_result"
+    step: str
+    tool_name: str
+    call_id: str
+    result: object
+
+
+class ToolFailed(EventModel):
+    kind: Literal["tool_failed"] = "tool_failed"
+    step: str
+    tool_name: str
+    call_id: str
+    error: str
 
 
 class ArtifactAdded(EventModel):
@@ -109,8 +136,12 @@ WorkflowEvent = Annotated[
     | StepSkipped
     | StepFailed
     | LoopIteration
-    | ToolStarted
-    | ToolCompleted
+    | AgentStarted
+    | AgentCompleted
+    | AgentFailed
+    | ToolCall
+    | ToolResult
+    | ToolFailed
     | ArtifactAdded
     | SourceAdded
     | OutputTextDelta

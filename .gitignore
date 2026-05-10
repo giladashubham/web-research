@@ -20,6 +20,7 @@ coverage.xml
 
 # Project runtime
 .webresearch/
+.web-research/
 .env
 .env.*
 !.env.example

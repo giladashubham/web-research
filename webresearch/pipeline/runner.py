@@ -14,6 +14,7 @@ from webresearch.events.step import (
     emit_loop_iteration,
     emit_step_completed,
     emit_step_skipped,
+    get_active_run_id,
     step,
 )
 from webresearch.pipeline.hooks import HookSignal
@@ -54,9 +55,10 @@ class Pipeline:
         self._workflow_id = workflow_id
 
     async def run(self, input: WorkflowInput) -> WorkflowResult:
+        run_id = get_active_run_id() or f"run_{uuid4().hex}"
         state = PipelineState(
             input=input,
-            run_id=f"run_{uuid4().hex}",
+            run_id=run_id,
             started_at=datetime.now(UTC),
             context=WorkflowContext(_max_sources=input.max_sources),
         )
