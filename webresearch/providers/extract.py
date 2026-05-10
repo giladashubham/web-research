@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Literal
 import trafilatura
 from pydantic import BaseModel, ConfigDict
 
+from webresearch.events.step import emit_artifact_added
 from webresearch.sources.url_normalize import normalize_url
 from webresearch.types import EvidenceArtifact, EvidenceNote
 
@@ -74,6 +75,7 @@ class ExtractProvider:
                 evidence_ids=[evidence_id],
             )
         )
+        await emit_artifact_added(artifact_id, "evidence")
 
         return ExtractResult(
             url=normalized_url,

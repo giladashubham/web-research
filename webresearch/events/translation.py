@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 from webresearch.events.step import current_run_id, current_step, emit_event
 from webresearch.events.types import (
     OutputTextDelta,
@@ -60,19 +58,19 @@ async def translate_sdk_event(sdk_event: object) -> None:
         await emit_event(OutputTextDelta(run_id=current_run_id(), delta=str(delta)))
 
 
-def _dict_get(value: object, key: str) -> Any | None:
+def _dict_get(value: object, key: str) -> object | None:
     if isinstance(value, dict):
         return value.get(key)
     return None
 
 
-def _optional_str(value: Any | None) -> str | None:
+def _optional_str(value: object | None) -> str | None:
     if value is None:
         return None
     return str(value)
 
 
-def _as_dict(value: Any) -> dict[str, object]:
+def _as_dict(value: object) -> dict[str, object]:
     if isinstance(value, dict):
         return value
     return {"raw": str(value)}
