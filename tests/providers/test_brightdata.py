@@ -84,9 +84,7 @@ def test_default_search_provider_missing_creds(monkeypatch: pytest.MonkeyPatch) 
     monkeypatch.setenv("WEBRESEARCH_SEARCH_PROVIDER", "brightdata")
     monkeypatch.delenv("BRIGHTDATA_API_KEY", raising=False)
 
-    with pytest.raises(
-        ValueError, match="BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required"
-    ):
+    with pytest.raises(ValueError, match="BRIGHTDATA_API_KEY and BRIGHTDATA_ZONE are required"):
         default_search_provider()
 
 
