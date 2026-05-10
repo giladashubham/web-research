@@ -6,13 +6,12 @@ from typing import TYPE_CHECKING, Any
 from agents import Agent, ModelSettings, Runner
 from agents.agent_output import AgentOutputSchema
 
-from webresearch.events.step import current_run_id, current_step, emit_event
+from webresearch.events.step import current_run_id, emit_event
 from webresearch.events.translation import translate_sdk_event
 from webresearch.events.types import (
     AgentCompleted,
     AgentFailed,
     AgentStarted,
-    OutputTextDelta,
 )
 
 if TYPE_CHECKING:
@@ -61,9 +60,7 @@ async def execute(
         model_settings=ModelSettings(store=False),
     )
 
-    await emit_event(
-        AgentStarted(run_id=current_run_id(), step=step.name, agent_name=step.name)
-    )
+    await emit_event(AgentStarted(run_id=current_run_id(), step=step.name, agent_name=step.name))
     try:
         result = await Runner.run(agent, prompt, context=context, max_turns=step.max_turns)
     except Exception as exc:
