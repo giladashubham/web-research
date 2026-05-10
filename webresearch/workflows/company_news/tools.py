@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from webresearch.pipeline import ToolContext, function_tool
-from webresearch.providers.fetch import FetchProvider
-from webresearch.providers.extract import ExtractProvider
 from webresearch.providers.discover import UrlDiscoverProvider
+from webresearch.providers.extract import ExtractProvider
+from webresearch.providers.fetch import FetchProvider
 from webresearch.providers.services import SearchService
 
 _fetch_provider = FetchProvider()
@@ -13,12 +13,12 @@ _search_service = SearchService()
 
 
 @function_tool
-async def search_web_tool(
+async def search_news_tool(
     ctx: ToolContext,
     query: str,
-    limit: int = 10,
+    limit: int = 15,
 ) -> object:
-    """Search the web for sources relevant to the research query."""
+    """Search the web for company news. Use site: operators for social media, e.g. site:twitter.com or site:linkedin.com."""
     return await _search_service.search_web(ctx.context, query, limit)
 
 
@@ -28,7 +28,7 @@ async def fetch_and_extract_tool(
     url: str,
     query: str | None = None,
 ) -> object:
-    """Fetch a URL and return extracted text. Pass query to focus extraction."""
+    """Fetch a URL and return extracted text. Pass the topic being researched as query to focus extraction."""
     fetch_result = await _fetch_provider.fetch(ctx.context, url)
     if fetch_result.status != "fetched":
         return {
@@ -36,9 +36,7 @@ async def fetch_and_extract_tool(
             "status": fetch_result.status,
             "reason": fetch_result.reason,
         }
-    extract_result = await _extract_provider.extract(
-        ctx.context, fetch_result.url, query
-    )
+    extract_result = await _extract_provider.extract(ctx.context, fetch_result.url, query)
     return {
         "url": fetch_result.url,
         "status": extract_result.status,
@@ -52,27 +50,13 @@ async def fetch_and_extract_tool(
 
 
 @function_tool
-async def discover_urls_tool(
+async def discover_company_pages_tool(
     ctx: ToolContext,
     seed_url: str,
 ) -> object:
-    """Expand a seed URL into high-value pages. Use before searching."""
+    """Discover pages on a company's domain: blog, newsroom, press releases, changelog."""
     return await _discover_provider.discover(ctx.context, seed_url)
 
 
-@function_tool
-async def rank_sources_tool(
-    ctx: ToolContext,
-    source_ids: list[str] | None = None,
-    top_k: int = 10,
-) -> object:
-    """Rank registered sources by reliability and recency."""
-    return await _search_service.rank_sources(ctx.context, source_ids, top_k)
-
-
-RESEARCH_TOOLS = [
-    discover_urls_tool,
-    search_web_tool,
-    fetch_and_extract_tool,
-    rank_sources_tool,
-]
+NEWS_TOOLS = [search_news_tool, fetch_and_extract_tool]
+COMPANY_TOOLS = [discover_company_pages_tool, search_news_tool, fetch_and_extract_tool]

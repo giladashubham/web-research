@@ -21,11 +21,8 @@ from webresearch.workflows.technical_due_diligence.models import (
 )
 from webresearch.workflows.technical_due_diligence.tools import RESEARCH_TOOLS
 
-_URL_CATEGORIES = (
-    "docs", "api", "changelog", "security", "customers",
-    "blog", "careers", "other",
-)
-_MIN_COVERAGE_CATEGORIES = ("docs", "api", "changelog", "security")
+# Derive URL categories from config so url_budgets and categories stay in sync.
+_URL_CATEGORIES = tuple(CONFIG.url_budgets.keys())
 
 
 def _prompt(name: str) -> str:
@@ -39,10 +36,10 @@ def _prompt(name: str) -> str:
 # --- URL validation helpers ---
 
 def _all_priority_urls(cat: UrlsByCategory) -> list[str]:
-    return (
-        cat.docs + cat.api + cat.changelog + cat.security
-        + cat.customers + cat.blog + cat.careers + cat.other
-    )
+    result: list[str] = []
+    for category in _URL_CATEGORIES:
+        result.extend(_urls_for_category(cat, category))
+    return result
 
 
 def _urls_for_category(cat: UrlsByCategory, category: str) -> list[str]:
@@ -106,7 +103,7 @@ def _validated_priority_urls(
         return fallback
 
     fallback_by_category = _urls_by_category(fallback)
-    for category in _MIN_COVERAGE_CATEGORIES:
+    for category in CONFIG.min_coverage_categories:
         if not updates[category] and fallback_by_category[category]:
             updates[category] = fallback_by_category[category][:1]
 
@@ -165,6 +162,45 @@ async def _gap_post_hook(state: PipelineState) -> HookSignal:
     return HookSignal.CONTINUE
 
 
+# --- Pre-hook to populate context for reviewer and gap researcher templates ---
+
+async def _reviewer_pre_hook(state: PipelineState) -> HookSignal:
+    """Compute _pages_by_domain and _unread_high_value for templates.
+
+    Runs before technical_substance_reviewer (first step in the gap loop)
+    on every iteration so both reviewer and gap_researcher prompts have
+    fresh data.
+    """
+    from urllib.parse import urlsplit
+
+    # 1. Pages-by-domain count for the reviewer depth-floor check.
+    domain_counts: dict[str, int] = {}
+    for url in state.context.pages:
+        domain = urlsplit(url).hostname or "unknown"
+        domain_counts[domain] = domain_counts.get(domain, 0) + 1
+    state.outputs["_pages_by_domain"] = domain_counts
+
+    # 2. Unread high-value URLs for the gap researcher.
+    candidate = state.outputs.get("url_selector")
+    intake = state.outputs.get("intake_planner")
+    cat = (
+        candidate.evidence_urls_by_category
+        if candidate and hasattr(candidate, "evidence_urls_by_category")
+        else (
+            intake.evidence_urls_by_category
+            if intake and hasattr(intake, "evidence_urls_by_category")
+            else UrlsByCategory()
+        )
+    )
+    all_candidate_urls = _all_priority_urls(cat)
+    fetched_urls = set(state.context.pages.keys())
+    state.outputs["_unread_high_value"] = [
+        url for url in all_candidate_urls if url not in fetched_urls
+    ]
+
+    return HookSignal.CONTINUE
+
+
 # --- Agents ---
 
 intake_planner = AgentStep(
@@ -203,6 +239,7 @@ technical_substance_reviewer = AgentStep(
     name="technical_substance_reviewer",
     prompt=_prompt("technical_substance_reviewer"),
     output_type=TechnicalSubstanceReview,
+    pre_hook=_reviewer_pre_hook,
 )
 
 gap_researcher = AgentStep(

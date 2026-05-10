@@ -54,7 +54,7 @@ class Pipeline:
             input=input,
             run_id=f"run_{uuid4().hex}",
             started_at=datetime.now(UTC),
-            context=WorkflowContext(),
+            context=WorkflowContext(_max_sources=input.max_sources),
         )
         for step_def in self._steps:
             await self._execute(step_def, state)
@@ -116,16 +116,45 @@ class Pipeline:
         results: list[Any] = []
 
         async def _fan_item(item: object) -> None:
-            # FanOut: run step for each item, append to shared list
-            # We create a temporary sub-execution by building a prompt and calling execute
-            prompt = _build_prompt(fan.step, state, item=item)
-            result = await execute(fan.step, prompt, state.context)
-            results.append(result.output)
-            state.context.input_tokens += result.input_tokens
-            state.context.output_tokens += result.output_tokens
-            state.context.cost_usd += calculate_cost(
-                result.input_tokens, result.output_tokens, result.model
+            # pre_hook
+            if fan.step.pre_hook:
+                signal = await fan.step.pre_hook(state)
+                if signal == HookSignal.SKIP:
+                    return
+
+            # execute with step context (events, error isolation)
+            async with step(fan.step.name):
+                prompt = _build_prompt(fan.step, state, item=item)
+                exec_result = await execute(fan.step, prompt, state.context)
+                results.append(exec_result.output)
+
+                step_cost = calculate_cost(
+                    exec_result.input_tokens,
+                    exec_result.output_tokens,
+                    exec_result.model,
+                )
+                state.context.input_tokens += exec_result.input_tokens
+                state.context.output_tokens += exec_result.output_tokens
+                state.context.cost_usd += step_cost
+
+            state.iteration_count[fan.step.name] = (
+                state.iteration_count.get(fan.step.name, 0) + 1
             )
+
+            await emit_step_completed(
+                fan.step.name,
+                cost_usd=step_cost,
+                input_tokens=exec_result.input_tokens,
+                output_tokens=exec_result.output_tokens,
+            )
+
+            # post_hook with REPEAT support
+            if fan.step.post_hook:
+                signal = await fan.step.post_hook(state)
+                if signal == HookSignal.REPEAT:
+                    max_rounds = state.input.depth.max_rounds
+                    if state.iteration_count.get(fan.step.name, 0) < max_rounds:
+                        await _fan_item(item)
 
         await asyncio.gather(*[_fan_item(item) for item in items])
         state.outputs[fan.step.name] = results
@@ -135,8 +164,8 @@ class Pipeline:
         iteration = 0
         while not loop.until(state) and iteration < max_iter:
             iteration += 1
+            await emit_loop_iteration(loop.steps[0].name, iteration)
             for loop_step in loop.steps:
-                await emit_loop_iteration(loop_step.name, iteration)
                 await self._execute_agent(loop_step, state)
                 acc_key = f"_{loop_step.name}_history"
                 if acc_key not in state.outputs:

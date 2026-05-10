@@ -5,6 +5,7 @@ from typing import Any
 from webresearch.pipeline.runner import Pipeline
 from webresearch.pipeline.step import Loop, Parallel
 from webresearch.workflows.deep import agents
+from webresearch.workflows.deep.config import CONFIG
 from webresearch.workflows.deep.models import ReviewOutput
 
 
@@ -32,5 +33,5 @@ PIPELINE = Pipeline(
         agents.output_writer,
     ],
     final_output_key="output",
-    workflow_id="deep",
+    workflow_id=CONFIG.workflow_id,
 )

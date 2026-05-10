@@ -92,6 +92,7 @@ async def patch_runner_for_streaming() -> AsyncIterator[None]:
         yield
     finally:
         Runner.run = original_run  # type: ignore[method-assign]
+        Runner.run_streamed = original_run_streamed  # type: ignore[method-assign]
 
 
 async def _translate_sdk_event(sdk_event: object) -> None:

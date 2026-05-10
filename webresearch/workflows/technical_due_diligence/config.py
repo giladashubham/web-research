@@ -12,7 +12,7 @@ class TechnicalDueDiligenceConfig:
     url_selector_model_env: str = "WEBRESEARCH_URL_SELECTOR_MODEL"
     url_budgets: dict[str, int] = field(default_factory=lambda: {
         "docs": 8, "api": 5, "changelog": 5, "security": 4,
-        "customers": 3, "blog": 3, "careers": 2, "other": 4,
+        "customers": 3, "blog": 3, "careers": 2, "pricing": 3, "other": 4,
     })
     min_coverage_categories: tuple[str, ...] = ("docs", "api", "changelog", "security")
 

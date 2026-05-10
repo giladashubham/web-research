@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 from importlib.metadata import entry_points
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
-from webresearch.types import WorkflowInput, WorkflowResult
-
-WorkflowFn = Callable[[WorkflowInput], Awaitable[WorkflowResult]]
+from webresearch.types import WorkflowFn
 
 
 class WorkflowEntry(BaseModel):
@@ -30,6 +27,14 @@ _WORKFLOW_METADATA: dict[str, WorkflowEntry] = {
         description=(
             "Public technical claims, release activity, competitors, "
             "and code-review follow-ups."
+        ),
+    ),
+    "company_news": WorkflowEntry(
+        id="company_news",
+        name="Company News",
+        description=(
+            "Recent news about a company: leadership changes, funding, product updates, "
+            "M&A, and anything else notable within a configurable time window."
         ),
     ),
 }

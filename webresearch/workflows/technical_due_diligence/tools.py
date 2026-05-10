@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from webresearch.context import WorkflowContext
-from webresearch.pipeline import RunContextWrapper, function_tool
+from webresearch.pipeline import ToolContext, function_tool
 from webresearch.providers.fetch import FetchProvider
 from webresearch.providers.extract import ExtractProvider
 from webresearch.providers.discover import UrlDiscoverProvider
@@ -15,7 +14,7 @@ _search_service = SearchService()
 
 @function_tool
 async def search_web_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     query: str,
     limit: int = 10,
 ) -> object:
@@ -25,7 +24,7 @@ async def search_web_tool(
 
 @function_tool
 async def fetch_and_extract_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     url: str,
     query: str | None = None,
 ) -> object:
@@ -57,7 +56,7 @@ async def fetch_and_extract_tool(
 
 @function_tool
 async def discover_urls_tool(
-    ctx: RunContextWrapper[WorkflowContext],
+    ctx: ToolContext,
     seed_url: str,
 ) -> object:
     """

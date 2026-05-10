@@ -9,8 +9,13 @@ SourceAddedCallback = Callable[[SourceRecord], None]
 
 
 class SourceRegistry:
-    def __init__(self, source_added: SourceAddedCallback | None = None) -> None:
+    def __init__(
+        self,
+        source_added: SourceAddedCallback | None = None,
+        max_sources: int | None = None,
+    ) -> None:
         self._source_added = source_added
+        self._max_sources = max_sources
         self._records: list[SourceRecord] = []
         self._by_id: dict[str, SourceRecord] = {}
         self._by_url: dict[str, SourceRecord] = {}
@@ -20,6 +25,9 @@ class SourceRegistry:
         existing = self._by_url.get(normalized_url)
         if existing is not None:
             return existing
+
+        if self._max_sources is not None and len(self._records) >= self._max_sources:
+            return self._records[-1] if self._records else existing  # type: ignore[return-value]
 
         source_id = f"src_{len(self._records) + 1}"
         record = SourceRecord(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator
 from uuid import uuid4
 
 from webresearch.events.step import event_context
@@ -12,9 +12,7 @@ from webresearch.events.types import (
     WorkflowStarted,
 )
 from webresearch.pipeline.runtime import patch_runner_for_streaming
-from webresearch.types import WorkflowInput, WorkflowResult
-
-WorkflowFn = Callable[[WorkflowInput], Awaitable[WorkflowResult]]
+from webresearch.types import WorkflowFn, WorkflowInput, WorkflowResult
 
 
 async def stream_workflow(
