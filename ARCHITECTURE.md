@@ -48,17 +48,8 @@ webresearch/
     registry.py         ← SourceRegistry
     url_normalize.py    ← URL normalization
 
-  cli/                  ← Typer CLI
-    __init__.py         ← App definition
-    run_cmd.py          ← Run command
-    list_cmd.py         ← List command
-    progress.py         ← ProgressRenderer
-    formats.py          ← Output formatting
-
-  workflows/            ← Discovered via entry points
+  workflows/            ← Entry-point loader (no workflows shipped in core)
     __init__.py         ← load_workflows(), load_workflow_entries()
-    deep/               ← Deep research workflow
-    technical_due_diligence/  ← Technical due diligence workflow
 
   context.py            ← WorkflowContext (pages, sources, evidence, cost)
   types.py              ← Core contracts
@@ -202,8 +193,11 @@ Available variables:
 
 ## Adding a New Workflow
 
-1. Create a package: `webresearch/workflows/my_workflow/`
-2. Required files:
+Workflows ship as separate pip packages. No changes to this package are needed.
+
+1. Create a new Python package (e.g., `webresearch-my-workflow/`).
+2. Add `webresearch` as a dependency.
+3. Create the workflow under `src/webresearch/workflows/my_workflow/`:
    - `workflow.py` — Async entry point `run_my_workflow(input) -> WorkflowResult`
    - `agents.py` — `AgentStep` definitions
    - `tools.py` — `function_tool` wrappers around `providers/` calls
@@ -211,13 +205,16 @@ Available variables:
    - `models.py` — Pydantic output models
    - `config.py` — Workflow configuration
    - `prompts/*.j2` — Jinja2 prompt templates
-3. Register in `pyproject.toml`:
+4. Register in your package's `pyproject.toml`:
    ```toml
    [project.entry-points."webresearch.workflows"]
    my_workflow = "webresearch.workflows.my_workflow.workflow:run_my_workflow"
+
+   [project.entry-points."webresearch.workflows.metadata"]
+   my_workflow = "webresearch.workflows.my_workflow:get_metadata"
    ```
 
-No other files need modification. The CLI discovers the workflow via `importlib.metadata`.
+Once installed, `load_workflows()` discovers it via `importlib.metadata`.
 
 ---
 
@@ -235,4 +232,4 @@ To swap to a different runtime:
 3. Update `patch_runner_for_streaming()` if the new framework has a different streaming model
 4. Update `pipeline/__init__.py` re-exports if the new framework uses different tool decorators
 
-No workflow files, providers, events, or CLI code needs to change.
+No workflow files, providers, or events code needs to change.

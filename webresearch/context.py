@@ -1,3 +1,10 @@
+"""Runtime state container for workflow execution.
+
+:class:`WorkflowContext` accumulates pages, sources, evidence, artifacts,
+warnings, and token/cost counters during a pipeline run.  It is owned by the
+pipeline engine and passed to providers and tools as a shared mutable bag.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -19,6 +26,12 @@ class FetchedPage:
 
 @dataclass
 class WorkflowContext:
+    """Mutable bag of runtime state shared across all steps in a pipeline run.
+
+    Accumulates fetched pages, registered sources, collected evidence,
+    generated artifacts, warnings, and cumulative token/cost counters.
+    """
+
     sources: SourceRegistry = field(default_factory=SourceRegistry)
     pages: dict[str, FetchedPage] = field(default_factory=dict)
     evidence: list[EvidenceNote] = field(default_factory=list)

@@ -1,6 +1,6 @@
 # Web Research Documentation
 
-Welcome to the documentation for **Web Research**, a Python CLI and library for running LLM-powered web research workflows.
+Welcome to the documentation for **Web Research**, a Python SDK for running LLM-powered web research workflows.
 
 ## 📖 Product Documentation
 
@@ -17,11 +17,12 @@ Deep dive into the architecture and how the system is built.
 
 ## 🔄 Workflow Guides
 
-Detailed guides for the built-in research patterns.
+Workflows are installed as separate pip packages. See each package's repository for its guide:
 
-- [**Deep Research**](workflows/deep.md): The iterative "Gap Analysis" workflow.
-- [**Technical Due Diligence**](workflows/technical_due_diligence.md): Specialized verification for technical targets.
-- [**Company News**](workflows/company_news.md): Multi-channel monitoring of official and social news.
+- [**webresearch-deep**](https://github.com/kodepo-com/web-research-deep) — Deep research with parallel lanes and gap analysis.
+- *More workflows coming soon.*
+
+To add your own, see the [API & Extension Guide](api/extension_guide.md).
 
 ---
 

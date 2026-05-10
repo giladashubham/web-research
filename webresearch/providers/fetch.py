@@ -37,6 +37,12 @@ class FetchResult(BaseModel):
 
 
 class FetchProvider:
+    """HTTP fetcher that caches results in :class:`WorkflowContext`.
+
+    Normalises URLs before fetching and stores the response body in
+    ``context.pages`` keyed by the normalised URL.
+    """
+
     def __init__(self, timeout: float = 30, body_limit_bytes: int = BODY_SIZE_LIMIT_BYTES) -> None:
         self._timeout = timeout
         self._body_limit = body_limit_bytes

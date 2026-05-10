@@ -4,6 +4,22 @@
 
 ### Major
 
+- **Workflow extraction** — Built-in workflows moved to separate pip packages:
+  - `webresearch-deep` — Deep research workflow.
+  - `webresearch-tdd` — Technical due diligence (coming soon).
+  - `webresearch-company-news` — Company news monitoring (coming soon).
+  
+  Core `webresearch` is now a pure SDK: pipeline engine, providers, events,
+  and entry-point discovery. The CLI has been removed — workflow packages
+  provide their own CLI. Workflows are installed as optional packages.
+
+- **CLI removed** — `webresearch/cli/` and the `typer` dependency removed from core.
+  Workflow packages (e.g., `webresearch-deep`) own their own CLI.
+
+- **Metadata entry points** — New `webresearch.workflows.metadata` entry-point group for
+  workflow descriptions. `load_workflow_entries()` discovers metadata from installed
+  packages with a fallback for workflows without metadata.
+
 - **Architecture rewrite** — The codebase was restructured following the plan in
   `ARCHITECTURE_PLAN.md`. Key changes:
 

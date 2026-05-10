@@ -37,7 +37,7 @@ uv run pre-commit run -a
 
 ## Adding a Workflow
 
-See [ARCHITECTURE.md](ARCHITECTURE.md#adding-a-new-workflow).
+Workflows are maintained as separate pip packages. See [ARCHITECTURE.md](ARCHITECTURE.md#adding-a-new-workflow) for the structure and [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep) for a complete example.
 
 ## Project Conventions
 

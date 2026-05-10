@@ -6,8 +6,7 @@ Web Research is built with a strictly layered architecture to ensure that workfl
 
 | Layer | Responsibility | Key Files |
 |-------|----------------|-----------|
-| **CLI** | User interface, input parsing, formatting output. | `cli/` |
-| **Workflows** | High-level research logic and pipeline definitions. | `workflows/` |
+| **Workflows** | High-level research logic and pipeline definitions (external packages). | `workflows/__init__.py` (loader) |
 | **Pipeline Engine** | Orchestrates step execution, hooks, loops, and events. | `pipeline/` |
 | **Context** | Maintains state: pages, sources, evidence, and costs. | `context.py` |
 | **Providers** | Low-level I/O (Search, Fetch, Extract). | `providers/` |
@@ -47,4 +46,4 @@ The system emits detailed events for every significant action:
 - `ToolCallStarted` / `ToolCallCompleted`
 - `TextDelta` (for streaming answers)
 
-These events are used by the CLI to show progress and are saved to `.jsonc` logs for debugging.
+These events can be consumed in real time (e.g., by a CLI or UI) and saved to `.jsonc` logs via `JSONCWriter` for debugging.

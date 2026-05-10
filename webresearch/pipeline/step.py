@@ -1,3 +1,13 @@
+"""Pipeline step types.
+
+Defines the four step primitives that workflows compose into a pipeline:
+
+* :class:`AgentStep` — single LLM agent call.
+* :class:`Parallel` — run multiple agents concurrently.
+* :class:`FanOut` — run one agent per item in a dynamic list.
+* :class:`Loop` — repeat steps until a condition is met.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -14,6 +24,19 @@ if TYPE_CHECKING:
 
 @dataclass
 class AgentStep:
+    """A single LLM agent step in a pipeline.
+
+    Parameters:
+        name: Unique step identifier (used in ``state.outputs``).
+        prompt: Jinja2 template string rendered with pipeline state.
+        output_type: Pydantic model for structured output parsing.
+        tools: List of ``function_tool``-decorated async functions.
+        pre_hook: Called before execution; can return ``SKIP``.
+        post_hook: Called after execution; can return ``REPEAT``.
+        max_turns: Maximum LLM turns (tool calls + responses).
+        strict_schema: Whether to enforce strict JSON schema on output.
+    """
+
     name: str
     prompt: str
     output_type: type[BaseModel]
@@ -26,17 +49,36 @@ class AgentStep:
 
 @dataclass
 class Parallel:
+    """Run multiple :class:`AgentStep` instances concurrently.
+
+    All steps must complete before the pipeline continues.
+    """
+
     steps: list[AgentStep]
 
 
 @dataclass
 class FanOut:
+    """Run one agent per item in a dynamic list.
+
+    ``over`` is a callable that receives :class:`PipelineState` and returns
+    a list of items.  One agent instance is launched per item; all run
+    concurrently.  Results are collected into a list under the step name.
+    """
+
     step: AgentStep
     over: Callable[[PipelineState], list[Any]]
 
 
 @dataclass
 class Loop:
+    """Repeat a sequence of steps until a condition is met.
+
+    ``until`` is called after every iteration.  When it returns ``True``
+    the loop exits.  ``max_iterations`` defaults to
+    ``input.depth.max_rounds`` if not set.
+    """
+
     steps: list[AgentStep]
     until: Callable[[PipelineState], bool]
     max_iterations: int | None = None

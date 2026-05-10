@@ -44,6 +44,18 @@ _jinja.filters["tojson"] = lambda v, indent=None: json.dumps(
 
 
 class Pipeline:
+    """Orchestrates a sequence of pipeline steps against a :class:`WorkflowInput`.
+
+    Steps can be :class:`AgentStep`, :class:`Parallel`, :class:`FanOut`, or
+    :class:`Loop`.  The pipeline renders Jinja2 prompts, manages hooks,
+    accumulates cost/tokens, and emits lifecycle events.
+
+    Parameters:
+        steps: Ordered list of step definitions.
+        final_output_key: Key in ``state.outputs`` that holds the final answer.
+        workflow_id: Identifier used in result metadata.
+    """
+
     def __init__(
         self,
         steps: list[PipelineStep],

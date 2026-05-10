@@ -1,6 +1,6 @@
 # Product Overview
 
-**Web Research** is a powerful Python framework and CLI tool designed to perform deep, automated research using Large Language Models (LLMs) and real-time web access.
+**Web Research** is a Python SDK for building LLM-powered web research agents with real-time web access.
 
 ## What it does
 
@@ -14,14 +14,10 @@ Web Research automates the tedious parts of gathering information from the web. 
 ## Key Use Cases
 
 ### 1. Deep Topic Research
-Perfect for broad questions like "What are the latest trends in AI agents?" or "Summarize the current state of Node.js LTS." The `deep` workflow handles multi-step research, reviewing its own work to find and fix gaps.
+Perfect for broad questions like "What are the latest trends in AI agents?" or "Summarize the current state of Node.js LTS." The `deep` workflow (install via [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep)) handles multi-step research, reviewing its own work to find and fix gaps.
 
 ### 2. Technical Due Diligence
-Specifically designed for evaluating technical products or companies. It can:
-- Select high-value URLs (docs, changelogs, security pages).
-- Extract specific technical claims.
-- Research evidence for those claims.
-- Provide a substance review and a final structured memo.
+Evaluate technical products or companies by extracting claims, researching evidence, and producing structured diligence reports. Available as a separate workflow package.
 
 ### 3. Automated Monitoring
 Track company news or specific topics by running workflows on a schedule (e.g., via GitHub Actions).

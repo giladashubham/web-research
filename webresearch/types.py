@@ -1,3 +1,10 @@
+"""Core type contracts for web research workflows.
+
+Defines the :class:`WorkflowInput` → :class:`WorkflowResult` contract that every
+workflow must satisfy, along with supporting types for depth configuration,
+source tracking, evidence collection, and cost metadata.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
@@ -58,6 +65,8 @@ class Depth(WebResearchModel):
 
 
 class WorkflowInput(WebResearchModel):
+    """Input contract that every workflow entry point must accept."""
+
     query: str = Field(min_length=1)
     instructions: str | None = None
     depth: Depth = Field(default_factory=lambda: Depth.for_preset("standard"))
@@ -173,6 +182,8 @@ WorkflowArtifact = Annotated[
 
 
 class WorkflowResult(WebResearchModel):
+    """Output contract that every workflow entry point must return."""
+
     answer_markdown: str
     structured_data: dict[str, object] | None = None
     summary: str

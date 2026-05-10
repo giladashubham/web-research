@@ -1,3 +1,9 @@
+"""HTML content extraction via trafilatura.
+
+:class:`ExtractProvider` extracts readable text from fetched HTML pages
+and registers the result as an evidence artifact.
+"""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -17,6 +23,8 @@ MAX_EXTRACTED_CHARS = 8000
 
 
 class ExtractResult(BaseModel):
+    """Result of extracting readable text from a fetched page."""
+
     model_config = ConfigDict(extra="forbid")
 
     url: str

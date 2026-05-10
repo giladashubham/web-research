@@ -10,12 +10,11 @@ abstraction layer so the underlying runtime can be swapped without touching work
   `FanOut`, and `Loop` steps. The pipeline owns all execution mechanics (hooks, parallelism,
   loop control, event emission, cost tracking).
 - **Entry-point workflow discovery** — Workflows are registered via Python entry points.
-  Adding a new workflow requires zero changes outside the workflow's own folder.
-- **Two built-in workflows:**
-  - **`deep`** — Planner → parallel research (official/recent/broad) → review → gap loop → answer.
-  - **`technical_due_diligence`** — Intake planning, URL selection, claim extraction, evidence
-    research, substance review with gap loop, final memo with structured report validated
-    against a JSON Schema.
+  Adding a new workflow requires zero changes to this package. Just install its pip package.
+- **Pluggable workflows** — Workflows ship as separate pip-installable packages:
+  - [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep) — Planner → parallel research (official/recent/broad) → review → gap loop → answer.
+  - `webresearch-tdd` (coming soon) — Technical due diligence with claim extraction, evidence research, and structured reports.
+  - `webresearch-company-news` (coming soon) — Multi-channel company news monitoring.
 - **Provider layer** — Raw I/O adapters for web search (Tavily/mock), HTTP fetching, HTML
   extraction (trafilatura), and URL discovery (sitemap + link parsing). No LLM concepts.
 - **Runtime isolation** — Only `pipeline/runtime.py` imports from the LLM framework.
@@ -46,60 +45,16 @@ WEBRESEARCH_URL_SELECTOR_MODEL=gpt-4.1-mini
 Environment variables are loaded from `.env` automatically. Values already set in your
 shell take precedence.
 
-## CLI
+## Usage
 
-List available workflows:
-
-```sh
-uv run webresearch list
-```
-
-Run the deep workflow:
-
-```sh
-uv run webresearch run "What is the current Node.js LTS version?"
-```
-
-Choose a workflow and depth:
-
-```sh
-uv run webresearch run "Compare Python 3.13 migration risks" deep --depth deep
-uv run webresearch run "Summarize the latest Django release" quick --depth quick
-```
-
-Run technical due diligence:
-
-```sh
-uv run webresearch run \
-  "Evaluate ProductX for technical diligence. URLs: https://productx.com/docs. Competitors: ACME, Contoso." \
-  technical_due_diligence \
-  --format json \
-  --out diligence.json
-```
-
-Output formats:
-
-```sh
-uv run webresearch run "What changed in Python 3.13?" --format md --out answer.md
-uv run webresearch run "What changed in Python 3.13?" --format json --out answer.json
-```
-
-Useful options:
-
-```sh
---instructions "Prefer official release notes"
---max-sources 8
---quiet
---events-out logs/my-run.jsonc
-```
+`webresearch` is an SDK. Workflow packages (like [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep)) provide their own CLI or you call the API directly.
 
 ### Event Logs
 
-Every run automatically captures observable events (agent calls, tool interactions, warnings, etc.)
-into a `.jsonc` file. This is useful for debugging and diligence review without cluttering
-the final result output.
+Run observers can capture observable events (agent calls, tool interactions, warnings, etc.)
+to `.jsonc` files via `webresearch.events.jsonc_writer.JSONCWriter`. Useful for
+debugging and diligence review without cluttering the final result output.
 
-- **Default location:** `.web-research/logs/run_<id>.jsonc`
 - **What is captured:** Workflow/Step/Agent lifecycle, Tool calls (redacted), Tool results (truncated), output deltas.
 - **Privacy:** Hidden model chain-of-thought is **not** captured.
 
@@ -109,11 +64,14 @@ the final result output.
 import asyncio
 from webresearch import run_workflow
 from webresearch.types import WorkflowInput
-from webresearch.workflows.deep import run_deep
+from webresearch.workflows import load_workflows
 
 async def main() -> None:
+    workflows = load_workflows()
+    deep = workflows["deep"]  # discovered via entry points
+
     result = await run_workflow(
-        run_deep,
+        deep,
         WorkflowInput(query="What is the current Node.js LTS version?"),
     )
     print(result.answer_markdown)
@@ -125,10 +83,12 @@ For streaming progress:
 
 ```python
 from webresearch import stream_workflow
-from webresearch.workflows.deep import run_deep
+from webresearch.workflows import load_workflows
 from webresearch.types import WorkflowInput
 
-async for event in stream_workflow(run_deep, WorkflowInput(query="Research query")):
+workflows = load_workflows()
+
+async for event in stream_workflow(workflows["deep"], WorkflowInput(query="Research query")):
     print(event.kind)
 ```
 
@@ -161,37 +121,12 @@ webresearch/
     registry.py        ← SourceRegistry (stable src_* IDs, fetch status)
     url_normalize.py   ← URL normalization (scheme, host, port, tracking params)
 
-  cli/                 ← Typer CLI
-    __init__.py        ← app, commands
-    run_cmd.py         ← run command
-    list_cmd.py        ← list command
-    progress.py        ← ProgressRenderer
-    formats.py         ← Output formatting (JSON, Markdown)
-
   context.py           ← WorkflowContext (pages, sources, evidence, cost)
   types.py             ← Core contracts (WorkflowInput, WorkflowResult, Depth, etc.)
   env.py               ← Environment / .env loading
 
-  workflows/           ← Workflow packages, discovered via entry points
+  workflows/           ← Entry-point loader (no workflows shipped here)
     __init__.py        ← load_workflows(), load_workflow_entries()
-    deep/              ← Deep research workflow
-      agents.py        ← AgentStep definitions
-      tools.py         ← function_tool wrappers
-      pipeline.py      ← Pipeline declaration
-      models.py        ← Output models
-      config.py        ← Workflow config
-      workflow.py      ← run_deep() entry point
-      prompts/         ← .j2 Jinja2 templates
-    technical_due_diligence/
-      agents.py        ← AgentStep definitions + hooks
-      tools.py         ← function_tool wrappers
-      pipeline.py      ← Pipeline declaration
-      models.py        ← Output models + UrlsByCategory
-      config.py        ← Workflow config
-      workflow.py      ← run_technical_due_diligence() entry point
-      prompts/         ← .j2 Jinja2 templates
-      schema.json      ← JSON Schema for structured report output
-      examples/        ← Example input/output
 ```
 
 ## Architecture
@@ -203,14 +138,14 @@ webresearch/
 | `providers/` | Raw HTTP calls, API responses, HTML extraction | LLM concepts, tools, prompts |
 | `pipeline/` | Step execution, hooks, loops, events, cost, result build | Workflow logic, prompt content |
 | `pipeline/runtime.py` | LLM framework imports, agent construction | Everything else |
-| `events/` | Event types, sink, streaming to CLI | Workflow logic |
+| `events/` | Event types, sink, streaming to consumers | Workflow logic |
 | `context.py` | Page cache, source registry, evidence list | Execution, providers, LLM |
 | `types.py` | `WorkflowInput` / `WorkflowResult` contract | Workflow-specific types |
-| `workflow/*/tools.py` | function_tool wrappers + workflow-tuned docstrings | Provider implementation |
-| `workflow/*/agents.py` | AgentStep definitions + hook logic | LLM framework, Runner |
-| `workflow/*/pipeline.py` | Step sequence declaration | Hook logic, execution |
-| `workflow/*/workflow.py` | `run()` entry point | Everything (delegates to Pipeline) |
-| `cli/` | Workflow discovery, input parsing, output formatting | Workflow internals |
+| `workflow/*/tools.py` | function_tool wrappers + workflow-tuned docstrings (in external packages) | Provider implementation |
+| `workflow/*/agents.py` | AgentStep definitions + hook logic (in external packages) | LLM framework, Runner |
+| `workflow/*/pipeline.py` | Step sequence declaration (in external packages) | Hook logic, execution |
+| `workflow/*/workflow.py` | `run()` entry point (in external packages) | Everything (delegates to Pipeline) |
+
 
 ### Pipeline step types
 
@@ -229,19 +164,34 @@ Cost flows through two channels simultaneously:
    counts. `pipeline/runner.py` accumulates these into `state.context.cost_usd`,
    `input_tokens`, `output_tokens`. Final `WorkflowResult.metadata` reads from here.
 2. **Event emission** — Each `StepCompleted` event carries `cost_usd`, `input_tokens`,
-   `output_tokens` for real-time CLI display.
+   `output_tokens` for real-time display in consumers (CLI, UI, logs).
 
 ### Adding a new workflow
 
-1. Create `webresearch/workflows/my_workflow/` with `workflow.py`, `agents.py`,
-   `tools.py`, `pipeline.py`, `models.py`, `config.py`, and `prompts/`.
-2. In `workflow.py`, expose an async `run_my_workflow(input: WorkflowInput) -> WorkflowResult`.
-3. Add an entry point in `pyproject.toml`:
+Workflows live in their own pip packages. To create one:
+
+1. Create a new Python package (e.g., `webresearch-my-workflow/`).
+2. Add `webresearch` as a dependency in your `pyproject.toml`.
+3. Create the workflow files under your package (use `src/webresearch/workflows/my_workflow/`
+   for namespace-package compatibility):
+   - `workflow.py` — async `run_my_workflow(input: WorkflowInput) -> WorkflowResult`
+   - `agents.py` — `AgentStep` definitions
+   - `tools.py` — `function_tool` wrappers around providers
+   - `pipeline.py` — `Pipeline([...])` declaration
+   - `models.py` — Pydantic output models
+   - `config.py` — Workflow configuration
+   - `prompts/*.j2` — Jinja2 prompt templates
+4. Register the workflow and its metadata via entry points:
    ```toml
    [project.entry-points."webresearch.workflows"]
    my_workflow = "webresearch.workflows.my_workflow.workflow:run_my_workflow"
+
+   [project.entry-points."webresearch.workflows.metadata"]
+   my_workflow = "webresearch.workflows.my_workflow:get_metadata"
    ```
-No other changes needed. The CLI discovers it automatically.
+5. Publish your package. Anyone who installs it gets the workflow auto-discovered.
+
+See [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep) for a complete example.
 
 ## Development
 
@@ -267,6 +217,5 @@ Key runtime dependencies:
 - `trafilatura` — HTML content extraction
 - `jinja2` — Prompt template rendering
 - `pydantic` — Data validation and schema enforcement
-- `typer` — CLI framework
 - `python-dotenv` — Environment file loading
 - `defusedxml` — Safe XML parsing for sitemaps

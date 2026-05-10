@@ -5,6 +5,7 @@ Web Research is designed to be easily extended with new workflows or by integrat
 ## Running Workflows from Python
 
 You can run any registered workflow using the `run_workflow` or `stream_workflow` functions.
+Workflows are discovered via entry points — install a workflow package and call `load_workflows()`.
 
 ### Simple Run
 
@@ -12,11 +13,14 @@ You can run any registered workflow using the `run_workflow` or `stream_workflow
 import asyncio
 from webresearch import run_workflow
 from webresearch.types import WorkflowInput
-from webresearch.workflows.deep import run_deep
+from webresearch.workflows import load_workflows
 
 async def main():
+    workflows = load_workflows()
+    deep = workflows["deep"]
+
     result = await run_workflow(
-        run_deep,
+        deep,
         WorkflowInput(query="What is the latest version of Python?")
     )
     print(f"Answer: {result.answer_markdown}")
@@ -31,12 +35,13 @@ For real-time feedback (like in a UI or CLI), use `stream_workflow`:
 
 ```python
 from webresearch import stream_workflow
-from webresearch.workflows.deep import run_deep
+from webresearch.workflows import load_workflows
 from webresearch.types import WorkflowInput
 
 async def stream_example():
+    workflows = load_workflows()
     input = WorkflowInput(query="Research AI Trends")
-    async for event in stream_workflow(run_deep, input):
+    async for event in stream_workflow(workflows["deep"], input):
         if event.kind == "text_delta":
             print(event.delta, end="", flush=True)
         elif event.kind == "step_completed":
@@ -47,12 +52,23 @@ asyncio.run(stream_example())
 
 ## Adding a New Workflow
 
-1. **Package**: Create `webresearch/workflows/my_new_workflow/`.
-2. **Define State**: Use `BaseModel` to define your input/output shapes in `models.py`.
-3. **Draft Prompts**: Place `.j2` templates in `prompts/`.
-4. **Build Pipeline**: In `pipeline.py`, define the sequence of `AgentStep`s.
-5. **Entry Point**: In `workflow.py`, create the `run` function that calls `Pipeline.run()`.
-6. **Register**: Add to `pyproject.toml` under `[project.entry-points."webresearch.workflows"]`.
+Workflows ship as separate pip packages. No changes to the core `webresearch` package needed.
+
+1. **Create a package**: A new Python package (e.g., `webresearch-my-workflow/`).
+2. **Add dependency**: Add `webresearch` as a dependency in your `pyproject.toml`.
+3. **Namespace layout**: Place workflow files under `src/webresearch/workflows/my_new_workflow/`.
+4. **Define State**: Use `BaseModel` to define your input/output shapes in `models.py`.
+5. **Draft Prompts**: Place `.j2` templates in `prompts/`.
+6. **Build Pipeline**: In `pipeline.py`, define the sequence of `AgentStep`s.
+7. **Entry Point**: In `workflow.py`, create the `run` function that calls `Pipeline.run()`.
+8. **Register**: Add to your `pyproject.toml`:
+   ```toml
+   [project.entry-points."webresearch.workflows"]
+   my_new_workflow = "webresearch.workflows.my_new_workflow.workflow:run_my_workflow"
+
+   [project.entry-points."webresearch.workflows.metadata"]
+   my_new_workflow = "webresearch.workflows.my_new_workflow:get_metadata"
+   ```
 
 ## Using Providers Independently
 

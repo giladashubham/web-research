@@ -1,28 +1,35 @@
 [project]
 name = "webresearch"
 version = "0.1.0"
-description = "A Python CLI and TUI web research runner built on agent workflows."
+description = "Python SDK for LLM-powered web research workflows."
 readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Web Research contributors" },
+]
 requires-python = ">=3.12"
+keywords = ["web-research", "llm", "agents", "research", "pipeline"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "defusedxml>=0.7.1",
     "httpx>=0.28.1",
     "jinja2>=3.1.0",
-    "jsonschema>=4.26.0",
     "openai-agents==0.6.1",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.2",
     "trafilatura>=2.0.0",
-    "typer>=0.25.1",
 ]
-
-[project.scripts]
-webresearch = "webresearch.cli:app"
-
-[project.entry-points."webresearch.workflows"]
-deep = "webresearch.workflows.deep.workflow:run_deep"
-technical_due_diligence = "webresearch.workflows.technical_due_diligence.workflow:run_technical_due_diligence"
-company_news = "webresearch.workflows.company_news.workflow:run_company_news"
 
 [dependency-groups]
 dev = [
@@ -36,6 +43,11 @@ dev = [
     "ruff>=0.14.8",
     "types-jsonschema>=4.26.0.20260408",
 ]
+
+[project.urls]
+Homepage = "https://github.com/shubham/web-research"
+Repository = "https://github.com/shubham/web-research"
+Issues = "https://github.com/shubham/web-research/issues"
 
 [build-system]
 requires = ["hatchling>=1.27.0"]
@@ -102,14 +114,6 @@ module = "webresearch.events.types"
 disallow_any_explicit = false
 
 [[tool.mypy.overrides]]
-module = "webresearch.workflows.technical_due_diligence.models"
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
-module = "webresearch.workflows.company_news.models"
-disallow_any_explicit = false
-
-[[tool.mypy.overrides]]
 module = [
     "webresearch.pipeline",
     "webresearch.pipeline.state",
@@ -122,20 +126,6 @@ module = [
     "webresearch.providers.discover",
     "webresearch.providers.services",
     "webresearch.workflows",
-    "webresearch.workflows.deep.models",
-    "webresearch.workflows.deep.tools",
-    "webresearch.workflows.deep.agents",
-    "webresearch.workflows.deep.pipeline",
-    "webresearch.workflows.deep.workflow",
-    "webresearch.workflows.technical_due_diligence.agents",
-    "webresearch.workflows.technical_due_diligence.pipeline",
-    "webresearch.workflows.technical_due_diligence.tools",
-    "webresearch.workflows.technical_due_diligence.workflow",
-    "webresearch.workflows.company_news.agents",
-    "webresearch.workflows.company_news.pipeline",
-    "webresearch.workflows.company_news.tools",
-    "webresearch.workflows.company_news.workflow",
-    "webresearch.cli.run_cmd",
 ]
 disallow_any_explicit = false
 

@@ -6,42 +6,27 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from webresearch.types import WorkflowFn
 
 
 class WorkflowEntry(BaseModel):
+    """Metadata for a workflow, discoverable via entry points."""
+
     model_config = ConfigDict(extra="forbid")
     id: str
     name: str
     description: str
 
 
-_WORKFLOW_METADATA: dict[str, WorkflowEntry] = {
-    "deep": WorkflowEntry(
-        id="deep",
-        name="Deep",
-        description="Higher-budget deep research with parallel lanes and gap loop.",
-    ),
-    "technical_due_diligence": WorkflowEntry(
-        id="technical_due_diligence",
-        name="Technical Due Diligence",
-        description=(
-            "Public technical claims, release activity, competitors, and code-review follow-ups."
-        ),
-    ),
-    "company_news": WorkflowEntry(
-        id="company_news",
-        name="Company News",
-        description=(
-            "Recent news about a company: leadership changes, funding, product updates, "
-            "M&A, and anything else notable within a configurable time window."
-        ),
-    ),
-}
+_WORKFLOW_GROUP = "webresearch.workflows"
+_METADATA_GROUP = "webresearch.workflows.metadata"
 
 
 def load_workflows() -> dict[str, WorkflowFn]:
-    eps = entry_points(group="webresearch.workflows")
+    """Discover and load all installed workflows via entry points."""
+    eps = entry_points(group=_WORKFLOW_GROUP)
     result: dict[str, WorkflowFn] = {}
     for ep in eps:
         loaded = ep.load()
@@ -50,10 +35,30 @@ def load_workflows() -> dict[str, WorkflowFn]:
 
 
 def load_workflow_entries() -> list[WorkflowEntry]:
-    eps = entry_points(group="webresearch.workflows")
-    entries: list[WorkflowEntry] = []
-    for ep in eps:
-        meta = _WORKFLOW_METADATA.get(ep.name)
-        if meta is not None:
-            entries.append(meta)
-    return entries
+    """Collect metadata for all installed workflows.
+
+    Reads from the ``webresearch.workflows.metadata`` entry-point group.
+    Each entry must point to a zero-argument callable that returns a
+    :class:`WorkflowEntry`.  Workflows registered in ``webresearch.workflows``
+    that lack a metadata entry receive a minimal fallback entry.
+    """
+    entries_by_id: dict[str, WorkflowEntry] = {}
+
+    # Preferred: dedicated metadata entry points.
+    meta_eps = entry_points(group=_METADATA_GROUP)
+    for ep in meta_eps:
+        factory: Callable[[], WorkflowEntry] = ep.load()
+        entry = factory()
+        entries_by_id[entry.id] = entry
+
+    # Fallback: any workflow entry point without metadata.
+    wf_eps = entry_points(group=_WORKFLOW_GROUP)
+    for ep in wf_eps:
+        if ep.name not in entries_by_id:
+            entries_by_id[ep.name] = WorkflowEntry(
+                id=ep.name,
+                name=ep.name.replace("_", " ").title(),
+                description="",
+            )
+
+    return list(entries_by_id.values())
