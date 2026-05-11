@@ -45,9 +45,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/shubham/web-research"
-Repository = "https://github.com/shubham/web-research"
-Issues = "https://github.com/shubham/web-research/issues"
+Homepage = "https://github.com/kodepo-com/web-research"
+Repository = "https://github.com/kodepo-com/web-research"
+Issues = "https://github.com/kodepo-com/web-research/issues"
 
 [build-system]
 requires = ["hatchling>=1.27.0"]

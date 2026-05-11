@@ -27,6 +27,6 @@ To add your own, see the [API & Extension Guide](api/extension_guide.md).
 ---
 
 ## Quick Links
-- [GitHub Repository](https://github.com/shubham/web-research)
+- [GitHub Repository](https://github.com/kodepo-com/web-research)
 - [README](../../README.md)
 - [Architecture Details](../../ARCHITECTURE.md)
