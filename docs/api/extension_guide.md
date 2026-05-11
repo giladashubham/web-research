@@ -76,17 +76,20 @@ You can use the low-level providers without the pipeline:
 
 ```python
 from webresearch.providers.search import TavilySearchProvider
-from webresearch.providers.fetch import HttpFetchProvider
-from webresearch.providers.extract import TrafilaturaExtractProvider
+from webresearch.providers.fetch import FetchProvider
+from webresearch.providers.extract import ExtractProvider
+from webresearch.context import WorkflowContext
+
+ctx = WorkflowContext()
 
 # Search
 search = TavilySearchProvider()
 results = await search.search("Python 3.13")
 
 # Fetch & Extract
-fetcher = HttpFetchProvider()
-extractor = TrafilaturaExtractProvider()
+fetcher = FetchProvider()
+extractor = ExtractProvider()
 
-page_content = await fetcher.fetch(results[0].url)
-text = extractor.extract(page_content.html)
+fetch_result = await fetcher.fetch(ctx, results[0].url)
+text = await extractor.extract(ctx, fetch_result.url)
 ```

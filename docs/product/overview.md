@@ -4,7 +4,7 @@
 
 ## What it does
 
-Web Research automates the tedious parts of gathering information from the web. Instead of manually searching, clicking links, and summarizing, you can define high-level research goals, and the system will:
+Web Research provides the building blocks to automate web research. Define high-level research goals and the pipeline engine will:
 1. **Plan** the research strategy.
 2. **Search** for relevant sources.
 3. **Extract** content from web pages.
@@ -17,7 +17,7 @@ Web Research automates the tedious parts of gathering information from the web. 
 Perfect for broad questions like "What are the latest trends in AI agents?" or "Summarize the current state of Node.js LTS." The `deep` workflow (install via [`webresearch-deep`](https://github.com/kodepo-com/web-research-deep)) handles multi-step research, reviewing its own work to find and fix gaps.
 
 ### 2. Technical Due Diligence
-Evaluate technical products or companies by extracting claims, researching evidence, and producing structured diligence reports. Available as a separate workflow package.
+Evaluate technical products or companies by extracting claims, researching evidence, and producing structured diligence reports. Available as a separate workflow package (see `workflows-archive`).
 
 ### 3. Automated Monitoring
 Track company news or specific topics by running workflows on a schedule (e.g., via GitHub Actions).

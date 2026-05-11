@@ -1,6 +1,6 @@
 # Web Research
 
-A Python CLI and library for running LLM-powered web research workflows. Built on the
+A Python SDK for running LLM-powered web research workflows. Built on the
 [OpenAI Agents SDK](https://github.com/openai/openai-agents-python) with a clean
 abstraction layer so the underlying runtime can be swapped without touching workflow code.
 
