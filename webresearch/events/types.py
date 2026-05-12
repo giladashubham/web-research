@@ -25,6 +25,11 @@ class WorkflowStarted(EventModel):
 class WorkflowCompleted(EventModel):
     kind: Literal["workflow_completed"] = "workflow_completed"
     workflow_id: str
+    cost_usd: float | None = None
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    cached_tokens: int | None = None
+    model: str | None = None
 
 
 class WorkflowFailed(EventModel):
@@ -44,6 +49,8 @@ class StepCompleted(EventModel):
     cost_usd: float | None = None
     input_tokens: int | None = None
     output_tokens: int | None = None
+    cached_tokens: int | None = None
+    model: str | None = None
 
 
 class StepSkipped(EventModel):

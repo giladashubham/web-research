@@ -36,9 +36,11 @@ def test_execution_result_holds_values() -> None:
         output={"key": "value"},
         input_tokens=100,
         output_tokens=50,
+        cached_tokens=20,
         model="gpt-4.1-mini",
     )
     assert result.output == {"key": "value"}
     assert result.input_tokens == 100
     assert result.output_tokens == 50
+    assert result.cached_tokens == 20
     assert result.model == "gpt-4.1-mini"

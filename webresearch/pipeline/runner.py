@@ -108,6 +108,7 @@ class Pipeline:
         )
         state.context.input_tokens += exec_result.input_tokens
         state.context.output_tokens += exec_result.output_tokens
+        state.context.cached_tokens += exec_result.cached_tokens
         state.context.cost_usd += step_cost
 
         await emit_step_completed(
@@ -115,6 +116,8 @@ class Pipeline:
             cost_usd=step_cost,
             input_tokens=exec_result.input_tokens,
             output_tokens=exec_result.output_tokens,
+            cached_tokens=exec_result.cached_tokens,
+            model=exec_result.model,
         )
 
         if step_def.post_hook:
@@ -151,6 +154,7 @@ class Pipeline:
                 )
                 state.context.input_tokens += exec_result.input_tokens
                 state.context.output_tokens += exec_result.output_tokens
+                state.context.cached_tokens += exec_result.cached_tokens
                 state.context.cost_usd += step_cost
 
             state.iteration_count[fan.step.name] = state.iteration_count.get(fan.step.name, 0) + 1
@@ -160,6 +164,8 @@ class Pipeline:
                 cost_usd=step_cost,
                 input_tokens=exec_result.input_tokens,
                 output_tokens=exec_result.output_tokens,
+                cached_tokens=exec_result.cached_tokens,
+                model=exec_result.model,
             )
 
             # post_hook with REPEAT support
@@ -251,6 +257,7 @@ def _build_result(
             tokens=TokenUsage(
                 input_tokens=state.context.input_tokens,
                 output_tokens=state.context.output_tokens,
+                cached_tokens=state.context.cached_tokens,
                 total_tokens=state.context.input_tokens + state.context.output_tokens,
             ),
         ),

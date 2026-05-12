@@ -33,11 +33,13 @@ class ExecutionResult:
         output: object,
         input_tokens: int,
         output_tokens: int,
+        cached_tokens: int,
         model: str,
     ) -> None:
         self.output = output
         self.input_tokens = input_tokens
         self.output_tokens = output_tokens
+        self.cached_tokens = cached_tokens
         self.model = model
 
 
@@ -72,12 +74,19 @@ async def execute(
     usage = result.raw_responses[-1].usage if result.raw_responses else None
     input_tokens = usage.input_tokens if usage else 0
     output_tokens = usage.output_tokens if usage else 0
+    cached_tokens = (
+        usage.input_tokens_details.cached_tokens if usage and usage.input_tokens_details else 0
+    )
+    model = (
+        getattr(result.raw_responses[-1], "model", "unknown") if result.raw_responses else "unknown"
+    )
 
     return ExecutionResult(
         output=result.final_output,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
-        model=getattr(agent, "model", None) or "default",
+        cached_tokens=cached_tokens,
+        model=model,
     )
 
 

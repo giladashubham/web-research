@@ -38,6 +38,7 @@ def _make_result(output: object) -> ExecutionResult:
         output=output,
         input_tokens=50,
         output_tokens=25,
+        cached_tokens=10,
         model="gpt-4.1-mini",
     )
 
@@ -394,6 +395,7 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
             output=FakeOutput(result="ok"),
             input_tokens=200,
             output_tokens=100,
+            cached_tokens=50,
             model="gpt-4.1",
         )
 

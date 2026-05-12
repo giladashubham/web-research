@@ -78,11 +78,13 @@ async def emit_output_text_delta(delta: str) -> None:
         await emit_event(OutputTextDelta(run_id=current_run_id(), delta=delta))
 
 
-async def emit_step_completed(
+async def emit_step_completed(  # noqa: PLR0913
     name: str,
     cost_usd: float | None = None,
     input_tokens: int | None = None,
     output_tokens: int | None = None,
+    cached_tokens: int | None = None,
+    model: str | None = None,
 ) -> None:
     await emit_event(
         StepCompleted(
@@ -91,6 +93,8 @@ async def emit_step_completed(
             cost_usd=cost_usd,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            cached_tokens=cached_tokens,
+            model=model,
         )
     )
 

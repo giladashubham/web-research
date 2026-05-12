@@ -31,16 +31,28 @@ async def stream_workflow(
         await queue.put(event)
 
     async def run_background() -> None:
+        result: WorkflowResult | None = None
         await emit(WorkflowStarted(run_id=run_id, workflow_id=workflow_id))
         try:
             async with event_context(run_id, emit):
-                await workflow_fn(input)
+                result = await workflow_fn(input)
         except asyncio.CancelledError:
             raise
         except Exception as exc:
             await emit(WorkflowFailed(run_id=run_id, workflow_id=workflow_id, error=str(exc)))
         else:
-            await emit(WorkflowCompleted(run_id=run_id, workflow_id=workflow_id))
+            metadata = getattr(result, "metadata", None) if result else None
+            tokens = getattr(metadata, "tokens", None) if metadata else None
+            await emit(
+                WorkflowCompleted(
+                    run_id=run_id,
+                    workflow_id=workflow_id,
+                    cost_usd=getattr(metadata, "cost_usd", None) if metadata else None,
+                    input_tokens=getattr(tokens, "input_tokens", None) if tokens else None,
+                    output_tokens=getattr(tokens, "output_tokens", None) if tokens else None,
+                    cached_tokens=getattr(tokens, "cached_tokens", None) if tokens else None,
+                )
+            )
         finally:
             await queue.put(None)
 

@@ -77,6 +77,7 @@ class WorkflowInput(WebResearchModel):
 class TokenUsage(WebResearchModel):
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+    cached_tokens: int = Field(default=0, ge=0)
     total_tokens: int = Field(default=0, ge=0)
 
 
