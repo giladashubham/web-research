@@ -1,15 +1,22 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 import pytest
 from pydantic import BaseModel
 
 from webresearch.pipeline.hooks import HookSignal
-from webresearch.pipeline.runner import Pipeline
+from webresearch.pipeline.runner import Pipeline, ResultBuilder
 from webresearch.pipeline.runtime import ExecutionResult
 from webresearch.pipeline.step import AgentStep, FanOut, Loop, Parallel
-from webresearch.types import Depth, WorkflowInput
+from webresearch.types import (
+    Depth,
+    TokenUsage,
+    WorkflowInput,
+    WorkflowMetadata,
+    WorkflowResult,
+)
 
 if TYPE_CHECKING:
     from webresearch.pipeline.state import PipelineState
@@ -43,6 +50,48 @@ def _make_result(output: object) -> ExecutionResult:
     )
 
 
+def _make_result_builder(
+    final_output_key: str = "writer",
+    workflow_id: str = "test",
+) -> ResultBuilder:
+    """Factory for a :class:`ResultBuilder` that pulls ``answer_markdown``
+    from the *final_output_key* step and wires up metadata from pipeline state.
+
+    This mirrors the old ``_build_result`` behaviour for use in tests that
+    target the pipeline engine rather than a specific workflow.
+    """
+
+    def builder(state: PipelineState) -> WorkflowResult:
+        final = state.outputs.get(final_output_key)
+        if final is None:
+            msg = f"Final output key '{final_output_key}' not found in state outputs"
+            raise ValueError(msg)
+        return WorkflowResult(
+            answer_markdown=getattr(final, "answer_markdown", ""),
+            structured_data=getattr(final, "structured_data", None),
+            summary="",
+            sources=list(state.context.sources.list()),
+            evidence=list(state.context.evidence),
+            artifacts=[*state.context.artifacts],
+            warnings=[*state.warnings, *state.context.warnings],
+            metadata=WorkflowMetadata(
+                run_id=state.run_id,
+                workflow_id=workflow_id,
+                started_at=state.started_at,
+                finished_at=datetime.now(UTC),
+                cost_usd=state.context.cost_usd,
+                tokens=TokenUsage(
+                    input_tokens=state.context.input_tokens,
+                    output_tokens=state.context.output_tokens,
+                    cached_tokens=state.context.cached_tokens,
+                    total_tokens=state.context.input_tokens + state.context.output_tokens,
+                ),
+            ),
+        )
+
+    return builder
+
+
 # ---------------------------------------------------------------------------
 # Sequential execution
 # ---------------------------------------------------------------------------
@@ -74,8 +123,7 @@ async def test_pipeline_runs_sequential_steps(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write {{ input.query }}", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="test"),
     )
 
     result = await pipeline.run(WorkflowInput(query="hello", depth=Depth.for_preset("quick")))
@@ -112,8 +160,7 @@ async def test_pipeline_runs_parallel_steps(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="parallel_test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="parallel_test"),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -155,8 +202,7 @@ async def test_pipeline_runs_fanout(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="fanout_test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="fanout_test"),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -191,8 +237,9 @@ async def test_fanout_collects_results(monkeypatch) -> None:
                 over=lambda _state: ["a", "b", "c"],
             ),
         ],
-        final_output_key="fan_step",
-        workflow_id="fanout_collect",
+        result_builder=_make_result_builder(
+            final_output_key="fan_step", workflow_id="fanout_collect"
+        ),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -230,8 +277,9 @@ async def test_fanout_with_pre_hook_skip(monkeypatch) -> None:
                 over=lambda _state: ["x", "y"],
             ),
         ],
-        final_output_key="skipped_fan",
-        workflow_id="fanout_skip",
+        result_builder=_make_result_builder(
+            final_output_key="skipped_fan", workflow_id="fanout_skip"
+        ),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -264,6 +312,45 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
 
     monkeypatch.setattr(f"{RUNTIME_MODULE}.execute", mock_execute)
 
+    def _loop_result_builder(state: PipelineState) -> WorkflowResult:
+        final = state.outputs.get("writer")
+        if final is None:
+            msg = "Final output key 'writer' not found in state outputs"
+            raise ValueError(msg)
+        # Collect summaries from loop history entries that carry a .summary attribute
+        summaries: list[str] = []
+        for key, output in state.outputs.items():
+            if key.startswith("_") and key.endswith("_history") and isinstance(output, list):
+                for hist_output in output:
+                    val = getattr(hist_output, "summary", None)
+                    if val:
+                        summaries.append(str(val))
+            else:
+                val = getattr(output, "summary", None)
+                if val:
+                    summaries.append(str(val))
+        return WorkflowResult(
+            answer_markdown=getattr(final, "answer_markdown", ""),
+            summary="\n".join(summaries) if summaries else "",
+            sources=list(state.context.sources.list()),
+            evidence=list(state.context.evidence),
+            artifacts=[*state.context.artifacts],
+            warnings=[*state.warnings, *state.context.warnings],
+            metadata=WorkflowMetadata(
+                run_id=state.run_id,
+                workflow_id="loop_test",
+                started_at=state.started_at,
+                finished_at=datetime.now(UTC),
+                cost_usd=state.context.cost_usd,
+                tokens=TokenUsage(
+                    input_tokens=state.context.input_tokens,
+                    output_tokens=state.context.output_tokens,
+                    cached_tokens=state.context.cached_tokens,
+                    total_tokens=state.context.input_tokens + state.context.output_tokens,
+                ),
+            ),
+        )
+
     pipeline = Pipeline(
         steps=[
             AgentStep(name="planner", prompt="plan", output_type=FakeOutput),
@@ -280,8 +367,7 @@ async def test_pipeline_runs_loop(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="loop_test",
+        result_builder=_loop_result_builder,
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("deep")))
@@ -324,8 +410,7 @@ async def test_agent_pre_hook_skip(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="skip_test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="skip_test"),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -367,8 +452,7 @@ async def test_agent_post_hook_repeat(monkeypatch) -> None:
             ),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="repeat_test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="repeat_test"),
     )
 
     result = await pipeline.run(
@@ -407,8 +491,7 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
             AgentStep(name="step2", prompt="s2", output_type=FakeOutput),
             AgentStep(name="writer", prompt="write", output_type=FakeFinal),
         ],
-        final_output_key="writer",
-        workflow_id="cost_test",
+        result_builder=_make_result_builder(final_output_key="writer", workflow_id="cost_test"),
     )
 
     result = await pipeline.run(WorkflowInput(query="test", depth=Depth.for_preset("quick")))
@@ -424,11 +507,11 @@ async def test_pipeline_tracks_cost_and_tokens(monkeypatch) -> None:
 
 
 # ---------------------------------------------------------------------------
-# _build_result raises on missing key
+# result_builder raises when the expected output key is missing
 # ---------------------------------------------------------------------------
 
 
-async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
+async def test_pipeline_result_builder_raises_on_missing_key(monkeypatch) -> None:
     async def mock_execute(
         _step: AgentStep, _prompt: str, _context: object, _tools: list[Any] | None = None
     ) -> ExecutionResult:
@@ -436,12 +519,18 @@ async def test_pipeline_missing_final_key_raises(monkeypatch) -> None:
 
     monkeypatch.setattr(f"{RUNTIME_MODULE}.execute", mock_execute)
 
+    def raising_builder(state: PipelineState) -> WorkflowResult:
+        final = state.outputs.get("missing_key")
+        if final is None:
+            msg = "Final output key 'missing_key' not found in state outputs"
+            raise ValueError(msg)
+        raise AssertionError("should not reach")
+
     pipeline = Pipeline(
         steps=[
             AgentStep(name="step1", prompt="s1", output_type=FakeOutput),
         ],
-        final_output_key="missing_key",
-        workflow_id="missing_test",
+        result_builder=raising_builder,
     )
 
     with pytest.raises(ValueError, match="not found in state outputs"):

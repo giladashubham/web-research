@@ -17,6 +17,9 @@ adding new workflows or swapping the LLM runtime.
    `Parallel`, `FanOut`, and `Loop` steps. The SDK owns all execution mechanics.
 4. **No prompt-building code** — Prompts are Jinja2 templates rendered with the full
    pipeline state. No Python function builds prompt strings.
+5. **Output-agnostic SDK** — The pipeline engine knows nothing about output shapes.
+   Each workflow provides its own `ResultBuilder` that maps `PipelineState` →
+   `WorkflowResult`. The SDK never reaches into step outputs.
 
 ---
 
@@ -87,8 +90,13 @@ For each step in Pipeline.steps:
                 for each step: _execute_agent
        │
        ▼
-_build_result(state, final_output_key) → WorkflowResult
+result_builder(state) → WorkflowResult
 ```
+
+The ``result_builder`` is a ``Callable[[PipelineState], WorkflowResult]`` supplied by
+the workflow.  It has full access to every step output, source, evidence note,
+artifact, warning, and cost accumulator in the state.  The pipeline itself never
+inspects or assumes anything about the shape of step outputs.
 
 ### Cost tracking
 

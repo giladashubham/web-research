@@ -112,19 +112,3 @@ async def patch_runner_for_streaming() -> AsyncIterator[None]:
     finally:
         Runner.run = original_run  # type: ignore[method-assign]
         Runner.run_streamed = original_run_streamed  # type: ignore[method-assign]
-
-
-def _dict_get(value: object, key: str) -> object | None:
-    if isinstance(value, dict):
-        return value.get(key)
-    return None
-
-
-def _attr(value: object, name: str) -> object | None:
-    return getattr(value, name, None)
-
-
-def _optional_str(value: object | None) -> str | None:
-    if value is None:
-        return None
-    return str(value)

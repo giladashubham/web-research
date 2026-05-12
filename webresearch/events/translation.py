@@ -54,7 +54,7 @@ async def translate_sdk_event(sdk_event: object) -> None:
 
     data = getattr(sdk_event, "data", None)
     delta = getattr(data, "delta", None)
-    if step == "output" and getattr(data, "type", None) == "response.output_text.delta" and delta:
+    if getattr(data, "type", None) == "response.output_text.delta" and delta:
         await emit_event(OutputTextDelta(run_id=current_run_id(), delta=str(delta)))
 
 

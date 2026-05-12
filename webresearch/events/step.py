@@ -74,7 +74,7 @@ async def emit_step_skipped(name: str, reason: str) -> None:
 
 
 async def emit_output_text_delta(delta: str) -> None:
-    if current_step() == "output" and delta:
+    if delta:
         await emit_event(OutputTextDelta(run_id=current_run_id(), delta=delta))
 
 
