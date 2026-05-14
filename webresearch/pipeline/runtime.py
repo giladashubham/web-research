@@ -20,12 +20,6 @@ if TYPE_CHECKING:
     from webresearch.context import WorkflowContext
     from webresearch.pipeline.step import AgentStep
 
-_COST_PER_1M: dict[str, dict[str, float]] = {
-    "gpt-4.1": {"input": 2.00, "output": 8.00},
-    "gpt-4.1-mini": {"input": 0.40, "output": 1.60},
-    "o4-mini": {"input": 1.10, "output": 4.40},
-}
-
 
 class ExecutionResult:
     def __init__(
@@ -34,13 +28,11 @@ class ExecutionResult:
         input_tokens: int,
         output_tokens: int,
         cached_tokens: int,
-        model: str,
     ) -> None:
         self.output = output
         self.input_tokens = input_tokens
         self.output_tokens = output_tokens
         self.cached_tokens = cached_tokens
-        self.model = model
 
 
 async def execute(
@@ -77,22 +69,13 @@ async def execute(
     cached_tokens = (
         usage.input_tokens_details.cached_tokens if usage and usage.input_tokens_details else 0
     )
-    model = (
-        getattr(result.raw_responses[-1], "model", "unknown") if result.raw_responses else "unknown"
-    )
 
     return ExecutionResult(
         output=result.final_output,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
         cached_tokens=cached_tokens,
-        model=model,
     )
-
-
-def calculate_cost(input_tokens: int, output_tokens: int, model: str) -> float:
-    rates = _COST_PER_1M.get(model, {"input": 0.0, "output": 0.0})
-    return (input_tokens * rates["input"] + output_tokens * rates["output"]) / 1_000_000
 
 
 @asynccontextmanager

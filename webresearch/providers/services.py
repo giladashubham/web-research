@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import AwareDatetime, BaseModel, ConfigDict
 
 from webresearch.events.step import emit_source_added
 from webresearch.providers.errors import SearchProviderError
@@ -65,6 +65,7 @@ class SearchService:
             title: str
             snippet: str
             publisher: str | None = None
+            published_at: AwareDatetime | None = None
 
         class SearchResults(BaseModel):
             model_config = ConfigDict(extra="forbid")
@@ -107,6 +108,7 @@ class SearchService:
                     title=provider_result.title,
                     snippet=provider_result.snippet,
                     publisher=provider_result.publisher,
+                    published_at=provider_result.published_at,
                 )
             )
 

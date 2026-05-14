@@ -37,7 +37,6 @@ class WorkflowContext:
     evidence: list[EvidenceNote] = field(default_factory=list)
     artifacts: list[Artifact] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
-    cost_usd: float = 0.0
     input_tokens: int = 0
     output_tokens: int = 0
     cached_tokens: int = 0

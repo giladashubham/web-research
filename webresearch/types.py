@@ -86,7 +86,6 @@ class WorkflowMetadata(WebResearchModel):
     workflow_id: str
     started_at: AwareDatetime
     finished_at: AwareDatetime | None = None
-    cost_usd: float | None = Field(default=None, ge=0)
     tokens: TokenUsage = Field(default_factory=TokenUsage)
 
 

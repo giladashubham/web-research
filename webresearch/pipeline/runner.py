@@ -19,7 +19,7 @@ from webresearch.events.step import (
     step,
 )
 from webresearch.pipeline.hooks import HookSignal
-from webresearch.pipeline.runtime import calculate_cost, execute
+from webresearch.pipeline.runtime import execute
 from webresearch.pipeline.state import PipelineState
 from webresearch.pipeline.step import AgentStep, FanOut, Loop, Parallel
 from webresearch.types import WorkflowResult
@@ -107,21 +107,15 @@ class Pipeline:
 
         state.outputs[step_def.name] = exec_result.output
         state.iteration_count[step_def.name] = state.iteration_count.get(step_def.name, 0) + 1
-        step_cost = calculate_cost(
-            exec_result.input_tokens, exec_result.output_tokens, exec_result.model
-        )
         state.context.input_tokens += exec_result.input_tokens
         state.context.output_tokens += exec_result.output_tokens
         state.context.cached_tokens += exec_result.cached_tokens
-        state.context.cost_usd += step_cost
 
         await emit_step_completed(
             step_def.name,
-            cost_usd=step_cost,
             input_tokens=exec_result.input_tokens,
             output_tokens=exec_result.output_tokens,
             cached_tokens=exec_result.cached_tokens,
-            model=exec_result.model,
         )
 
         if step_def.post_hook:
@@ -151,25 +145,17 @@ class Pipeline:
                 exec_result = await execute(fan.step, prompt, state.context)
                 results.append(exec_result.output)
 
-                step_cost = calculate_cost(
-                    exec_result.input_tokens,
-                    exec_result.output_tokens,
-                    exec_result.model,
-                )
                 state.context.input_tokens += exec_result.input_tokens
                 state.context.output_tokens += exec_result.output_tokens
                 state.context.cached_tokens += exec_result.cached_tokens
-                state.context.cost_usd += step_cost
 
             state.iteration_count[fan.step.name] = state.iteration_count.get(fan.step.name, 0) + 1
 
             await emit_step_completed(
                 fan.step.name,
-                cost_usd=step_cost,
                 input_tokens=exec_result.input_tokens,
                 output_tokens=exec_result.output_tokens,
                 cached_tokens=exec_result.cached_tokens,
-                model=exec_result.model,
             )
 
             # post_hook with REPEAT support

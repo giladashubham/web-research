@@ -47,7 +47,6 @@ async def stream_workflow(
                 WorkflowCompleted(
                     run_id=run_id,
                     workflow_id=workflow_id,
-                    cost_usd=getattr(metadata, "cost_usd", None) if metadata else None,
                     input_tokens=getattr(tokens, "input_tokens", None) if tokens else None,
                     output_tokens=getattr(tokens, "output_tokens", None) if tokens else None,
                     cached_tokens=getattr(tokens, "cached_tokens", None) if tokens else None,
